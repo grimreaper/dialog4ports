@@ -21,7 +21,7 @@ CFLAGS += -Wmissing-format-attribute
 #CFLAGS += -Wlogical-op -Wnormalized=nfc
 CFLAGS += -Wimport -Wunused-macros
 
-CFLAGS += -lncurses
+CFLAGS += -lmenu -lncurses 
 
 #-Wunreachable-code is disabled for way too many false postives
 

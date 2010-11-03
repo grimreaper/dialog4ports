@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <curses.h>
-
+#include <menu.h>
 
 struct list_el {
 	char *name;
