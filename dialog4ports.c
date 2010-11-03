@@ -24,44 +24,50 @@ int main(int argc, char* argv[])
 
 	for (int arg=1; arg < argc; ++arg)
 	{
-		char *token;
-		bool gotName = false;
-		while ((token = strsep(&(argv[arg]), " \t")) != NULL)
+		curr = (item *)malloc(sizeof(item));
+		if (!head)
 		{
-			curr = (item *)malloc(sizeof(item));
-			if (!head)
-			{
-				head = curr;
-			}
-			if (prev)
-			{
-				prev->next = curr;
-			}
-			char *internal_token;
-			while((internal_token = strsep(&token, "=")) != NULL)
-			{
-				if (!gotName)
-				{
-					printf("Setting name to %s\n", internal_token);
-					curr->name = internal_token;
-					gotName = true;
-
-				}
-				else
-				{
-					printf("Setting option to %s\n", internal_token);
-					curr->options = internal_token;
-				}
-			}
-			prev = curr;
-			curr = curr->next;
+			head = curr;
 		}
+		if (prev)
+		{
+			prev->next = curr;
+		}
+
+		bool gotName = false;
+		char *internal_token;
+		while((internal_token = strsep(&argv[arg], "=")) != NULL)
+		{
+			if (!gotName)
+			{
+				printf("Setting name to %s\n", internal_token);
+				curr->name = internal_token;
+				gotName = true;
+			}
+			else
+			{
+				printf("Setting %s's option to %s\n", curr->name, internal_token);
+				curr->options = internal_token;
+			}
+		}
+		prev = curr;
+		curr = curr->next;
 	}
 
 	curr = head;
 
 	while(curr) {
-		printf("%s support %s \n", curr->name, curr->options);
+		if (strcmp(curr->options,"%") == 0)
+		{
+			printf("BOOLEAN %s\n", curr->name);
+		}
+		else if (strcmp(curr->options,"-") == 0)
+		{
+			printf("INPUT %s\n", curr->name);
+		}
+		else {
+			printf("RADIO %s supports %s\n", curr->name, curr->options);
+		}
 		curr = curr->next;
 	}
 
