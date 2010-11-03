@@ -5,6 +5,33 @@
 #include <curses.h>
 #include <menu.h>
 
+//TODO - radio options - binary and user input works!
+
+char* getString(const char *curVal);
+char* getString(const char *curVal)
+{
+	const int bufSize = 80;
+	char mesg[]="Choose a new value: ";
+	char *str = calloc(bufSize,sizeof(char));
+
+	int row,col;
+//	clear();				/* clear the screen; use erase() instead? */
+	getmaxyx(stdscr,row,col);		/* get the number of rows and columns */
+	mvprintw(row/2,(col-strlen(mesg))/2,"%s",mesg);     /* print the message at the center of the screen */
+	if (curVal != NULL)
+	{
+		char *curValMesg;
+		curValMesg = calloc(strlen(curVal)+1,sizeof(char));
+		strcat(curValMesg, curVal);
+		strcat(curValMesg, "\n"); // I only added 1 space - is this a problem? (cr-lf)? 
+
+		mvprintw(row/2 + 1,(col-strlen(curVal))/2,"%s",curValMesg);     /* print the message at the center of the screen */
+	}
+	getnstr(str, bufSize);				/* request the input...*/
+//	clear();
+	return str;
+}
+
 struct list_el {
 	char *name;
 	char *options;
@@ -12,6 +39,8 @@ struct list_el {
 	char *value;		//this is user supplied
 	struct list_el *next;
 };
+
+
 
 typedef struct list_el OptionEl;
 
@@ -22,8 +51,10 @@ int main(int argc, char* argv[])
 	OptionEl *head = NULL;
 	OptionEl *prev = NULL;
 
+	unsigned int numElements = 0;
 	for (int arg=1; arg < argc; ++arg)
 	{
+		++numElements;
 		curr = (OptionEl *)malloc(sizeof(OptionEl));
 		if (!head)
 		{
@@ -55,32 +86,11 @@ int main(int argc, char* argv[])
 			{
 				printf("Setting %s's option to %s\n", curr->name, internal_token);
 				curr->options = internal_token;
+				printf("\n");
 			}
 		}
+		curr->value = NULL;
 		prev = curr;
-		curr = curr->next;
-	}
-
-
-
-	unsigned int numElements = 0;
-
-	//print out my list
-	curr = head;
-
-	while(curr) {
-		++numElements;
-		if (strcmp(curr->options,"%") == 0)
-		{
-			printf("BOOLEAN %s\n", curr->name);
-		}
-		else if (strcmp(curr->options,"-") == 0)
-		{
-			printf("INPUT %s\n", curr->name);
-		}
-		else {
-			printf("RADIO %s supports %s\n", curr->name, curr->options);
-		}
 		curr = curr->next;
 	}
 
@@ -95,37 +105,36 @@ int main(int argc, char* argv[])
 
 	initscr();
 	cbreak();
-	noecho();
+//	noecho();
 	keypad(stdscr, TRUE);
-	init_pair(1, COLOR_RED, COLOR_BLACK);
-	init_pair(2, COLOR_CYAN, COLOR_BLACK);
 
 	option_items=(ITEM**)calloc(n_choices + 1, sizeof(ITEM *));
 
 	curr = head;
 	unsigned int count = 0;
 	while(curr) {
-		option_items[count++] = new_item(curr->name, curr->descr);
+		option_items[count] = new_item(curr->name, curr->descr);
+		set_item_userptr(option_items[count], curr);
+		count++;
 		curr = curr->next;
 	}
+
 	option_items[n_choices] = (ITEM *)NULL;
+
 
 	option_menu = new_menu((ITEM **)option_items);
 
 	keypad(option_menu_win, TRUE);
 	set_menu_mark(option_menu, " * ");
 
-	attron(COLOR_PAIR(2));
 	mvprintw(LINES - 2, 0, "F1 to Exit");
 	menu_opts_off(option_menu,O_ONEVALUE);
-	attroff(COLOR_PAIR(2));
-	refresh();
 
 	post_menu(option_menu);
 	refresh();
 
 	int c;
-	while(  (c = getch()) != KEY_F(1)  )
+	while( (c = getch()) != KEY_F(1) )
 	{
 		switch(c)
 		{
@@ -147,21 +156,68 @@ int main(int argc, char* argv[])
 			case KEY_PPAGE:
 				menu_driver(option_menu, REQ_SCR_UPAGE);
 				break;
-
 			case ' ':
-				menu_driver(option_menu, REQ_TOGGLE_ITEM);
+			case 10:
+			{
+				ITEM *curItem = current_item(option_menu);
+				OptionEl *p = (OptionEl*)item_userptr(curItem);
+				if (item_opts(current_item(option_menu)) & O_SELECTABLE)
+				{
+					menu_driver(option_menu, REQ_TOGGLE_ITEM);
+					p->value = NULL;
+				}
+				else
+				{
+					p->value = getString(p->value);
+					refresh();
+				}
+			}
 				break;
+
 		}
+
+		ITEM *cur;
+		cur = current_item(option_menu);
+		OptionEl *p = (OptionEl*)item_userptr(cur);
+		if (strcmp("-",p->options) == 0)
+		{
+			item_opts_off(cur, O_SELECTABLE);
+		}
+
 	}
 	endwin(); //get out of ncurses
+
 
 	ITEM **items;
 	items = menu_items(option_menu);
 	int i;
 	for(i = 0; i < item_count(option_menu); ++i)
 	{
-		const char* val = (item_value(items[i]) == TRUE) ? "true" : "false";
-		printf("%s=%s\n", item_name(items[i]), val);
+		ITEM *cur;
+//		cur = current_item(option_menu);
+		OptionEl *p = (OptionEl*)item_userptr(items[i]);
+
+		if (strcmp("%",p->options) == 0)
+		{
+			const char* val = (item_value(items[i]) == TRUE) ? "true" : "false";
+			fprintf(stderr,"%s=%s\n", item_name(items[i]), val);
+		}
+		else if (strcmp("-", p->options) == 0)
+		{
+			if (p->value)
+			{
+				fprintf(stderr,"%s=%s\n", item_name(items[i]), p->value);
+			}
+			else
+			{
+				fprintf(stderr,"%s=\n", item_name(items[i]));
+			}
+		}
+		else
+		{
+			const char* val = (item_value(items[i]) == TRUE) ? "true" : "false";
+			fprintf(stderr,"%s=%s  #radio\n", item_name(items[i]), val);
+		}
 	}
 
 
