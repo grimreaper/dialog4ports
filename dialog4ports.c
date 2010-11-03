@@ -8,6 +8,8 @@
 struct list_el {
 	char *name;
 	char *options;
+	char *descr;
+	char *value;		//this is user supplied
 	struct list_el *next;
 };
 
@@ -34,6 +36,7 @@ int main(int argc, char* argv[])
 		}
 
 		bool gotName = false;
+		bool gotDescr = false;
 		char *internal_token;
 		while((internal_token = strsep(&argv[arg], "=")) != NULL)
 		{
@@ -42,6 +45,12 @@ int main(int argc, char* argv[])
 				printf("Setting name to %s\n", internal_token);
 				curr->name = internal_token;
 				gotName = true;
+			}
+			else if (!gotDescr)
+			{
+				printf("Setting %s's descr to %s\n", curr->name, internal_token);
+				curr->descr = internal_token;
+				gotDescr = true;
 			}
 			else
 			{
