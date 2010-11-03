@@ -17,7 +17,6 @@ typedef struct list_el OptionEl;
 
 int main(int argc, char* argv[])
 {
-
 	//create the linked list that I work with later
 	OptionEl *curr = NULL;
 	OptionEl *head = NULL;
@@ -91,12 +90,15 @@ int main(int argc, char* argv[])
 
 	ITEM **option_items;
 	MENU *option_menu;
+	WINDOW *option_menu_win;
 	unsigned int n_choices = numElements;
 
 	initscr();
 	cbreak();
 	noecho();
 	keypad(stdscr, TRUE);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+	init_pair(2, COLOR_CYAN, COLOR_BLACK);
 
 	option_items=(ITEM**)calloc(n_choices + 1, sizeof(ITEM *));
 
@@ -110,7 +112,15 @@ int main(int argc, char* argv[])
 
 	option_menu = new_menu((ITEM **)option_items);
 
+	keypad(option_menu_win, TRUE);
+	set_menu_mark(option_menu, " * ");
+
+	attron(COLOR_PAIR(2));
 	mvprintw(LINES - 2, 0, "F1 to Exit");
+	menu_opts_off(option_menu,O_ONEVALUE);
+	attroff(COLOR_PAIR(2));
+	refresh();
+
 	post_menu(option_menu);
 	refresh();
 
@@ -125,17 +135,43 @@ int main(int argc, char* argv[])
 			case KEY_UP:
 				menu_driver(option_menu, REQ_UP_ITEM);
 				break;
+			case KEY_LEFT:
+				menu_driver(option_menu, REQ_LEFT_ITEM);
+				break;
+			case KEY_RIGHT:
+				menu_driver(option_menu, REQ_RIGHT_ITEM);
+				break;
+			case KEY_NPAGE:
+				menu_driver(option_menu, REQ_SCR_DPAGE);
+				break;
+			case KEY_PPAGE:
+				menu_driver(option_menu, REQ_SCR_UPAGE);
+				break;
+
+			case ' ':
+				menu_driver(option_menu, REQ_TOGGLE_ITEM);
+				break;
 		}
 	}
+	endwin(); //get out of ncurses
+
+	ITEM **items;
+	items = menu_items(option_menu);
+	int i;
+	for(i = 0; i < item_count(option_menu); ++i)
+	{
+		const char* val = (item_value(items[i]) == TRUE) ? "true" : "false";
+		printf("%s=%s\n", item_name(items[i]), val);
+	}
+
 
 	for (count = 0; count < n_choices; ++count)
 	{
 		free_item(option_items[count]);
 	}
 
-
+	unpost_menu(option_menu);
 	free_menu(option_menu);
-	endwin();				/* close the ncurses window */
 
 	return 0;
 }
