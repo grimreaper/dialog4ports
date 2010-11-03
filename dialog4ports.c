@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <curses.h>
+
 
 struct list_el {
 	char *name;
@@ -13,14 +15,11 @@ typedef struct list_el item;
 
 int main(int argc, char* argv[])
 {
-	item *curr;
-	item *head;
-	item *prev;
 
-//	head = (item *)malloc(sizeof(item));
-	prev = NULL;
-	head = NULL;
-	curr = NULL;
+	//create the linked list that I work with later
+	item *curr = NULL;
+	item *head = NULL;
+	item *prev = NULL;
 
 	for (int arg=1; arg < argc; ++arg)
 	{
@@ -54,6 +53,8 @@ int main(int argc, char* argv[])
 		curr = curr->next;
 	}
 
+
+	//print out my list
 	curr = head;
 
 	while(curr) {
@@ -71,5 +72,19 @@ int main(int argc, char* argv[])
 		curr = curr->next;
 	}
 
+
+	//check return codes
+
+	clear();				/* clear the screen; use erase() instead? */
+	initscr();				/* start the curses mode */
+
+
+	int row,col;				//rerun this on SIGWINCH
+	getmaxyx(stdscr,row,col);		/* get the number of rows and columns */
+
+
+	endwin();				/* close the ncurses window */
+
 	return 0;
 }
+
