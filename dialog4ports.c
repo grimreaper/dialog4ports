@@ -13,19 +13,19 @@ struct list_el {
 	struct list_el *next;
 };
 
-typedef struct list_el item;
+typedef struct list_el OptionEl;
 
 int main(int argc, char* argv[])
 {
 
 	//create the linked list that I work with later
-	item *curr = NULL;
-	item *head = NULL;
-	item *prev = NULL;
+	OptionEl *curr = NULL;
+	OptionEl *head = NULL;
+	OptionEl *prev = NULL;
 
 	for (int arg=1; arg < argc; ++arg)
 	{
-		curr = (item *)malloc(sizeof(item));
+		curr = (OptionEl *)malloc(sizeof(OptionEl));
 		if (!head)
 		{
 			head = curr;
@@ -63,10 +63,14 @@ int main(int argc, char* argv[])
 	}
 
 
+
+	unsigned int numElements = 0;
+
 	//print out my list
 	curr = head;
 
 	while(curr) {
+		++numElements;
 		if (strcmp(curr->options,"%") == 0)
 		{
 			printf("BOOLEAN %s\n", curr->name);
@@ -82,16 +86,55 @@ int main(int argc, char* argv[])
 	}
 
 
-	//check return codes
+	//deal with curses
+	curr = head;
 
-	clear();				/* clear the screen; use erase() instead? */
-	initscr();				/* start the curses mode */
+	ITEM **option_items;
+	MENU *option_menu;
+	unsigned int n_choices = numElements;
+
+	initscr();
+	cbreak();
+	noecho();
+	keypad(stdscr, TRUE);
+
+	option_items=(ITEM**)calloc(n_choices + 1, sizeof(ITEM *));
+
+	curr = head;
+	unsigned int count = 0;
+	while(curr) {
+		option_items[count++] = new_item(curr->name, curr->descr);
+		curr = curr->next;
+	}
+	option_items[n_choices] = (ITEM *)NULL;
+
+	option_menu = new_menu((ITEM **)option_items);
+
+	mvprintw(LINES - 2, 0, "F1 to Exit");
+	post_menu(option_menu);
+	refresh();
+
+	int c;
+	while(  (c = getch()) != KEY_F(1)  )
+	{
+		switch(c)
+		{
+			case KEY_DOWN:
+		      	menu_driver(option_menu, REQ_DOWN_ITEM);
+				break;
+			case KEY_UP:
+				menu_driver(option_menu, REQ_UP_ITEM);
+				break;
+		}
+	}
+
+	for (count = 0; count < n_choices; ++count)
+	{
+		free_item(option_items[count]);
+	}
 
 
-	int row,col;				//rerun this on SIGWINCH
-	getmaxyx(stdscr,row,col);		/* get the number of rows and columns */
-
-
+	free_menu(option_menu);
 	endwin();				/* close the ncurses window */
 
 	return 0;
