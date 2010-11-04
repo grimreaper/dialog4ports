@@ -181,6 +181,10 @@ main(int argc, char* argv[])
 				else
 				{
 					p->value = getString(p->value);
+					if (p->value != NULL && strcmp("",p->value) != 0)
+					{
+						menu_driver(option_menu, REQ_TOGGLE_ITEM);
+					}
 					refresh();
 				}
 			}
