@@ -18,19 +18,14 @@ getString(const char *curVal)
 //	clear();				/* clear the screen; use erase() instead? */
 	getmaxyx(stdscr,row,col);		/* get the number of rows and columns */
 	mvprintw(row/2,(col-strlen(mesg))/2,"%s",mesg);     /* print the message at the center of the screen */
-      /* culot: I don't see the point here with adding a newline */
-
 	if (curVal != NULL)
 	{
-		char *curValMesg;
-		curValMesg = calloc(strlen(curVal)+1,sizeof(char));
-		strlcat(curValMesg, curVal, strlen(curVal));
-		strlcat(curValMesg, "\n",1); // I only added 1 space - is this a problem? (cr-lf)? 
-
-		mvprintw(row/2 + 1,(col-strlen(curVal))/2,"%s",curValMesg);     /* print the message at the center of the screen */
+		mvprintw(row/2 + 1,(col-strlen(curVal))/2,"%s",curVal);     /* print the message at the center of the screen */
+		move(row/2 + 2, (col-strlen(curVal))/2);
 	}
 	getnstr(str, bufSize -1);				/* request the input...*/
-//	clear();
+	clear();
+	refresh();
 	return str;
 }
 
