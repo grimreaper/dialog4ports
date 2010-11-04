@@ -78,7 +78,7 @@ main(int argc, char* argv[])
 	   It will be easier to maintain, see queue(3). */
 	OptionEl *curr = NULL;
 	OptionEl *head = NULL;
-	OptionEl *prev = NULL;
+	OptionEl *prev = NULL, *next = NULL;
 
 	ITEM **option_items;
 	MENU *option_menu;
@@ -297,6 +297,15 @@ main(int argc, char* argv[])
 	}
 
 	free_menu(option_menu);
+
+	curr = head;
+	while (curr)
+	{
+		next = curr->next;
+		free(curr);
+		curr = next;
+	}
+
 
 	return 0;
 }
