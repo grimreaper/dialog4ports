@@ -11,7 +11,7 @@
 //TODO - radio options - binary and user input works!
 
 static char *
-getString(const char *curVal)
+getString(const char * const curVal)
 {
 	const int bufSize = 80;
 	char mesg[]="Choose a new value: ";
@@ -33,11 +33,11 @@ getString(const char *curVal)
 }
 
 static int
-countChar ( const char *input, char c )
+countChar ( const char * const input, char c )
 {
 	int retval = 0;
-	char *ptr = input;
-	while (ptr++)
+	const char * ptr = input;
+	while (ptr)
 	{
 		printf(".");
 
@@ -45,6 +45,7 @@ countChar ( const char *input, char c )
 		{
 			++retval;
 		}
+		ptr++;
 	}
 	return retval;
 }
@@ -150,7 +151,7 @@ main(int argc, char* argv[])
 					// is curr->options nul terminated?
 					printf("%d", strlen(curr->options));
 					getchar();
-//					hashMarks += countChar(curr->options,'#');
+//					hashMarks += countChar(internal_token,'#');
 					curr->mode = RADIOBOX;
 				}
 			}
