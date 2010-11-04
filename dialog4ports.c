@@ -192,14 +192,13 @@ main(int argc, char* argv[])
 		cur = current_item(option_menu);
 		OptionEl *p = (OptionEl*)item_userptr(cur);
 
-		/* culot: missing check for p non-nullity, 
-		   possible segfault here if one just presses enter */
-		if (strcmp("-",p->options) == 0)
+		if (p != NULL && strcmp("-",p->options) == 0)
 		{
 			item_opts_off(cur, O_SELECTABLE);
 		}
 
 	}
+	unpost_menu(option_menu);
 	endwin(); //get out of ncurses
 
 
@@ -240,7 +239,6 @@ main(int argc, char* argv[])
 		free_item(option_items[count]);
 	}
 
-	unpost_menu(option_menu);
 	free_menu(option_menu);
 
 	return 0;
