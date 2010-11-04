@@ -20,11 +20,11 @@ getString(const char * const curVal)
 	int row,col;
 //	clear();				/* clear the screen; use erase() instead? */
 	getmaxyx(stdscr,row,col);		/* get the number of rows and columns */
-	mvprintw(row/2,(col-strlen(mesg))/2,"%s",mesg);     /* print the message at the center of the screen */
+	mvprintw(row/2,(col-(int)strlen(mesg))/2,"%s",mesg);     /* print the message at the center of the screen */
 	if (curVal != NULL)
 	{
-		mvprintw(row/2 + 1,(col-strlen(curVal))/2,"%s",curVal);     /* print the message at the center of the screen */
-		move(row/2 + 2, (col-strlen(curVal))/2);
+		mvprintw(row/2 + 1,(col-(int)strlen(curVal))/2,"%s",curVal);     /* print the message at the center of the screen */
+		move(row/2 + 2, (col-(int)strlen(curVal))/2);
 	}
 	getnstr(str, bufSize -1);				/* request the input...*/
 	clear();
@@ -32,20 +32,18 @@ getString(const char * const curVal)
 	return str;
 }
 
-static int
-countChar ( const char * const input, char c )
+static unsigned int
+countChar ( const char * const input, const char c )
 {
-	int retval = 0;
-	const char * ptr = input;
-	while (ptr)
+	unsigned int retval = 0;
+	const size_t len = strlen(input);
+	size_t i;
+	for (i=0; i < len; ++i)
 	{
-		printf(".");
-
-		if (*ptr == c)
+		if (input[i] == c)
 		{
 			++retval;
 		}
-		ptr++;
 	}
 	return retval;
 }
@@ -88,7 +86,7 @@ main(int argc, char* argv[])
 
 	unsigned int numElements = 0;
 	unsigned int n_choices = 0;
-	int hashMarks = 0;
+	unsigned int hashMarks = 0;
 
 	if (argc < 2)
 	{
@@ -150,8 +148,7 @@ main(int argc, char* argv[])
 				{
 					// is curr->options nul terminated?
 					printf("%d", strlen(curr->options));
-					getchar();
-//					hashMarks += countChar(internal_token,'#');
+					hashMarks += countChar(internal_token,'#');
 					curr->mode = RADIOBOX;
 				}
 			}
@@ -165,9 +162,9 @@ main(int argc, char* argv[])
 	//deal with curses
 	curr = head;
 
-	n_choices = numElements;
+	n_choices = numElements + hashMarks;
 	printf("%d", n_choices + hashMarks);
-	getchar();
+	//getchar();
 
 	initscr();
 	cbreak();
