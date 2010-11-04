@@ -32,14 +32,38 @@ getString(const char *curVal)
 	return str;
 }
 
+static int
+countChar ( const char *input, char c )
+{
+	int retval = 0;
+	char *ptr = input;
+	while (ptr++)
+	{
+		printf(".");
+
+		if (*ptr == c)
+		{
+			++retval;
+		}
+	}
+	return retval;
+}
+
+
+enum OPTION_TYPE {
+	CHECKBOX,
+	RADIOBOX,
+	USER_INPUT,
+};
+
 struct list_el {
 	char *name;
 	char *options;
 	char *descr;
 	char *value;		//this is user supplied
+	enum OPTION_TYPE mode;
 	struct list_el *next;
 };
-
 
 
 typedef struct list_el OptionEl;
@@ -55,7 +79,16 @@ main(int argc, char* argv[])
 	OptionEl *head = NULL;
 	OptionEl *prev = NULL;
 
+	ITEM **option_items;
+	MENU *option_menu;
+	WINDOW *option_menu_win;
+
+
+
 	unsigned int numElements = 0;
+	unsigned int n_choices = 0;
+	int hashMarks = 0;
+
 	/* Avoid C++ style declaration inside loops */
 	int arg;
 
@@ -98,6 +131,22 @@ main(int argc, char* argv[])
 				printf("Setting %s's option to %s\n", curr->name, internal_token);
 				curr->options = internal_token;
 				printf("\n");
+				if (strcmp("%",curr->options) == 0)
+				{
+					curr->mode = CHECKBOX;
+				}
+				else if (strcmp("-", curr->options) == 0)
+				{
+					curr->mode = USER_INPUT;
+				}
+				else
+				{
+					// is curr->options nul terminated?
+					printf("%d", strlen(curr->options));
+					getchar();
+//					hashMarks += countChar(curr->options,'#');
+					curr->mode = RADIOBOX;
+				}
 			}
 		}
 		curr->value = NULL;
@@ -109,11 +158,9 @@ main(int argc, char* argv[])
 	//deal with curses
 	curr = head;
 
-	/* culot: avoid declaration not at the beginning of a block for portability */
-	ITEM **option_items;
-	MENU *option_menu;
-	WINDOW *option_menu_win;
-	unsigned int n_choices = numElements;
+	n_choices = numElements;
+	printf("%d", n_choices + hashMarks);
+	getchar();
 
 	initscr();
 	cbreak();
@@ -211,15 +258,14 @@ main(int argc, char* argv[])
 	int i;
 	for(i = 0; i < item_count(option_menu); ++i)
 	{
-//		cur = current_item(option_menu);
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
 
-		if (strcmp("%",p->options) == 0)
+		if (p->mode == CHECKBOX)
 		{
 			const char* val = (item_value(items[i]) == TRUE) ? "true" : "false";
 			fprintf(stderr,"%s=%s\n", item_name(items[i]), val);
 		}
-		else if (strcmp("-", p->options) == 0)
+		else if (p->mode == USER_INPUT)
 		{
 			if (p->value)
 			{
@@ -230,7 +276,7 @@ main(int argc, char* argv[])
 				fprintf(stderr,"%s=\n", item_name(items[i]));
 			}
 		}
-		else
+		else //p->mode == RADIOBOX
 		{
 			const char* val = (item_value(items[i]) == TRUE) ? "true" : "false";
 			fprintf(stderr,"%s=%s  #radio\n", item_name(items[i]), val);
