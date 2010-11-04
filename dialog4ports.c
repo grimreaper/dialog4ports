@@ -62,8 +62,6 @@ main(int argc, char* argv[])
 	for (arg=1; arg < argc; ++arg)
 	{
 		++numElements;
-		//curr = (OptionEl *)malloc(sizeof(OptionEl));
-		/* culot: better written like this (/!\ no checking): */
 		curr = malloc (sizeof *curr);
 		if (curr == NULL)
 		{
