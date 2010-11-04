@@ -89,6 +89,12 @@ main(int argc, char* argv[])
 	unsigned int n_choices = 0;
 	int hashMarks = 0;
 
+	if (argc < 2)
+	{
+		errx(EX_USAGE,"We require some option type to work");
+	}
+
+
 	/* Avoid C++ style declaration inside loops */
 	int arg;
 
