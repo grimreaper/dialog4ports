@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include <curses.h>
 #include <menu.h>
+#include <err.h>
+#include <sysexits.h>
+
 
 //TODO - radio options - binary and user input works!
 
@@ -62,6 +65,10 @@ main(int argc, char* argv[])
 		//curr = (OptionEl *)malloc(sizeof(OptionEl));
 		/* culot: better written like this (/!\ no checking): */
 		curr = malloc (sizeof *curr);
+		if (curr == NULL)
+		{
+			errx(EX_OSERR,"can not malloc");
+		}
 		if (!head)
 		{
 			head = curr;
