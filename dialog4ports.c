@@ -7,8 +7,8 @@
 
 //TODO - radio options - binary and user input works!
 
-char* getString(const char *curVal);
-char* getString(const char *curVal)
+static char *
+getString(const char *curVal)
 {
 	const int bufSize = 80;
 	char mesg[]="Choose a new value: ";
@@ -18,16 +18,18 @@ char* getString(const char *curVal)
 //	clear();				/* clear the screen; use erase() instead? */
 	getmaxyx(stdscr,row,col);		/* get the number of rows and columns */
 	mvprintw(row/2,(col-strlen(mesg))/2,"%s",mesg);     /* print the message at the center of the screen */
+      /* culot: I don't see the point here with adding a newline */
+
 	if (curVal != NULL)
 	{
 		char *curValMesg;
 		curValMesg = calloc(strlen(curVal)+1,sizeof(char));
-		strcat(curValMesg, curVal);
-		strcat(curValMesg, "\n"); // I only added 1 space - is this a problem? (cr-lf)? 
+		strlcat(curValMesg, curVal, strlen(curVal));
+		strlcat(curValMesg, "\n",1); // I only added 1 space - is this a problem? (cr-lf)? 
 
 		mvprintw(row/2 + 1,(col-strlen(curVal))/2,"%s",curValMesg);     /* print the message at the center of the screen */
 	}
-	getnstr(str, bufSize);				/* request the input...*/
+	getnstr(str, bufSize -1);				/* request the input...*/
 //	clear();
 	return str;
 }
@@ -44,18 +46,27 @@ struct list_el {
 
 typedef struct list_el OptionEl;
 
-int main(int argc, char* argv[])
+int 
+main(int argc, char* argv[])
 {
 	//create the linked list that I work with later
+
+	/* culot: better use sys/queue.h instead of your own linked list implementation.
+	   It will be easier to maintain, see queue(3). */
 	OptionEl *curr = NULL;
 	OptionEl *head = NULL;
 	OptionEl *prev = NULL;
 
 	unsigned int numElements = 0;
-	for (int arg=1; arg < argc; ++arg)
+	/* Avoid C++ style declaration inside loops */
+	int arg;
+
+	for (arg=1; arg < argc; ++arg)
 	{
 		++numElements;
-		curr = (OptionEl *)malloc(sizeof(OptionEl));
+		//curr = (OptionEl *)malloc(sizeof(OptionEl));
+		/* culot: better written like this (/!\ no checking): */
+		curr = malloc (sizeof *curr);
 		if (!head)
 		{
 			head = curr;
@@ -98,6 +109,7 @@ int main(int argc, char* argv[])
 	//deal with curses
 	curr = head;
 
+	/* culot: avoid declaration not at the beginning of a block for portability */
 	ITEM **option_items;
 	MENU *option_menu;
 	WINDOW *option_menu_win;
@@ -179,6 +191,9 @@ int main(int argc, char* argv[])
 		ITEM *cur;
 		cur = current_item(option_menu);
 		OptionEl *p = (OptionEl*)item_userptr(cur);
+
+		/* culot: missing check for p non-nullity, 
+		   possible segfault here if one just presses enter */
 		if (strcmp("-",p->options) == 0)
 		{
 			item_opts_off(cur, O_SELECTABLE);
@@ -193,7 +208,6 @@ int main(int argc, char* argv[])
 	int i;
 	for(i = 0; i < item_count(option_menu); ++i)
 	{
-		ITEM *cur;
 //		cur = current_item(option_menu);
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
 
