@@ -108,7 +108,7 @@ main(int argc, char* argv[])
 	// arg=1 port title
 	for (arg=2; arg < argc; ++arg) {
 		++numElements;
-		if ((curr = malloc (sizeof *curr) == NULL)
+		if ((curr = malloc (sizeof *curr)) == NULL)
 			errx(EX_OSERR,"can not malloc");
 
 		if (!head)
@@ -234,6 +234,22 @@ main(int argc, char* argv[])
 	wrefresh(title_menu_win);
 	wrefresh(option_menu_win);
 
+	/* toggling and truth have nothing to do with each other :-)
+	   so go thru each one, set the envrioment, and then return to top
+	*/
+	for(count = 0; count < n_choices; ++count) {
+
+            curr = (OptionEl*)item_userptr(option_items[count]);
+		curr->value = getenv(curr->name);
+		if (curr->value != NULL)
+		{
+			set_item_value(curr, true);
+			menu_driver(option_menu, REQ_TOGGLE_ITEM);
+		}
+            menu_driver(option_menu, REQ_DOWN_ITEM);
+	}
+      menu_driver(option_menu, REQ_FIRST_ITEM);
+
 	while( (c = wgetch(option_menu_win)) != 27 ) {
 		ITEM *curItem = current_item(option_menu);
 
@@ -282,16 +298,28 @@ main(int argc, char* argv[])
 								}
 							}
 						}
-					} else {
-						p->value = NULL;
 					}
-				} else {
-					p->value = getString(option_menu_win,p->value);
-					if (p->value != NULL && strcmp("",p->value) != 0)
-						menu_driver(option_menu, REQ_TOGGLE_ITEM);
+					else {
+						p->value = getString(option_menu_win,p->value);
+						if (p->value != NULL && strcmp("",p->value) != 0)
+						{
+							if (item_value(curItem) != TRUE)
+							{
+								menu_driver(option_menu, REQ_TOGGLE_ITEM);
+							}
+						}
+						else
+						{
+							if (item_value(curItem) != FALSE)
+							{
+								menu_driver(option_menu, REQ_TOGGLE_ITEM);
+							}
+							p->value = NULL;
+						}
 
-					wrefresh(title_menu_win);
-					wrefresh(option_menu_win);
+						wrefresh(title_menu_win);
+						wrefresh(option_menu_win);
+					}
 				}
 			break;
 		}

@@ -1,5 +1,7 @@
-./dialog4ports	portname \
-			WITH_XORG='use xorg'=% \
-			WITHOUT_FOO='do not use foo'=% \
-			WWW_TYPE='use this for a web server!'=apache#lighttpd#god#heaven \
-			LANGS='use a language '=-
+WITH_XORG=WITH_XORG	./dialog4ports	portname \
+				WITH_XORG='use xorg'=% \
+				WITHOUT_FOO='do not use foo'=% \
+				WWW_TYPE='use this for a web server!'=apache#lighttpd#god#heaven \
+				LANGS='use a language '=- \
+				XYZ='argi'=-		\
+				AAAAZ='hello my dear'=%
