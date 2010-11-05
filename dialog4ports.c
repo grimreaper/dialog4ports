@@ -266,18 +266,6 @@ main(int argc, char* argv[])
 
 		OptionEl *p = (OptionEl*)item_userptr(curItem);
 
-		// need to check in one line to make sure that options become unselectable again
-		// we are looking to see if we are an option which is radioed out
-/*		if (p != NULL && p->mode == RADIOBOX && p->value != NULL && p->value != item_name(curItem))
-		{
-			item_opts_off(curItem, O_SELECTABLE);
-		}
-		else
-		{
-			item_opts_on(curItem, O_SELECTABLE);
-		}
-*/
-
 		switch(c)
 		{
 			case KEY_DOWN:
