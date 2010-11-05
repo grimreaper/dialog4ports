@@ -11,8 +11,6 @@
 //TODO - handle sigwinch - resize winsows
 //TODO - replecate OTPIONS's looks and feel (the triple window approach)
 
-//BUG - getString() clears the border
-
 static char *
 getString(WINDOW *win, const char * const curVal)
 {
@@ -157,13 +155,16 @@ main(int argc, char* argv[])
 	//getchar();
 
 	initscr();
-	start_color();
+	if(has_colors() == TRUE) {
+		start_color();
+		init_pair(1, COLOR_GREEN, COLOR_BLACK);     //selected
+		init_pair(2, COLOR_YELLOW, COLOR_BLACK);	//selectable
+		init_pair(3, COLOR_RED, COLOR_BLACK); //disabled
+	}
+
 	cbreak();
 	noecho();
 	keypad(stdscr, TRUE);
-	init_pair(1, COLOR_GREEN, COLOR_BLACK);     //selected
-	init_pair(2, COLOR_YELLOW, COLOR_BLACK);	//selectable
-	init_pair(3, COLOR_RED, COLOR_BLACK); //disabled
 
 	option_items=(ITEM**)calloc(n_choices + 1, sizeof(ITEM *));
 
@@ -210,10 +211,12 @@ main(int argc, char* argv[])
 
 
 
-	/* Set fore ground and back ground of the menu */
-	set_menu_fore(option_menu, COLOR_PAIR(1) | A_REVERSE);
-	set_menu_back(option_menu, COLOR_PAIR(2));
-	set_menu_grey(option_menu, COLOR_PAIR(3));
+	if(has_colors() == TRUE) {
+		/* Set fore ground and back ground of the menu */
+		set_menu_fore(option_menu, COLOR_PAIR(1) | A_REVERSE);
+		set_menu_back(option_menu, COLOR_PAIR(2));
+		set_menu_grey(option_menu, COLOR_PAIR(3));
+	}
 
 
 	keypad(option_menu_win, TRUE);
@@ -225,8 +228,7 @@ main(int argc, char* argv[])
 	set_menu_format(option_menu, nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
-	box(option_menu_win, 0, 0);
-//	print_in_middle(option_menu_win, 1, 0, 40, "My Menu", COLOR_PAIR(1));
+	wborder(option_menu_win, '|', '|', '-', '-', '+', '+', '+', '+');
 	mvwaddch(option_menu_win, 2, 0, ACS_LTEE);
 	mvwhline(option_menu_win, 2, 1, ACS_HLINE, 38);
 	mvwaddch(option_menu_win, 2, 39, ACS_RTEE);
@@ -306,9 +308,10 @@ main(int argc, char* argv[])
 					}
 					else {
 						p->value = getString(option_menu_win,p->value);
+						wborder(option_menu_win, '|', '|', '-', '-', '+', '+', '+', '+');
 						wrefresh(title_menu_win);
-						wrefresh(option_menu_win);
-						refresh();
+//						wrefresh(option_menu_win);
+//						refresh();
 						if (p->value != NULL && strcmp("",p->value) != 0)
 						{
 							if (item_value(curItem) != TRUE)
