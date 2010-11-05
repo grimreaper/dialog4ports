@@ -8,7 +8,13 @@
 #include <sysexits.h>
 
 
-//TODO - radio options - binary and user input works!
+//TODO - radio options - get the selection code to actually work
+//TODO - handle sigwinch - resize winsows
+//TODO - replecate OTPIONS's looks and feel (the triple window approach)
+//TODO - default values
+
+//BUG - getString() clears the border
+//BUG - no mutually exclusive options are ever useable
 
 static char *
 getString(WINDOW *win, const char * const curVal)
@@ -18,7 +24,6 @@ getString(WINDOW *win, const char * const curVal)
 	char *str = calloc(bufSize,sizeof(char));
 
 	int row,col;
-//	clear();				/* clear the screen; use erase() instead? */
 	getmaxyx(win,row,col);		/* get the number of rows and columns */
 	mvwprintw(win,row/2,(col-(int)strlen(mesg))/2,"%s",mesg);     /* print the message at the center of the screen */
 	if (curVal != NULL)
@@ -26,9 +31,9 @@ getString(WINDOW *win, const char * const curVal)
 		mvwprintw(win,row/2 + 1,(col-(int)strlen(curVal))/2,"%s",curVal);     /* print the message at the center of the screen */
 		wmove(win,row/2 + 2, (col-(int)strlen(curVal))/2);
 	}
-	getnstr(str, bufSize -1);				/* request the input...*/
-	clear();
-	refresh();
+	wgetnstr(win,str, bufSize -1);				/* request the input...*/
+	wclear(win);
+	wrefresh(win);
 	return str;
 }
 
@@ -98,7 +103,12 @@ main(int argc, char* argv[])
 	/* Avoid C++ style declaration inside loops */
 	int arg;
 
-	for (arg=1; arg < argc; ++arg)
+	const char * const portName = argv[1];
+
+
+	// arg=0 program name
+	// arg=1 port title
+	for (arg=2; arg < argc; ++arg)
 	{
 		++numElements;
 		curr = malloc (sizeof *curr);
@@ -122,21 +132,17 @@ main(int argc, char* argv[])
 		{
 			if (!gotName)
 			{
-				printf("Setting name to %s\n", internal_token);
 				curr->name = internal_token;
 				gotName = true;
 			}
 			else if (!gotDescr)
 			{
-				printf("Setting %s's descr to %s\n", curr->name, internal_token);
 				curr->descr = internal_token;
 				gotDescr = true;
 			}
 			else
 			{
-				printf("Setting %s's option to %s\n", curr->name, internal_token);
 				curr->options = internal_token;
-				printf("\n");
 				if (strcmp("%",curr->options) == 0)
 				{
 					curr->mode = CHECKBOX;
@@ -206,8 +212,6 @@ main(int argc, char* argv[])
 	option_items[n_choices] = (ITEM *)NULL;
 
 	option_menu = new_menu((ITEM **)option_items);
-	const * const title ="hello";
-
 	// we want to leave 3 lines for the title
 	const int startMenyWinRow = 3;
 
@@ -219,7 +223,9 @@ main(int argc, char* argv[])
 
 	title_menu_win =  newwin(startMenyWinRow, ncols, 0, 0);
 	option_menu_win = newwin(nlines, ncols, startMenyWinRow, 0);
-	mvwprintw(title_menu_win,startMenyWinRow/2 + 1,(ncols-(int)strlen(title))/2,"%s",title);     /* print the message at the center of the screen */
+
+	//display the title in the center of the top window
+	mvwprintw(title_menu_win,startMenyWinRow/2 + 1,(ncols-(int)strlen(portName))/2,"%s",portName);
 	wrefresh(title_menu_win);
 
 
@@ -246,14 +252,15 @@ main(int argc, char* argv[])
 	mvwaddch(option_menu_win, 2, 39, ACS_RTEE);
 
 
-	mvprintw(LINES - 2, 0, "F1 to Exit");
+	mvprintw(LINES - 2, 0, "Escape to Exit");
 	menu_opts_off(option_menu,O_ONEVALUE);
 
 	post_menu(option_menu);
+	wrefresh(title_menu_win);
 	wrefresh(option_menu_win);
 
 	int c;
-	while( (c = wgetch(option_menu_win)) != KEY_F(1) )
+	while( (c = wgetch(option_menu_win)) != 27 )
 	{
 		ITEM *curItem = current_item(option_menu);
 
@@ -323,6 +330,7 @@ main(int argc, char* argv[])
 						{
 							menu_driver(option_menu, REQ_TOGGLE_ITEM);
 						}
+						wrefresh(title_menu_win);
 						wrefresh(option_menu_win);
 					}
 				}
