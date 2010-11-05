@@ -12,8 +12,6 @@
 //TODO - replecate OTPIONS's looks and feel (the triple window approach)
 //TODO - default values (from the envrioment - re dougb)
 
-//ODD - radio buttons only change state once you highlight them - maybe that should change
-
 //BUG - getString() clears the border
 
 static char *
@@ -270,7 +268,7 @@ main(int argc, char* argv[])
 
 		// need to check in one line to make sure that options become unselectable again
 		// we are looking to see if we are an option which is radioed out
-		if (p != NULL && p->mode == RADIOBOX && p->value != NULL && p->value != item_name(curItem))
+/*		if (p != NULL && p->mode == RADIOBOX && p->value != NULL && p->value != item_name(curItem))
 		{
 			item_opts_off(curItem, O_SELECTABLE);
 		}
@@ -278,6 +276,7 @@ main(int argc, char* argv[])
 		{
 			item_opts_on(curItem, O_SELECTABLE);
 		}
+*/
 
 		switch(c)
 		{
@@ -306,29 +305,52 @@ main(int argc, char* argv[])
 				{
 					if (p->mode != USER_INPUT)
 					{
+						bool setToTrue= false;
 						menu_driver(option_menu, REQ_TOGGLE_ITEM);
 						if(item_value(curItem) == TRUE)
 						{
+							setToTrue = true;
 							p->value = item_name(curItem);
+//							fprintf(stderr,"setting foobar = %s \n\n", item_name(curItem));
 						}
-						else
+						//if we are a radiobox - we need to disable/enable valid options
+						if (p->mode == RADIOBOX)
 						{
-							p->value = NULL;
+							for(count = 0; count < n_choices; ++count)
+							{
+						            curr = (OptionEl*)item_userptr(option_items[count]);
+								// if we have the same user ptr - but we are not ourself - disable it!
+								if (curr == p)
+								{
+									if (curItem == option_items[count] || !setToTrue)
+									{
+										item_opts_on(option_items[count], O_SELECTABLE);
+									}
+									else
+									{
+										item_opts_off(option_items[count], O_SELECTABLE);
+									}
+								}
+							}
 						}
 					}
 					else
 					{
-						p->value = getString(option_menu_win,p->value);
-						if (p->value != NULL && strcmp("",p->value) != 0)
-						{
-							menu_driver(option_menu, REQ_TOGGLE_ITEM);
-						}
-						wrefresh(title_menu_win);
-						wrefresh(option_menu_win);
+						p->value = NULL;
 					}
 				}
-				break;
+				else
+				{
+					p->value = getString(option_menu_win,p->value);
+					if (p->value != NULL && strcmp("",p->value) != 0)
+					{
+						menu_driver(option_menu, REQ_TOGGLE_ITEM);
+					}
+					wrefresh(title_menu_win);
+					wrefresh(option_menu_win);
+				}
 			}
+			break;
 		}
 	}
 	unpost_menu(option_menu);
