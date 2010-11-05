@@ -237,10 +237,6 @@ main(int argc, char* argv[])
 
 		if (p != NULL && p->mode == RADIOBOX &&p->value != NULL)
 		{
-			//item_name returns a const ptr
-			const char const* curName = item_name(curItem);
-			p->value = calloc(strlen(curName), sizeof(char)); //LEAKS
-			strcpy(p->value, curName);
 			if (p->value != item_name(curItem))
 			{
 				item_opts_off(curItem, O_SELECTABLE);
