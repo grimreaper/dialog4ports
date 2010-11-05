@@ -10,10 +10,10 @@
 
 //TODO - handle sigwinch - resize winsows
 //TODO - replecate OTPIONS's looks and feel (the triple window approach)
-//TODO - default values
+//TODO - default values (from the envrioment - re dougb)
 
 //BUG - getString() clears the border
-//BUG - once a radio option is selected - you can only choose that option :-|
+//BUG - once a radio option is  marked no-select - it never changes
 
 static char *
 getString(WINDOW *win, const char * const curVal)
@@ -97,6 +97,10 @@ main(int argc, char* argv[])
 	if (argc < 2)
 	{
 		errx(EX_USAGE,"We require some option type to work");
+	}
+	if (argc < 3)
+	{
+		errx(EX_USAGE,"We need more than just a port name");
 	}
 
 
@@ -263,17 +267,11 @@ main(int argc, char* argv[])
 
 		OptionEl *p = (OptionEl*)item_userptr(curItem);
 
-		if (p != NULL && p->mode == RADIOBOX)
+		if (p != NULL && p->mode == RADIOBOX && p->value != item_name(curItem))
 		{
-//			const char *foo = "unselectable";
-//			mvwprintw(title_menu_win,startMenyWinRow/2 + 1,(ncols-(int)strlen(foo))/2,"%s",foo);
-			if (p->value != item_name(curItem))
+			if (p->value != NULL)
 			{
-				if (p->value != NULL)
-				{
-//					fprintf(stderr, "%s", p->value);
-					item_opts_off(curItem, O_SELECTABLE);
-				}
+				item_opts_off(curItem, O_SELECTABLE);
 			}
 		}
 		else
