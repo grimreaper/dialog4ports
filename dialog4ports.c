@@ -12,8 +12,9 @@
 //TODO - replecate OTPIONS's looks and feel (the triple window approach)
 //TODO - default values (from the envrioment - re dougb)
 
+//ODD - radio buttons only change state once you highlight them - maybe that should change
+
 //BUG - getString() clears the border
-//BUG - once a radio option is  marked no-select - it never changes
 
 static char *
 getString(WINDOW *win, const char * const curVal)
@@ -267,12 +268,11 @@ main(int argc, char* argv[])
 
 		OptionEl *p = (OptionEl*)item_userptr(curItem);
 
-		if (p != NULL && p->mode == RADIOBOX && p->value != item_name(curItem))
+		// need to check in one line to make sure that options become unselectable again
+		// we are looking to see if we are an option which is radioed out
+		if (p != NULL && p->mode == RADIOBOX && p->value != NULL && p->value != item_name(curItem))
 		{
-			if (p->value != NULL)
-			{
-				item_opts_off(curItem, O_SELECTABLE);
-			}
+			item_opts_off(curItem, O_SELECTABLE);
 		}
 		else
 		{
