@@ -24,8 +24,7 @@ getString(WINDOW *win, const char * const curVal)
 	int row,col;
 	getmaxyx(win,row,col);		/* get the number of rows and columns */
 	mvwprintw(win,row/2,(col-(int)strlen(mesg))/2,"%s",mesg);     /* print the message at the center of the screen */
-	if (curVal != NULL)
-	{
+	if (curVal != NULL) {
 		mvwprintw(win,row/2 + 1,(col-(int)strlen(curVal))/2,"%s",curVal);     /* print the message at the center of the screen */
 		wmove(win,row/2 + 2, (col-(int)strlen(curVal))/2);
 	}
@@ -33,7 +32,8 @@ getString(WINDOW *win, const char * const curVal)
 	wclear(win);
 	wrefresh(win);
 	refresh();
-	return str;
+
+	return (str);
 }
 
 static unsigned int
@@ -42,14 +42,12 @@ countChar ( const char * const input, const char c )
 	unsigned int retval = 0;
 	const size_t len = strlen(input);
 	size_t i;
+
 	for (i=0; i < len; ++i)
-	{
 		if (input[i] == c)
-		{
 			++retval;
-		}
-	}
-	return retval;
+
+	return (retval);
 }
 
 
@@ -87,20 +85,17 @@ main(int argc, char* argv[])
 	WINDOW *option_menu_win;
 	WINDOW *title_menu_win;
 
-
+	int c;
 
 	unsigned int numElements = 0;
 	unsigned int n_choices = 0;
 	unsigned int hashMarks = 0;
 
 	if (argc < 2)
-	{
 		errx(EX_USAGE,"We require some option type to work");
-	}
+
 	if (argc < 3)
-	{
 		errx(EX_USAGE,"We need more than just a port name");
-	}
 
 
 	/* Avoid C++ style declaration inside loops */
@@ -111,51 +106,34 @@ main(int argc, char* argv[])
 
 	// arg=0 program name
 	// arg=1 port title
-	for (arg=2; arg < argc; ++arg)
-	{
+	for (arg=2; arg < argc; ++arg) {
 		++numElements;
-		curr = malloc (sizeof *curr);
-		if (curr == NULL)
-		{
+		if ((curr = malloc (sizeof *curr) == NULL)
 			errx(EX_OSERR,"can not malloc");
-		}
+
 		if (!head)
-		{
 			head = curr;
-		}
+
 		if (prev)
-		{
 			prev->next = curr;
-		}
 
 		bool gotName = false;
 		bool gotDescr = false;
 		char *internal_token;
-		while((internal_token = strsep(&argv[arg], "=")) != NULL)
-		{
-			if (!gotName)
-			{
+		while((internal_token = strsep(&argv[arg], "=")) != NULL) {
+			if (!gotName) {
 				curr->name = internal_token;
 				gotName = true;
-			}
-			else if (!gotDescr)
-			{
+			} else if (!gotDescr) {
 				curr->descr = internal_token;
 				gotDescr = true;
-			}
-			else
-			{
+			} else {
 				curr->options = internal_token;
-				if (strcmp("%",curr->options) == 0)
-				{
+				if (strcmp("%",curr->options) == 0) {
 					curr->mode = CHECKBOX;
-				}
-				else if (strcmp("-", curr->options) == 0)
-				{
+				} else if (strcmp("-", curr->options) == 0) {
 					curr->mode = USER_INPUT;
-				}
-				else
-				{
+				} else {
 					hashMarks += countChar(internal_token,'#');
 					curr->mode = RADIOBOX;
 				}
@@ -186,21 +164,18 @@ main(int argc, char* argv[])
 
 	curr = head;
 	unsigned int count = 0;
+
 	while(curr) {
-		if (curr->mode != RADIOBOX)
-		{
+		if (curr->mode != RADIOBOX) {
 			option_items[count] = new_item(curr->name, curr->descr);
 			set_item_userptr(option_items[count], curr);
 			count++;
-		}
-		else
-		{
+		} else {
 			char *tmpToken;
 			char *tmpOption = calloc(strlen(curr->options)+1,sizeof(char));
 			strncpy(tmpOption,curr->options,strlen(curr->options));
 
-			while((tmpToken = strsep(&tmpOption, "#")) != NULL)
-			{
+			while((tmpToken = strsep(&tmpOption, "#")) != NULL) {
 	                  option_items[count] = new_item(tmpToken, curr->descr);
 	                  set_item_userptr(option_items[count], curr);
 				count++;
@@ -245,7 +220,7 @@ main(int argc, char* argv[])
 	set_menu_format(option_menu, nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
-      box(option_menu_win, 0, 0);
+	box(option_menu_win, 0, 0);
 //	print_in_middle(option_menu_win, 1, 0, 40, "My Menu", COLOR_PAIR(1));
 	mvwaddch(option_menu_win, 2, 0, ACS_LTEE);
 	mvwhline(option_menu_win, 2, 1, ACS_HLINE, 38);
@@ -259,17 +234,14 @@ main(int argc, char* argv[])
 	wrefresh(title_menu_win);
 	wrefresh(option_menu_win);
 
-	int c;
-	while( (c = wgetch(option_menu_win)) != 27 )
-	{
+	while( (c = wgetch(option_menu_win)) != 27 ) {
 		ITEM *curItem = current_item(option_menu);
 
 		OptionEl *p = (OptionEl*)item_userptr(curItem);
 
-		switch(c)
-		{
+		switch(c) {
 			case KEY_DOWN:
-		      	menu_driver(option_menu, REQ_DOWN_ITEM);
+				menu_driver(option_menu, REQ_DOWN_ITEM);
 				break;
 			case KEY_UP:
 				menu_driver(option_menu, REQ_UP_ITEM);
@@ -288,56 +260,39 @@ main(int argc, char* argv[])
 				break;
 			case ' ':
 			case 10:
-			{
-				if (item_opts(curItem) & O_SELECTABLE)
-				{
-					if (p->mode != USER_INPUT)
-					{
+				if (item_opts(curItem) & O_SELECTABLE) {
+					if (p->mode != USER_INPUT) {
 						bool setToTrue= false;
 						menu_driver(option_menu, REQ_TOGGLE_ITEM);
-						if(item_value(curItem) == TRUE)
-						{
+						if(item_value(curItem) == TRUE) {
 							setToTrue = true;
 							p->value = item_name(curItem);
 //							fprintf(stderr,"setting foobar = %s \n\n", item_name(curItem));
 						}
 						//if we are a radiobox - we need to disable/enable valid options
-						if (p->mode == RADIOBOX)
-						{
-							for(count = 0; count < n_choices; ++count)
-							{
+						if (p->mode == RADIOBOX) {
+							for(count = 0; count < n_choices; ++count) {
 						            curr = (OptionEl*)item_userptr(option_items[count]);
 								// if we have the same user ptr - but we are not ourself - disable it!
-								if (curr == p)
-								{
+								if (curr == p) {
 									if (curItem == option_items[count] || !setToTrue)
-									{
 										item_opts_on(option_items[count], O_SELECTABLE);
-									}
 									else
-									{
 										item_opts_off(option_items[count], O_SELECTABLE);
-									}
 								}
 							}
 						}
-					}
-					else
-					{
+					} else {
 						p->value = NULL;
 					}
-				}
-				else
-				{
+				} else {
 					p->value = getString(option_menu_win,p->value);
 					if (p->value != NULL && strcmp("",p->value) != 0)
-					{
 						menu_driver(option_menu, REQ_TOGGLE_ITEM);
-					}
+
 					wrefresh(title_menu_win);
 					wrefresh(option_menu_win);
 				}
-			}
 			break;
 		}
 	}
@@ -348,45 +303,34 @@ main(int argc, char* argv[])
 	ITEM **items;
 	items = menu_items(option_menu);
 	int i;
-	for(i = 0; i < item_count(option_menu); ++i)
-	{
+	for(i = 0; i < item_count(option_menu); ++i) {
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
 
-		if (p->mode == CHECKBOX || p->mode == RADIOBOX)
-		{
+		if (p->mode == CHECKBOX || p->mode == RADIOBOX) {
 			const char* val = (item_value(items[i]) == TRUE) ? "true" : "false";
 			printf("%s=%s\n", item_name(items[i]), val);
-		}
-		else if (p->mode == USER_INPUT)
-		{
+		} else if (p->mode == USER_INPUT) {
 			if (p->value)
-			{
 				printf("%s=%s\n", item_name(items[i]), p->value);
-			}
 			else
-			{
 				printf("%s=\n", item_name(items[i]));
-			}
 		}
 	}
 
 
 	for (count = 0; count < n_choices; ++count)
-	{
 		free_item(option_items[count]);
-	}
 
 	free_menu(option_menu);
 
 	curr = head;
-	while (curr)
-	{
+	while (curr) {
 		next = curr->next;
 		free(curr);
 		curr = next;
 	}
 
 
-	return 0;
+	return (0);
 }
 
