@@ -228,7 +228,7 @@ main(int argc, char* argv[])
 	set_menu_format(option_menu, nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
-	wborder(option_menu_win, '|', '|', '-', '-', '+', '+', '+', '+');
+	wborder(option_menu_win, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 	mvwaddch(option_menu_win, 2, 0, ACS_LTEE);
 	mvwhline(option_menu_win, 2, 1, ACS_HLINE, 38);
 	mvwaddch(option_menu_win, 2, 39, ACS_RTEE);
@@ -307,7 +307,7 @@ main(int argc, char* argv[])
 					}
 					else {
 						p->value = getString(option_menu_win,p->value);
-						wborder(option_menu_win, '|', '|', '-', '-', '+', '+', '+', '+');
+						wborder(option_menu_win, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 						wrefresh(title_menu_win);
 //						wrefresh(option_menu_win);
 //						refresh();
