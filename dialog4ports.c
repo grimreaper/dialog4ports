@@ -167,18 +167,38 @@ main(int argc, char* argv[])
 	//getchar();
 
 	initscr();
+	start_color();
 	cbreak();
 //	noecho();
 	keypad(stdscr, TRUE);
+	init_pair(1, COLOR_GREEN, COLOR_BLACK);     //selected
+	init_pair(2, COLOR_YELLOW, COLOR_BLACK);	//selectable
+	init_pair(3, COLOR_RED, COLOR_BLACK); //disabled
 
 	option_items=(ITEM**)calloc(n_choices + 1, sizeof(ITEM *));
 
 	curr = head;
 	unsigned int count = 0;
 	while(curr) {
-		option_items[count] = new_item(curr->name, curr->descr);
-		set_item_userptr(option_items[count], curr);
-		count++;
+		if (curr->mode != RADIOBOX)
+		{
+			option_items[count] = new_item(curr->name, curr->descr);
+			set_item_userptr(option_items[count], curr);
+			count++;
+		}
+		else
+		{
+			char *tmpToken;
+			char *tmpOption = calloc(strlen(curr->options)+1,sizeof(char));
+			strncpy(tmpOption,curr->options,strlen(curr->options));
+
+			while((tmpToken = strsep(&tmpOption, "#")) != NULL)
+			{
+	                  option_items[count] = new_item(tmpToken, curr->descr);
+	                  set_item_userptr(option_items[count], curr);
+				count++;
+			}
+		}
 		curr = curr->next;
 	}
 
@@ -186,6 +206,13 @@ main(int argc, char* argv[])
 
 
 	option_menu = new_menu((ITEM **)option_items);
+
+	/* Set fore ground and back ground of the menu */
+	set_menu_fore(option_menu, COLOR_PAIR(1) | A_REVERSE);
+	set_menu_back(option_menu, COLOR_PAIR(2));
+	set_menu_grey(option_menu, COLOR_PAIR(3));
+
+
 
 	keypad(option_menu_win, TRUE);
 	set_menu_mark(option_menu, " * ");
@@ -199,6 +226,31 @@ main(int argc, char* argv[])
 	int c;
 	while( (c = getch()) != KEY_F(1) )
 	{
+		ITEM *curItem = current_item(option_menu);
+
+		OptionEl *p = (OptionEl*)item_userptr(curItem);
+
+		if (p != NULL && strcmp("-",p->options) == 0)
+		{
+			item_opts_off(curItem, O_SELECTABLE);
+		}
+
+		if (p != NULL && p->mode == RADIOBOX &&p->value != NULL)
+		{
+			//item_name returns a const ptr
+			const char const* curName = item_name(curItem);
+			p->value = calloc(strlen(curName), sizeof(char)); //LEAKS
+			strcpy(p->value, curName);
+			if (p->value != item_name(curItem))
+			{
+				item_opts_off(curItem, O_SELECTABLE);
+			}
+		}
+		else
+		{
+			item_opts_on(curItem, O_SELECTABLE);
+		}
+
 		switch(c)
 		{
 			case KEY_DOWN:
@@ -222,36 +274,36 @@ main(int argc, char* argv[])
 			case ' ':
 			case 10:
 			{
-				ITEM *curItem = current_item(option_menu);
-				OptionEl *p = (OptionEl*)item_userptr(curItem);
-				if (item_opts(current_item(option_menu)) & O_SELECTABLE)
+				if (item_opts(curItem) & O_SELECTABLE)
 				{
-					menu_driver(option_menu, REQ_TOGGLE_ITEM);
-					p->value = NULL;
-				}
-				else
-				{
-					p->value = getString(p->value);
-					if (p->value != NULL && strcmp("",p->value) != 0)
+					if (p->mode != USER_INPUT)
 					{
 						menu_driver(option_menu, REQ_TOGGLE_ITEM);
+						if(item_value(curItem) == TRUE)
+						{
+							//item_name returns a const ptr
+							const char const* curName = item_name(curItem);
+							p->value = calloc(strlen(curName), sizeof(char)); //LEAKS
+							strcpy(p->value, curName);
+						}
+						else
+						{
+							p->value = NULL;
+						}
 					}
-					refresh();
+					else
+					{
+						p->value = getString(p->value);
+						if (p->value != NULL && strcmp("",p->value) != 0)
+						{
+							menu_driver(option_menu, REQ_TOGGLE_ITEM);
+						}
+						refresh();
+					}
 				}
-			}
 				break;
-
+			}
 		}
-
-		ITEM *cur;
-		cur = current_item(option_menu);
-		OptionEl *p = (OptionEl*)item_userptr(cur);
-
-		if (p != NULL && strcmp("-",p->options) == 0)
-		{
-			item_opts_off(cur, O_SELECTABLE);
-		}
-
 	}
 	unpost_menu(option_menu);
 	endwin(); //get out of ncurses
