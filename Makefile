@@ -25,11 +25,6 @@ CFLAGS += -lmenu -lncurses
 
 #-Wunreachable-code is disabled for way too many false postives
 
-INCLUDE_FILES = -I/usr/local/include
-# Default includes...
-CFLAGS += -isystem /usr/local/include
-LDFLAGS = -L/usr/local/lib
-
 PREFIX = /usr/local
 
 nameclean: .NOTMAIN .USE .EXEC .IGNORE .PHONY
