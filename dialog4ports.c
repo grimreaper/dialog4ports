@@ -22,15 +22,21 @@ getString(WINDOW *win, const char * const curVal)
 
 	int row,col;
 	getmaxyx(win,row,col);		/* get the number of rows and columns */
-	mvwprintw(win,row/2,(col-(int)strlen(mesg))/2,"%s",mesg);     /* print the message at the center of the screen */
+
+	int messageLen = (int)strlen(mesg);
+	int messageStart = (col-messageLen)/2;
+
+	mvwprintw(win,row/2,messageStart,"%s",mesg);     /* print the message at the center of the screen */
 	if (curVal != NULL) {
-		mvwprintw(win,row/2 + 1,(col-(int)strlen(curVal))/2,"%s",curVal);     /* print the message at the center of the screen */
-		wmove(win,row/2 + 2, (col-(int)strlen(curVal))/2);
+		mvwprintw(win,row/2, messageStart + messageLen + 1," [ %s ]",curVal);
 	}
+	echo();
+	wmove(win,row/2 + 1, (messageStart + messageLen)/2);
+	waddstr(win,"==>");
 	wgetnstr(win,str, bufSize -1);				/* request the input...*/
+	noecho();
 	wclear(win);
 	wrefresh(win);
-	refresh();
 
 	return (str);
 }
@@ -153,7 +159,7 @@ main(int argc, char* argv[])
 	initscr();
 	start_color();
 	cbreak();
-//	noecho();
+	noecho();
 	keypad(stdscr, TRUE);
 	init_pair(1, COLOR_GREEN, COLOR_BLACK);     //selected
 	init_pair(2, COLOR_YELLOW, COLOR_BLACK);	//selectable
@@ -300,6 +306,9 @@ main(int argc, char* argv[])
 					}
 					else {
 						p->value = getString(option_menu_win,p->value);
+						wrefresh(title_menu_win);
+						wrefresh(option_menu_win);
+						refresh();
 						if (p->value != NULL && strcmp("",p->value) != 0)
 						{
 							if (item_value(curItem) != TRUE)
