@@ -290,7 +290,6 @@ main(int argc, char* argv[])
 						if(item_value(curItem) == TRUE) {
 							setToTrue = true;
 							p->value = item_name(curItem);
-//							fprintf(stderr,"setting foobar = %s \n\n", item_name(curItem));
 						}
 						//if we are a radiobox - we need to disable/enable valid options
 						if (p->mode == RADIOBOX) {
@@ -347,12 +346,12 @@ main(int argc, char* argv[])
 
 		if (p->mode == CHECKBOX || p->mode == RADIOBOX) {
 			const char* val = (item_value(items[i]) == TRUE) ? "true" : "false";
-			printf("%s=%s\n", item_name(items[i]), val);
+			fprintf(stderr,"%s=%s\n", item_name(items[i]), val);
 		} else if (p->mode == USER_INPUT) {
 			if (p->value)
-				printf("%s=%s\n", item_name(items[i]), p->value);
+				fprintf(stderr,"%s=%s\n", item_name(items[i]), p->value);
 			else
-				printf("%s=\n", item_name(items[i]));
+				fprintf(stderr,"%s=\n", item_name(items[i]));
 		}
 	}
 
