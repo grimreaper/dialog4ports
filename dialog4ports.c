@@ -10,7 +10,6 @@
 
 //TODO - handle sigwinch - resize winsows
 //TODO - replecate OTPIONS's looks and feel (the triple window approach)
-//TODO - default values (from the envrioment - re dougb)
 
 //BUG - getString() clears the border
 
