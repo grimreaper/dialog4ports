@@ -11,7 +11,7 @@
 //TODO - radio options - binary and user input works!
 
 static char *
-getString(const char * const curVal)
+getString(WINDOW *win, const char * const curVal)
 {
 	const int bufSize = 80;
 	char mesg[]="Choose a new value: ";
@@ -19,12 +19,12 @@ getString(const char * const curVal)
 
 	int row,col;
 //	clear();				/* clear the screen; use erase() instead? */
-	getmaxyx(stdscr,row,col);		/* get the number of rows and columns */
-	mvprintw(row/2,(col-(int)strlen(mesg))/2,"%s",mesg);     /* print the message at the center of the screen */
+	getmaxyx(win,row,col);		/* get the number of rows and columns */
+	mvwprintw(win,row/2,(col-(int)strlen(mesg))/2,"%s",mesg);     /* print the message at the center of the screen */
 	if (curVal != NULL)
 	{
-		mvprintw(row/2 + 1,(col-(int)strlen(curVal))/2,"%s",curVal);     /* print the message at the center of the screen */
-		move(row/2 + 2, (col-(int)strlen(curVal))/2);
+		mvwprintw(win,row/2 + 1,(col-(int)strlen(curVal))/2,"%s",curVal);     /* print the message at the center of the screen */
+		wmove(win,row/2 + 2, (col-(int)strlen(curVal))/2);
 	}
 	getnstr(str, bufSize -1);				/* request the input...*/
 	clear();
@@ -81,6 +81,7 @@ main(int argc, char* argv[])
 	ITEM **option_items;
 	MENU *option_menu;
 	WINDOW *option_menu_win;
+	WINDOW *title_menu_win;
 
 
 
@@ -204,8 +205,24 @@ main(int argc, char* argv[])
 
 	option_items[n_choices] = (ITEM *)NULL;
 
-
 	option_menu = new_menu((ITEM **)option_items);
+	const * const title ="hello";
+
+	// we want to leave 3 lines for the title
+	const int startMenyWinRow = 3;
+
+	const int nlines= getmaxy(stdscr) - startMenyWinRow;
+	const int ncols= getmaxx(stdscr);
+
+	const int nMenuRows = 5;
+	const int nMenuCols = 1;
+
+	title_menu_win =  newwin(startMenyWinRow, ncols, 0, 0);
+	option_menu_win = newwin(nlines, ncols, startMenyWinRow, 0);
+	mvwprintw(title_menu_win,startMenyWinRow/2 + 1,(ncols-(int)strlen(title))/2,"%s",title);     /* print the message at the center of the screen */
+	wrefresh(title_menu_win);
+
+
 
 	/* Set fore ground and back ground of the menu */
 	set_menu_fore(option_menu, COLOR_PAIR(1) | A_REVERSE);
@@ -213,18 +230,30 @@ main(int argc, char* argv[])
 	set_menu_grey(option_menu, COLOR_PAIR(3));
 
 
-
 	keypad(option_menu_win, TRUE);
 	set_menu_mark(option_menu, " * ");
+
+	/* Set main window and sub window */
+	set_menu_win(option_menu, option_menu_win);
+	set_menu_sub(option_menu, derwin(option_menu_win, nlines -3, ncols-2, 1, 1));
+	set_menu_format(option_menu, nMenuRows, nMenuCols);
+
+	/* Print a border around the main window and print a title */
+      box(option_menu_win, 0, 0);
+//	print_in_middle(option_menu_win, 1, 0, 40, "My Menu", COLOR_PAIR(1));
+	mvwaddch(option_menu_win, 2, 0, ACS_LTEE);
+	mvwhline(option_menu_win, 2, 1, ACS_HLINE, 38);
+	mvwaddch(option_menu_win, 2, 39, ACS_RTEE);
+
 
 	mvprintw(LINES - 2, 0, "F1 to Exit");
 	menu_opts_off(option_menu,O_ONEVALUE);
 
 	post_menu(option_menu);
-	refresh();
+	wrefresh(option_menu_win);
 
 	int c;
-	while( (c = getch()) != KEY_F(1) )
+	while( (c = wgetch(option_menu_win)) != KEY_F(1) )
 	{
 		ITEM *curItem = current_item(option_menu);
 
@@ -289,12 +318,12 @@ main(int argc, char* argv[])
 					}
 					else
 					{
-						p->value = getString(p->value);
+						p->value = getString(option_menu_win,p->value);
 						if (p->value != NULL && strcmp("",p->value) != 0)
 						{
 							menu_driver(option_menu, REQ_TOGGLE_ITEM);
 						}
-						refresh();
+						wrefresh(option_menu_win);
 					}
 				}
 				break;
