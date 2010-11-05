@@ -8,13 +8,12 @@
 #include <sysexits.h>
 
 
-//TODO - radio options - get the selection code to actually work
 //TODO - handle sigwinch - resize winsows
 //TODO - replecate OTPIONS's looks and feel (the triple window approach)
 //TODO - default values
 
 //BUG - getString() clears the border
-//BUG - no mutually exclusive options are ever useable
+//BUG - once a radio option is selected - you can only choose that option :-|
 
 static char *
 getString(WINDOW *win, const char * const curVal)
@@ -34,6 +33,7 @@ getString(WINDOW *win, const char * const curVal)
 	wgetnstr(win,str, bufSize -1);				/* request the input...*/
 	wclear(win);
 	wrefresh(win);
+	refresh();
 	return str;
 }
 
@@ -64,7 +64,7 @@ struct list_el {
 	char *name;
 	char *options;
 	char *descr;
-	char *value;		//this is user supplied
+	const char *value;		//this is user supplied
 	enum OPTION_TYPE mode;
 	struct list_el *next;
 };
@@ -153,8 +153,6 @@ main(int argc, char* argv[])
 				}
 				else
 				{
-					// is curr->options nul terminated?
-					printf("%d", strlen(curr->options));
 					hashMarks += countChar(internal_token,'#');
 					curr->mode = RADIOBOX;
 				}
@@ -170,7 +168,6 @@ main(int argc, char* argv[])
 	curr = head;
 
 	n_choices = numElements + hashMarks;
-	printf("%d", n_choices + hashMarks);
 	//getchar();
 
 	initscr();
@@ -252,7 +249,7 @@ main(int argc, char* argv[])
 	mvwaddch(option_menu_win, 2, 39, ACS_RTEE);
 
 
-	mvprintw(LINES - 2, 0, "Escape to Exit");
+	mvwprintw(option_menu_win, nlines - 2, 2, "Escape to Exit");
 	menu_opts_off(option_menu,O_ONEVALUE);
 
 	post_menu(option_menu);
@@ -266,16 +263,17 @@ main(int argc, char* argv[])
 
 		OptionEl *p = (OptionEl*)item_userptr(curItem);
 
-		if (p != NULL && strcmp("-",p->options) == 0)
+		if (p != NULL && p->mode == RADIOBOX)
 		{
-			item_opts_off(curItem, O_SELECTABLE);
-		}
-
-		if (p != NULL && p->mode == RADIOBOX &&p->value != NULL)
-		{
+//			const char *foo = "unselectable";
+//			mvwprintw(title_menu_win,startMenyWinRow/2 + 1,(ncols-(int)strlen(foo))/2,"%s",foo);
 			if (p->value != item_name(curItem))
 			{
-				item_opts_off(curItem, O_SELECTABLE);
+				if (p->value != NULL)
+				{
+//					fprintf(stderr, "%s", p->value);
+					item_opts_off(curItem, O_SELECTABLE);
+				}
 			}
 		}
 		else
@@ -313,10 +311,7 @@ main(int argc, char* argv[])
 						menu_driver(option_menu, REQ_TOGGLE_ITEM);
 						if(item_value(curItem) == TRUE)
 						{
-							//item_name returns a const ptr
-							const char const* curName = item_name(curItem);
-							p->value = calloc(strlen(curName), sizeof(char)); //LEAKS
-							strcpy(p->value, curName);
+							p->value = item_name(curItem);
 						}
 						else
 						{
@@ -349,26 +344,21 @@ main(int argc, char* argv[])
 	{
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
 
-		if (p->mode == CHECKBOX)
+		if (p->mode == CHECKBOX || p->mode == RADIOBOX)
 		{
 			const char* val = (item_value(items[i]) == TRUE) ? "true" : "false";
-			fprintf(stderr,"%s=%s\n", item_name(items[i]), val);
+			printf("%s=%s\n", item_name(items[i]), val);
 		}
 		else if (p->mode == USER_INPUT)
 		{
 			if (p->value)
 			{
-				fprintf(stderr,"%s=%s\n", item_name(items[i]), p->value);
+				printf("%s=%s\n", item_name(items[i]), p->value);
 			}
 			else
 			{
-				fprintf(stderr,"%s=\n", item_name(items[i]));
+				printf("%s=\n", item_name(items[i]));
 			}
-		}
-		else //p->mode == RADIOBOX
-		{
-			const char* val = (item_value(items[i]) == TRUE) ? "true" : "false";
-			fprintf(stderr,"%s=%s  #radio\n", item_name(items[i]), val);
 		}
 	}
 
