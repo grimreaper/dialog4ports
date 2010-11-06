@@ -1,7 +1,10 @@
-WITH_XORG=WITH_XORG	./dialog4ports	portname \
-				WITH_XORG='use xorg'=% \
-				WITHOUT_FOO='do not use foo'=% \
-				WWW_TYPE='use this for a web server!'=apache#lighttpd#god#heaven \
-				LANGS='use a language '=- \
-				XYZ='argi'=-		\
-				AAAAZ='hello my dear'=%
+WITH_XORG=WITH_XORG	./dialog4ports --portname name \
+				--check WITH_XORG='use xorg for this' \
+				--check WITHOUT_HELLO='dont use that' \
+				--radio APACHE='fineprint' \
+					LIGHTTPD='or not' \
+					PYTHON='use python to host me' \
+				--input LANG='choose a language' \
+				--check life='use life....'
+
+				
