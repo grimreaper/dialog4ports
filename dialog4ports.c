@@ -20,7 +20,7 @@ printInCenter(WINDOW *win, const int row, const char * const str)
 static char *
 getString(WINDOW *win, const char * const curVal)
 {
-	const int bufSize = 80;
+	const unsigned int bufSize = 80;
 	char mesg[]="Choose a new value: ";
 	char *str = calloc(bufSize, sizeof(char));
 
@@ -36,7 +36,7 @@ getString(WINDOW *win, const char * const curVal)
 	echo();
 	wmove(win,row/2 + 1, (messageStart + (int)strlen(mesg))/2);
 	waddstr(win,"==>");
-	wgetnstr(win, str, bufSize -1);				/* request the input...*/
+	wgetnstr(win, str, (int)bufSize -1);				/* request the input...*/
 	noecho();
 	wclear(win);
 	wrefresh(win);
@@ -523,6 +523,7 @@ main(int argc, char* argv[])
 		c = wgetch(winGetInput);
 		curItem = current_item(whichMenu);
 
+		oldwindow = winGetInput;
 		if (arginfo->outputLicenceRequest)
 			if (winGetInput == licenceWindow)
 				licenceSelected = curItem;
