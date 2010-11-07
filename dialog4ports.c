@@ -84,8 +84,9 @@ outputValues(MENU *menu) {
 	parses the arguments and modifies arginfo
 	with some information
 */
-void
+struct ARGINFO*
 parseArguments(const int argc, char * argv[]) {
+	struct ARGINFO *arginfo = malloc(sizeof(struct ARGINFO));
 	int arg;
 	OptionEl *curr = NULL;
 	OptionEl *prev = NULL;
@@ -107,30 +108,30 @@ parseArguments(const int argc, char * argv[]) {
 	bool gotPortName = false;
       while((internal_token = strsep(&programInfo, "=")) != NULL) {
 		if (!gotPortName) {
-			arginfo.portname = internal_token;
+			arginfo->portname = internal_token;
 			gotPortName = true;
 		}
 		else {
-			arginfo.portcomment = internal_token;
+			arginfo->portcomment = internal_token;
 		}
 	}
 	free(programInfo);
 
-	arginfo.outputLicenceRequest = false;
+	arginfo->outputLicenceRequest = false;
 
 	for (arg=2; arg < argc; ++arg) {
 		if (strcmp("--showLicence",argv[arg]) == 0) {
-			arginfo.outputLicenceRequest = true;
+			arginfo->outputLicenceRequest = true;
 			arg++;
 			continue;
 		}
 
-		++arginfo.nElements;
+		++arginfo->nElements;
 		if ((curr = malloc (sizeof *curr)) == NULL)
 			errx(EX_OSERR,"can not malloc");
 
-		if (!arginfo.head)
-			arginfo.head = curr;
+		if (!arginfo->head)
+			arginfo->head = curr;
 
 		if (prev)
 			prev->next = curr;
@@ -153,7 +154,7 @@ parseArguments(const int argc, char * argv[]) {
 				} else if (strcmp("-", curr->options) == 0) {
 					curr->mode = USER_INPUT;
 				} else {
-					arginfo.nHashMarks += countChar(internal_token,'#');
+					arginfo->nHashMarks += countChar(internal_token,'#');
 					curr->mode = RADIOBOX;
 				}
 				gotOpts = true;
@@ -167,6 +168,7 @@ parseArguments(const int argc, char * argv[]) {
 		curr = curr->next;
 	}
 
+	return (arginfo);
 }
 
 
@@ -190,14 +192,12 @@ main(int argc, char* argv[])
 
 	/* Avoid C++ style declaration inside loops */
 
-	parseArguments(argc, argv);
-//	head = arginfo.head;
-
+	struct ARGINFO *arginfo = parseArguments(argc, argv);
 
 	//deal with curses
-	curr = arginfo.head;
+	curr = arginfo->head;
 
-	n_choices = arginfo.nElements + arginfo.nHashMarks;
+	n_choices = arginfo->nElements + arginfo->nHashMarks;
 	//getchar();
 
 	initscr();
@@ -214,7 +214,7 @@ main(int argc, char* argv[])
 
 	option_items=(ITEM**)calloc(n_choices + 1, sizeof(ITEM *));
 
-	curr = arginfo.head;
+	curr = arginfo->head;
 	unsigned int count = 0;
 
 	while(curr) {
@@ -268,7 +268,7 @@ main(int argc, char* argv[])
 	const int full_licence_menu_size = (int)strlen("YES")*2+1;
 	//Hack because menu ignores starting location
 	int licenceColStart;
-      if (arginfo.outputLicenceRequest)
+      if (arginfo->outputLicenceRequest)
 		licenceColStart = (frameCols - full_licence_menu_size)/2;
 	else
 		licenceColStart = 0;
@@ -343,7 +343,7 @@ main(int argc, char* argv[])
 	ITEM* licenceSelected = licenceItems[licenceNO];
 
 	MENU *licenceMenu;
-	if (arginfo.outputLicenceRequest) {
+	if (arginfo->outputLicenceRequest) {
 		licenceMenu = new_menu(licenceItems);
 
 	      set_menu_win(licenceMenu, licenceWindow);
@@ -377,10 +377,10 @@ main(int argc, char* argv[])
 	const int nMenuCols = 1;
 
 	//display the title in the center of the top window
-	mvwprintw(headWindow,startMenyWinRow/2 ,(headCols-(int)strlen(arginfo.portname))/2,"%s",arginfo.portname);
-	if (arginfo.portcomment != NULL)
+	mvwprintw(headWindow,startMenyWinRow/2 ,(headCols-(int)strlen(arginfo->portname))/2,"%s",arginfo->portname);
+	if (arginfo->portcomment != NULL)
 	{
-		mvwprintw(headWindow,startMenyWinRow/2 + 1,(headCols-(int)strlen(arginfo.portcomment))/2,"%s",arginfo.portcomment);
+		mvwprintw(headWindow,startMenyWinRow/2 + 1,(headCols-(int)strlen(arginfo->portcomment))/2,"%s",arginfo->portcomment);
 	}
 	wrefresh(headWindow);
 
@@ -396,7 +396,7 @@ main(int argc, char* argv[])
 	keypad(exitWindow, TRUE);
 	keypad(helpWindow, TRUE);
 	keypad(headWindow, TRUE);
-	if (arginfo.outputLicenceRequest)
+	if (arginfo->outputLicenceRequest)
 		keypad(licenceWindow, TRUE);
 
 	set_menu_mark(option_menu, " * ");
@@ -443,7 +443,7 @@ main(int argc, char* argv[])
 		c = wgetch(winGetInput);
 		ITEM *curItem = current_item(whichMenu);
 
-		if (arginfo.outputLicenceRequest)
+		if (arginfo->outputLicenceRequest)
 			if (winGetInput == licenceWindow)
 				licenceSelected = curItem;
 		WINDOW *oldwindow;
@@ -477,7 +477,7 @@ main(int argc, char* argv[])
       		      set_menu_fore(whichMenu, COLOR_PAIR(1));
 
 				if (winGetInput == primaryWindow) {
-					if (arginfo.outputLicenceRequest) {
+					if (arginfo->outputLicenceRequest) {
 						winGetInput = licenceWindow;
 						whichMenu = licenceMenu;
 					}
@@ -618,7 +618,7 @@ main(int argc, char* argv[])
 
 	if (somethingChanged) {
 		outputValues(option_menu);
-		if (arginfo.outputLicenceRequest)
+		if (arginfo->outputLicenceRequest)
 			outputBinaryValue(licenceItems[licenceYES], "ACCEPTED_LICENCE");
 	}
 
@@ -626,16 +626,18 @@ main(int argc, char* argv[])
 		free_item(option_items[count]);
 
 	free_menu(option_menu);
-	if (arginfo.outputLicenceRequest)
+	if (arginfo->outputLicenceRequest)
 		free_menu(licenceMenu);
 	free_menu(exitMenu);
 
-	curr = arginfo.head;
+	curr = arginfo->head;
 	while (curr) {
 		next = curr->next;
 		free(curr);
 		curr = next;
 	}
+
+	free(arginfo);
 
 	return ((somethingChanged) ? exitOK : exitCancel);
 }

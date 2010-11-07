@@ -35,15 +35,15 @@ outputValues(MENU *menu);
 /*
 	this is fugly
 */
-struct {
+struct ARGINFO {
 	unsigned int nElements;
 	unsigned int nHashMarks;
 	OptionEl * head;
 	const char * portname;
 	const char * portcomment;
 	bool outputLicenceRequest;
-} arginfo;
+};
 
-void
+struct ARGINFO*
 parseArguments(const int argc, char * argv[]);
 
