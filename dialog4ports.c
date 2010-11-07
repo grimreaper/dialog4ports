@@ -25,13 +25,10 @@ getString(WINDOW *win, const char * const curVal)
 	char mesg[]="Choose a new value: ";
 	char *str = calloc(bufSize,sizeof(char));
 
-//	int row,col;
 	int messageStart;
-//	getmaxyx(win,row,col);		/* get the number of rows and columns */
 	int row = getmaxx(win);
 
 	printInCenter(win, row/2, mesg);
-//	mvwprintw(win,row/2,messageStart,"%s",mesg);     /* print the message at the center of the screen */
 
 	if (curVal != NULL) {
 		messageStart = printInCenter(win, row/2, mesg);
@@ -209,7 +206,6 @@ main(int argc, char* argv[])
 	/* culot: better use sys/queue.h instead of your own linked list implementation.
 	   It will be easier to maintain, see queue(3). */
 	OptionEl *curr = NULL;
-//	OptionEl *head = NULL;
 	OptionEl *next = NULL;
 
 	ITEM **option_items;
@@ -219,15 +215,12 @@ main(int argc, char* argv[])
 
 	unsigned int n_choices = 0;
 
-	/* Avoid C++ style declaration inside loops */
-
 	struct ARGINFO *arginfo = parseArguments(argc, argv);
 
 	//deal with curses
 	curr = arginfo->head;
 
 	n_choices = arginfo->nElements + arginfo->nHashMarks;
-	//getchar();
 
 	initscr();
 	if(has_colors() == TRUE) {
