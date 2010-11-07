@@ -249,14 +249,14 @@ main(int argc, char* argv[])
 	const int exitCols = frameCols;
 	const int exitRowStart = frameRows - exitRows;
 	// menu == sizeof(largest item) + 1 space for each item
-	const int full_exit_menu_size = strlen("CANCEL")*2+1;
+	const int full_exit_menu_size = (int)strlen("CANCEL")*2+1;
 	const int exitColStart = (frameCols - full_exit_menu_size)/2;
 
 	const int licenceRows = 3;
 	const int licenceCols = frameCols;
 	const int licenceRowStart = exitRowStart - licenceRows;
 	// menu == sizeof(largest item) + 1 space for each item
-	const int full_licence_menu_size = strlen("YES")*2+1;
+	const int full_licence_menu_size = (int)strlen("YES")*2+1;
 	const int licenceColStart = (frameCols - full_licence_menu_size)/2;
 
 	const int primaryRowStart = headRows + 1;
@@ -410,7 +410,7 @@ main(int argc, char* argv[])
       menu_driver(option_menu, REQ_FIRST_ITEM);
 
 
-	const WINDOW *winGetInput = primaryWindow;
+	WINDOW *winGetInput = primaryWindow;
 	MENU	 *whichMenu = option_menu;
 	bool weWantMore = true;
 	bool somethingChanged = false;

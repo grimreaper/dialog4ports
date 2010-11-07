@@ -5,9 +5,9 @@ enum OPTION_TYPE {
 };
 
 struct list_el {
-	char *name;
-	char *options;
-	char *descr;
+	const char *name;
+	const char *options;
+	const char *descr;
 	const char *value;		//this is user supplied
 	enum OPTION_TYPE mode;
 	struct list_el *next;
