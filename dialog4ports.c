@@ -10,6 +10,8 @@
 //BUG - licence output is always false
 //user ptr to change licence!?
 
+//TODO - display the licence in the helptext window when on the licence menu
+
 static char *
 getString(WINDOW *win, const char * const curVal)
 {
