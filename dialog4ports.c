@@ -7,7 +7,6 @@
 #include <err.h>
 #include <sysexits.h>
 
-
 //TODO - handle sigwinch - resize winsows
 //TODO - replecate OTPIONS's looks and feel (the triple window approach)
 
@@ -85,8 +84,6 @@ main(int argc, char* argv[])
 
 	ITEM **option_items;
 	MENU *option_menu;
-	WINDOW *option_menu_win;
-	WINDOW *title_menu_win;
 
 	int c;
 
@@ -193,21 +190,71 @@ main(int argc, char* argv[])
 	option_items[n_choices] = (ITEM *)NULL;
 
 	option_menu = new_menu((ITEM **)option_items);
+
+
+/* a bunch of constants re the size of the window */
+
+
+	/*
+		maybe I should make this a struct instead?
+	*/
+	const int frameRows = getmaxy(stdscr);
+	const int frameCols = getmaxx(stdscr);
+
+	const int headRowStart = 0;
+	const int headColStart = 0;
+	const int headRows = 3;
+	const int headCols = frameCols;
+
+	const int exitRows = 2;
+	const int exitCols = frameCols;
+	const int exitRowStart = frameRows - exitRows;
+	const int exitColStart = 0;
+
+	const int licenceRows = 2;
+	const int licenceCols = frameCols;
+	const int licenceRowStart = exitRowStart - licenceRows;
+	const int licenceColStart = 0;
+
+	const int primaryRowStart = headRows + 1;
+	const int primaryColStart = 0;
+	const int primaryRows = frameRows - licenceRows - exitRows;
+	const int primaryCols = frameCols / 2;
+
+	const int helpRowStart = headRows + 1;
+	const int helpColStart = primaryCols + 1;
+	const int helpRows = primaryRows;
+	const int helpCols = frameCols - primaryCols;
+
+
+	WINDOW *headWindow;
+	WINDOW *exitWindow;
+	WINDOW *licenceWindow;
+	WINDOW *primaryWindow;
+	WINDOW *helpWindow;
+
+	headWindow = newwin(headRows, headCols, headRowStart, headColStart);
+	exitWindow = newwin(exitRows, exitCols, exitRowStart, exitColStart);
+	licenceWindow = newwin(licenceRows, licenceCols, licenceRowStart, licenceColStart);
+	primaryWindow = newwin(primaryRows, primaryCols, primaryRowStart, primaryColStart);
+	helpWindow = newwin(helpRows, helpCols, helpRowStart, helpColStart);
+
+	/*	head + primary + help + licence + exit */
+	const int minRows = headRows + licenceRows + exitRows + 1;
+	const int minCols = headCols;
+
+	if (frameRows < minRows || frameCols < minCols) {
+		errx(EX_UNAVAILABLE, "Terminal size is to small");
+	}
 	// we want to leave 3 lines for the title
 	const int startMenyWinRow = 3;
 
-	const int nlines= getmaxy(stdscr) - startMenyWinRow;
-	const int ncols= getmaxx(stdscr);
-
-	const int nMenuRows = nlines - 1;
+	const int nMenuRows = primaryRows - 1;
 	const int nMenuCols = 1;
 
-	title_menu_win =  newwin(startMenyWinRow, ncols, 0, 0);
-	option_menu_win = newwin(nlines, ncols, startMenyWinRow, 0);
-
 	//display the title in the center of the top window
-	mvwprintw(title_menu_win,startMenyWinRow/2 + 1,(ncols-(int)strlen(portName))/2,"%s",portName);
-	wrefresh(title_menu_win);
+	mvwprintw(headWindow,startMenyWinRow/2 + 1,(headCols-(int)strlen(portName))/2,"%s",portName);
+	wrefresh(headWindow);
 
 
 
@@ -219,27 +266,27 @@ main(int argc, char* argv[])
 	}
 
 
-	keypad(option_menu_win, TRUE);
+	keypad(primaryWindow, TRUE);
 	set_menu_mark(option_menu, " * ");
 
 	/* Set main window and sub window */
-	set_menu_win(option_menu, option_menu_win);
-	set_menu_sub(option_menu, derwin(option_menu_win, nlines -3, ncols-2, 1, 1));
+	set_menu_win(option_menu, primaryWindow);
+	set_menu_sub(option_menu, derwin(primaryWindow, primaryRows -3, primaryCols-2, 1, 1));
 	set_menu_format(option_menu, nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
-	wborder(option_menu_win, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-	mvwaddch(option_menu_win, 2, 0, ACS_LTEE);
-	mvwhline(option_menu_win, 2, 1, ACS_HLINE, 38);
-	mvwaddch(option_menu_win, 2, 39, ACS_RTEE);
+	wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
+	mvwaddch(primaryWindow, 2, 0, ACS_LTEE);
+	mvwhline(primaryWindow, 2, 1, ACS_HLINE, 38);
+	mvwaddch(primaryWindow, 2, 39, ACS_RTEE);
 
 
-	mvwprintw(option_menu_win, nlines - 2, 2, "Escape to Exit");
+	mvwprintw(primaryWindow, primaryRows - 2, 2, "Escape to Exit");
 	menu_opts_off(option_menu,O_ONEVALUE);
 
 	post_menu(option_menu);
-	wrefresh(title_menu_win);
-	wrefresh(option_menu_win);
+	wrefresh(headWindow);
+	wrefresh(primaryWindow);
 
 	/* toggling and truth have nothing to do with each other :-)
 	   so go thru each one, set the envrioment, and then return to top
@@ -257,7 +304,7 @@ main(int argc, char* argv[])
 	}
       menu_driver(option_menu, REQ_FIRST_ITEM);
 
-	while( (c = wgetch(option_menu_win)) != 27 ) {
+	while( (c = wgetch(primaryWindow)) != 27 ) {
 		ITEM *curItem = current_item(option_menu);
 
 		OptionEl *p = (OptionEl*)item_userptr(curItem);
@@ -306,10 +353,10 @@ main(int argc, char* argv[])
 						}
 					}
 					else {
-						p->value = getString(option_menu_win,p->value);
-						wborder(option_menu_win, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-						wrefresh(title_menu_win);
-//						wrefresh(option_menu_win);
+						p->value = getString(primaryWindow,p->value);
+						wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
+						wrefresh(headWindow);
+//						wrefresh(primaryWindow);
 //						refresh();
 						if (p->value != NULL && strcmp("",p->value) != 0)
 						{
@@ -327,8 +374,8 @@ main(int argc, char* argv[])
 							p->value = NULL;
 						}
 
-						wrefresh(title_menu_win);
-						wrefresh(option_menu_win);
+						wrefresh(headWindow);
+						wrefresh(primaryWindow);
 					}
 				}
 			break;
