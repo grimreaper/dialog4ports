@@ -8,6 +8,10 @@
 #include <sysexits.h>
 
 
+
+//BUG - licence output is always false
+//TODO - get long description support
+
 enum OPTION_TYPE {
 	CHECKBOX,
 	RADIOBOX,
@@ -25,8 +29,6 @@ struct list_el {
 
 typedef struct list_el OptionEl;
 
-//TODO - handle sigwinch - resize winsows
-//TODO - replecate OTPIONS's looks and feel (the triple window approach)
 
 static char *
 getString(WINDOW *win, const char * const curVal)
@@ -71,6 +73,12 @@ countChar ( const char * const input, const char c )
 }
 
 void
+outputBinaryValue(ITEM* item, const char *key) {
+	bool val = item_value(item) == TRUE;
+	printf("%s=%s\n",key,(val) ? "true" : "false");
+}
+
+void
 outputValues(MENU *menu) {
 	ITEM **items;
       OptionEl *p;
@@ -84,6 +92,7 @@ outputValues(MENU *menu) {
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
 
 		if (p->mode == CHECKBOX || p->mode == RADIOBOX) {
+			outputBinaryValue(items[i], item_name(items[i]));
 			val = (item_value(items[i]) == TRUE) ? "true" : "false";
 			fprintf(stderr,"%s=%s\n", item_name(items[i]), val);
 		} else if (p->mode == USER_INPUT) {
@@ -94,8 +103,6 @@ outputValues(MENU *menu) {
 		}
 	}
 }
-
-
 
 struct {
 	unsigned int nElements;
@@ -183,10 +190,7 @@ main(int argc, char* argv[])
 	unsigned int n_choices = 0;
 	unsigned int hashMarks = 0;
 
-
-
 	/* Avoid C++ style declaration inside loops */
-	int arg;
 
 	const char * const portName = argv[1];
 
@@ -332,6 +336,8 @@ main(int argc, char* argv[])
 	licenceItems[licenceYES] = new_item("YES", "");
 	licenceItems[2] = (ITEM*)NULL;
 
+	ITEM* licenceSelected = licenceItems[licenceNO];
+
 	MENU *licenceMenu = new_menu(licenceItems);
 
       set_menu_win(licenceMenu, licenceWindow);
@@ -424,7 +430,10 @@ main(int argc, char* argv[])
 	while(weWantMore) {
 		c = wgetch(winGetInput);
 		ITEM *curItem = current_item(whichMenu);
-
+		if (winGetInput == licenceWindow)
+		{
+			licenceSelected = curItem;
+		}
 		switch(c)
 		{
 			case KEY_DOWN:
@@ -551,16 +560,17 @@ main(int argc, char* argv[])
 	delwin(licenceWindow);
 	delwin(exitWindow);
 
-	if (somethingChanged)
-	{
+
+	if (somethingChanged) {
 		outputValues(option_menu);
+		outputBinaryValue(licenceItems[licenceYES], "ACCEPTED_LICENCE");
 	}
 
 	for (count = 0; count < n_choices; ++count)
 		free_item(option_items[count]);
 
 	free_menu(option_menu);
-	free_menu(exitMenu);
+	free_menu(licenceMenu);
 
 	curr = arginfo.head;
 	while (curr) {
@@ -571,4 +581,3 @@ main(int argc, char* argv[])
 
 	return ((somethingChanged) ? exitOK : exitCancel);
 }
-
