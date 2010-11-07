@@ -199,7 +199,7 @@ main(int argc, char* argv[])
 	const int nlines= getmaxy(stdscr) - startMenyWinRow;
 	const int ncols= getmaxx(stdscr);
 
-	const int nMenuRows = 5;
+	const int nMenuRows = nlines - 1;
 	const int nMenuCols = 1;
 
 	title_menu_win =  newwin(startMenyWinRow, ncols, 0, 0);
