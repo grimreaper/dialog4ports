@@ -108,6 +108,8 @@ struct {
 	unsigned int nElements;
 	unsigned int nHashMarks;
 	OptionEl * head;
+	const char * portname;
+	const char * portcomment;
 } arginfo;
 
 /*
