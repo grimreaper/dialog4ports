@@ -258,8 +258,10 @@ main(int argc, char* argv[])
 	OptionEl *curr = NULL;
 	OptionEl *next = NULL;
 
-	ITEM **option_items;
-	MENU *option_menu;
+	ITEM	**option_items;
+	MENU	*option_menu;
+	ITEM	**exitItems;
+	ITEM	**licenceItems;
 
 	bool weWantMore = true;
 	bool somethingChanged = false;
@@ -267,14 +269,16 @@ main(int argc, char* argv[])
 	ITEM *curItem;
 	WINDOW *oldwindow;
 
-	WINDOW *headWindow;
-	WINDOW *exitWindow;
-	WINDOW *licenceWindow;
-	WINDOW *primaryWindow;
-	WINDOW *helpWindow;
+	WINDOW	*headWindow;
+	WINDOW	*exitWindow;
+	WINDOW	*licenceWindow;
+	WINDOW	*primaryWindow;
+	WINDOW	*helpWindow;
 
-	WINDOW *winGetInput;
-	MENU	 *whichMenu;
+	WINDOW	*winGetInput;
+	MENU		*whichMenu;
+	MENU		*licenceMenu;
+	MENU		*exitMenu;
 
 	bool licenceAccepted = false;
 
@@ -387,7 +391,7 @@ main(int argc, char* argv[])
 	}
 
 
-	ITEM** exitItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
+	exitItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
 
 	const int exitOK = 0;
 	const int exitCancel = 1;
@@ -395,7 +399,7 @@ main(int argc, char* argv[])
 	exitItems[exitCancel] = new_item("CANCEL", "");
 	exitItems[2] = (ITEM*)NULL;
 
-	MENU *exitMenu = new_menu(exitItems);
+	exitMenu = new_menu(exitItems);
 
       set_menu_win(exitMenu, exitWindow);
       set_menu_sub(exitMenu, derwin(exitWindow, exitRows, exitCols, 0, 0));
@@ -413,7 +417,7 @@ main(int argc, char* argv[])
 	wrefresh(exitWindow);
 
 
-	ITEM** licenceItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
+	licenceItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
 
 	/* default to no... */
 	const int licenceNO = 0;
@@ -424,7 +428,6 @@ main(int argc, char* argv[])
 
 	ITEM* licenceSelected = licenceItems[licenceNO];
 
-	MENU *licenceMenu;
 	if (arginfo->outputLicenceRequest) {
 		licenceMenu = new_menu(licenceItems);
 
