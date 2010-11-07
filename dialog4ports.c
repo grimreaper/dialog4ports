@@ -648,6 +648,10 @@ main(int argc, char* argv[])
 					printFileToWindow(helpWindow, p->longDescrFile);
 				}
 			}
+			else if (winGetInput == licenceWindow) {
+				if (arginfo->licenceText != NULL)
+					printFileToWindow(helpWindow, arginfo->licenceText);
+			}
 			wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 			wrefresh(helpWindow);
 
