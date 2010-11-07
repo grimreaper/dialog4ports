@@ -7,9 +7,6 @@
 #include "dialog4ports.h"
 
 
-//TODO - display the licence in the helptext window when on the licence menu
-//TODO - add text asking user if they want to accept the licence
-
 int
 printInCenter(WINDOW *win, const int row, const char * const str) {
 	const int cols = getmaxx(win);
@@ -128,12 +125,12 @@ parseArguments(const int argc, char * argv[]) {
 	arginfo->licenceName = NULL;
 
 	enum {
-		OPEN,		//we can get the next argument
-		NEXT_OPTION, //fix the struct
-		READ_LNAME, //next thing is the wlicence name
-		READ_LTEXT, //next thing to read is the licence text
-		READ_PNAME, //next thing is the port name
-		READ_PCOMMENT, //next thing is the port comment
+		OPEN,			/* we can get the next argument */
+		NEXT_OPTION, 	/* fix the struct	*/
+		READ_LNAME,		/* next thing is the wlicence name */
+		READ_LTEXT, 	/* next thing to read is the licence text */
+		READ_PNAME, 	/* next thing is the port name */
+		READ_PCOMMENT,	/* next thing is the port comment */
 	} stage;
 
 	stage = OPEN;
@@ -219,15 +216,15 @@ parseArguments(const int argc, char * argv[]) {
 
 void
 printFileToWindow(WINDOW * const win, const char * const filename) {
-	//function fileToWindow ?
-	const unsigned int maxCharPerLine = 80; //NEVER - ever go above 80
-								//deal with terminal size below
+	/* function fileToWindow ? */
+	const unsigned int maxCharPerLine = 80; /* NEVER - ever go above 80
+								deal with terminal size below */
 	FILE *hFile = fopen(filename, "r");
 
 	int maxCols = getmaxx(win);
 	if (hFile == NULL)
 		errx(EX_IOERR, "File specified does not exist");
-	//never read more than 80 charaters per line
+	/* never read more than 80 charaters per line */
 	char buf[maxCharPerLine + 1];
 	int row = 1;
 	while (fgets(buf, maxCharPerLine, hFile)) {
@@ -242,7 +239,7 @@ printFileToWindow(WINDOW * const win, const char * const filename) {
 int
 main(int argc, char* argv[])
 {
-	//create the linked list that I work with later
+	/* create the linked list that I work with later */
 
 	/* culot: better use sys/queue.h instead of your own linked list implementation.
 	   It will be easier to maintain, see queue(3). */
@@ -273,7 +270,7 @@ main(int argc, char* argv[])
 
 	struct ARGINFO *arginfo = parseArguments(argc, argv);
 
-	//deal with curses
+	/* deal with curses */
 	curr = arginfo->head;
 
 	n_choices = arginfo->nElements + arginfo->nHashMarks;
@@ -281,9 +278,9 @@ main(int argc, char* argv[])
 	initscr();
 	if(has_colors() == TRUE) {
 		start_color();
-		init_pair(1, COLOR_GREEN, COLOR_BLACK);   //selected
-		init_pair(2, COLOR_YELLOW, COLOR_BLACK);	//selectable
-		init_pair(3, COLOR_RED, COLOR_BLACK); 	//disabled
+		init_pair(1, COLOR_GREEN, COLOR_BLACK);   /* selected */
+		init_pair(2, COLOR_YELLOW, COLOR_BLACK);	/* selectable */
+		init_pair(3, COLOR_RED, COLOR_BLACK); 	/* disabled */
 	}
 
 	cbreak();
@@ -335,16 +332,16 @@ main(int argc, char* argv[])
 	const int exitRows = 4;
 	const int exitCols = frameCols;
 	const int exitRowStart = frameRows - exitRows;
-	// menu == sizeof(largest item) + 1 space for each item
+	/* menu == sizeof(largest item) + 1 space for each item */
 	const int full_exit_menu_size = (int)strlen("CANCEL")*2+1;
 	const int exitColStart = (frameCols - full_exit_menu_size)/2;
 
 	const int licenceRows = 3;
 	const int licenceCols = frameCols;
 	const int licenceRowStart = exitRowStart - licenceRows;
-	// menu == sizeof(largest item) + 1 space for each item
+	/* menu == sizeof(largest item) + 1 space for each item */
 	const int full_licence_menu_size = (int)(strlen("ACCEPT")+strlen("the licence"))*2+1;
-	//Hack because menu ignores starting location
+	/* Hack because menu ignores starting location */
 	int licenceColStart;
       if (arginfo->outputLicenceRequest)
 		licenceColStart = (frameCols - full_licence_menu_size)/2;
@@ -389,7 +386,7 @@ main(int argc, char* argv[])
 
       set_menu_win(exitMenu, exitWindow);
       set_menu_sub(exitMenu, derwin(exitWindow, exitRows, exitCols, 0, 0));
-	// 1 row - 2 cols for ok/cancel
+	/* 1 row - 2 cols for ok/cancel */
       set_menu_format(exitMenu, 1, 2);
 	set_menu_mark(exitMenu, ">");
 
@@ -405,7 +402,7 @@ main(int argc, char* argv[])
 
 	ITEM** licenceItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
 
-	//default to no...
+	/* default to no... */
 	const int licenceNO = 0;
 	const int licenceYES  = 1;
 	licenceItems[licenceNO] = new_item("REJECT", "the licence");
@@ -420,7 +417,7 @@ main(int argc, char* argv[])
 
 	      set_menu_win(licenceMenu, licenceWindow);
       	set_menu_sub(licenceMenu, derwin(licenceWindow, licenceRows, licenceCols, 1, 0));
-		// 1 row - 2 cols for ok/cancel
+		/* 1 row - 2 cols for ok/cancel */
       	set_menu_format(licenceMenu, 1, 2);
 		set_menu_mark(licenceMenu, ">");
 		set_menu_fore(licenceMenu, COLOR_PAIR(1));
@@ -442,13 +439,13 @@ main(int argc, char* argv[])
 	menu_opts_off(option_menu, O_SHOWDESC);
 	menu_opts_on(option_menu, O_NONCYCLIC);
 
-	// we want to leave 3 lines for the title
+	/* we want to leave 3 lines for the title */
 	const int startMenyWinRow = 3;
 
 	const int nMenuRows = primaryRows - 1;
 	const int nMenuCols = 1;
 
-	//display the title in the center of the top window
+	/* display the title in the center of the top window */
 	printInCenter(headWindow, startMenyWinRow/2, arginfo->portname);
 	if (arginfo->portcomment != NULL)
 	{
@@ -583,13 +580,13 @@ main(int argc, char* argv[])
 								setToTrue = true;
 								p->value = item_name(curItem);
 							}
-							//if we are a radiobox - we need to disable/enable valid options
+							/* if we are a radiobox - we need to disable/enable valid options */
 							if (p->mode == RADIOBOX)
 							{
 								for(count = 0; count < n_choices; ++count)
 								{
 							            curr = (OptionEl*)item_userptr(option_items[count]);
-									// if we have the same user ptr - but we are not ourself - disable it!
+									/* if we have the same user ptr - but we are not ourself - disable it! */
 									if (curr == p)
 									{
 										if (curItem == option_items[count] || !setToTrue)
@@ -633,7 +630,7 @@ main(int argc, char* argv[])
 					weWantMore = false;
 				}
 				break;
-			case 27: //ESCAPE
+			case 27: /* ESCAPE */
 				weWantMore = false;
 				break;
 			}
@@ -667,7 +664,7 @@ main(int argc, char* argv[])
 			}
 		}
 	unpost_menu(option_menu);
-	endwin(); //get out of ncurses
+	endwin(); /* get out of ncurses */
 
 	delwin(headWindow);
 	delwin(primaryWindow);
