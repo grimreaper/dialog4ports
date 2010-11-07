@@ -23,7 +23,6 @@ struct list_el {
 	struct list_el *next;
 };
 
-
 typedef struct list_el OptionEl;
 
 //TODO - handle sigwinch - resize winsows
