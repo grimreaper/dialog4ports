@@ -197,6 +197,7 @@ printFileToWindow(WINDOW * const win, const char * const filename) {
 		if (result == ERR)
 			errx(EX_SOFTWARE, "unable to write string to screen for unknown reason");
 	}
+
 	fclose(hFile);
 }
 
