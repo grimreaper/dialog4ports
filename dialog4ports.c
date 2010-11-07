@@ -66,9 +66,8 @@ outputBinaryValue(ITEM* item, const char *key) {
 void
 outputValues(MENU *menu) {
 	ITEM **items;
-
-	items = menu_items(menu);
 	int i;
+	items = menu_items(menu);
 	for(i = 0; i < item_count(menu); ++i) {
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
 
@@ -94,6 +93,18 @@ parseArguments(const int argc, char * argv[]) {
 	OptionEl *curr = NULL;
 	OptionEl *prev = NULL;
 	const char* internal_token = NULL;
+	char * programInfo;
+	bool gotPortName;
+
+	enum {
+		OPEN,			/* we can get the next argument */
+		NEXT_OPTION, 	/* fix the struct	*/
+		READ_LNAME,		/* next thing is the wlicence name */
+		READ_LTEXT, 	/* next thing to read is the licence text */
+		READ_PNAME, 	/* next thing is the port name */
+		READ_PCOMMENT	/* next thing is the port comment */
+	} stage;
+
 
 	if (argc < 2)
 		errx(EX_USAGE, "We require some option type to work");
@@ -105,11 +116,11 @@ parseArguments(const int argc, char * argv[]) {
 	* arg=1 port title & comment
 	*/
 
-	char * programInfo = calloc(strlen(argv[1]), sizeof(char));
+	programInfo = calloc(strlen(argv[1]), sizeof(char));
 	/* we are not really being safer here :-) */
 	strncpy(programInfo, argv[1], strlen(argv[1]));
 
-	bool gotPortName = false;
+	gotPortName = false;
       while((internal_token = strsep(&programInfo, "=")) != NULL) {
 		if (!gotPortName) {
 			arginfo->portname = internal_token;
@@ -124,15 +135,6 @@ parseArguments(const int argc, char * argv[]) {
 	arginfo->outputLicenceRequest = false;
 	arginfo->licenceText = NULL;
 	arginfo->licenceName = NULL;
-
-	enum {
-		OPEN,			/* we can get the next argument */
-		NEXT_OPTION, 	/* fix the struct	*/
-		READ_LNAME,		/* next thing is the wlicence name */
-		READ_LTEXT, 	/* next thing to read is the licence text */
-		READ_PNAME, 	/* next thing is the port name */
-		READ_PCOMMENT	/* next thing is the port comment */
-	} stage;
 
 	stage = OPEN;
 
@@ -217,17 +219,21 @@ parseArguments(const int argc, char * argv[]) {
 
 void
 printFileToWindow(WINDOW * const win, const char * const filename) {
+
+	int row;
+	int maxCols;
 	/* function fileToWindow ? */
 	const unsigned int maxCharPerLine = 80; /* NEVER - ever go above 80
 								deal with terminal size below */
+	char buf[maxCharPerLine + 1];
+
 	FILE *hFile = fopen(filename, "r");
 
-	int maxCols = getmaxx(win);
+	maxCols = getmaxx(win);
 	if (hFile == NULL)
 		errx(EX_IOERR, "File specified does not exist");
 	/* never read more than 80 charaters per line */
-	char buf[maxCharPerLine + 1];
-	int row = 1;
+	row = 1;
 	while (fgets(buf, maxCharPerLine, hFile)) {
 		const int result = mvwaddnstr(win, row++, 1, buf, maxCols - 1);
 		if (result == ERR)
