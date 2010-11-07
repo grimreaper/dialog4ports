@@ -15,7 +15,7 @@ printInCenter(WINDOW *win, const int row, const char * const str) {
 	const int start = (cols-(int)strlen(str))/2;
       if (mvwaddstr(win, row, start, str) == ERR)
 		errx(EX_SOFTWARE, "unable to write string to screen for unknown reason");
-	return start;
+	return (start);
 }
 
 static char *
