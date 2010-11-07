@@ -12,7 +12,7 @@ struct list_el {
 	const char *name;
 	const char *options;
 	const char *descr;
-	const char *value;		//this is user supplied
+	const char *value;		/* this is user supplied */
 	const char *longDescrFile;
 	enum OPTION_TYPE mode;
 	struct list_el *next;
@@ -49,7 +49,7 @@ struct ARGINFO {
 struct ARGINFO*
 parseArguments(const int argc, char * argv[]);
 
-//returns the starting location for the message
+/* returns the starting location for the message */
 int
 printInCenter(WINDOW * const win, const int row, const char * const str);
 
