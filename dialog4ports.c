@@ -651,6 +651,10 @@ main(int argc, char* argv[])
 			else if (winGetInput == licenceWindow) {
 				if (arginfo->licenceText != NULL)
 					printFileToWindow(helpWindow, arginfo->licenceText);
+				else if (arginfo->licenceName != NULL) {
+					printInCenter(helpWindow,helpRows/2, "This licence is the default");
+					printInCenter(helpWindow,helpRows/2 + 1, arginfo->licenceName);
+				}
 			}
 			wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 			wrefresh(helpWindow);
