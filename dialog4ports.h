@@ -5,7 +5,7 @@
 enum OPTION_TYPE {
 	CHECKBOX,
 	RADIOBOX,
-	USER_INPUT,
+	USER_INPUT
 };
 
 struct list_el {

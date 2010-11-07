@@ -106,7 +106,7 @@ parseArguments(const int argc, char * argv[]) {
 	*/
 
 	char * programInfo = calloc(strlen(argv[1]), sizeof(char));
-	//we are not really being safer here :-)
+	/* we are not really being safer here :-) */
 	strncpy(programInfo, argv[1], strlen(argv[1]));
 
 	bool gotPortName = false;
@@ -131,7 +131,7 @@ parseArguments(const int argc, char * argv[]) {
 		READ_LNAME,		/* next thing is the wlicence name */
 		READ_LTEXT, 	/* next thing to read is the licence text */
 		READ_PNAME, 	/* next thing is the port name */
-		READ_PCOMMENT,	/* next thing is the port comment */
+		READ_PCOMMENT	/* next thing is the port comment */
 	} stage;
 
 	stage = OPEN;
