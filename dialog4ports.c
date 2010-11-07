@@ -189,7 +189,13 @@ main(int argc, char* argv[])
 
 	option_items[n_choices] = (ITEM *)NULL;
 
-	option_menu = new_menu((ITEM **)option_items);
+	option_menu = new_menu(option_items);
+
+
+
+	ITEM** exitItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
+	//exitMenu = new_menu(exitItems);
+
 
 
 /* a bunch of constants re the size of the window */
