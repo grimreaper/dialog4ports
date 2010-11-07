@@ -7,6 +7,25 @@
 #include <err.h>
 #include <sysexits.h>
 
+
+enum OPTION_TYPE {
+	CHECKBOX,
+	RADIOBOX,
+	USER_INPUT,
+};
+
+struct list_el {
+	char *name;
+	char *options;
+	char *descr;
+	const char *value;		//this is user supplied
+	enum OPTION_TYPE mode;
+	struct list_el *next;
+};
+
+
+typedef struct list_el OptionEl;
+
 //TODO - handle sigwinch - resize winsows
 //TODO - replecate OTPIONS's looks and feel (the triple window approach)
 
@@ -53,23 +72,30 @@ countChar ( const char * const input, const char c )
 }
 
 
-enum OPTION_TYPE {
-	CHECKBOX,
-	RADIOBOX,
-	USER_INPUT,
-};
 
-struct list_el {
-	char *name;
-	char *options;
-	char *descr;
-	const char *value;		//this is user supplied
-	enum OPTION_TYPE mode;
-	struct list_el *next;
-};
+void outputValues(MENU *menu) {
+	ITEM **items;
+      OptionEl *p;
+	const char* val;
+
+	items = menu_items(menu);
+	int i;
+	for(i = 0; i < item_count(menu); ++i) {
+		OptionEl *p = (OptionEl*)item_userptr(items[i]);
+
+		if (p->mode == CHECKBOX || p->mode == RADIOBOX) {
+			val = (item_value(items[i]) == TRUE) ? "true" : "false";
+			fprintf(stderr,"%s=%s\n", item_name(items[i]), val);
+		} else if (p->mode == USER_INPUT) {
+			if (p->value)
+				fprintf(stderr,"%s=%s\n", item_name(items[i]), p->value);
+			else
+				fprintf(stderr,"%s=\n", item_name(items[i]));
+		}
+	}
+}
 
 
-typedef struct list_el OptionEl;
 
 int 
 main(int argc, char* argv[])
@@ -428,23 +454,8 @@ main(int argc, char* argv[])
 	delwin(licenceWindow);
 	delwin(exitWindow);
 
-	ITEM **items;
-	items = menu_items(option_menu);
-	int i;
-	for(i = 0; i < item_count(option_menu); ++i) {
-		OptionEl *p = (OptionEl*)item_userptr(items[i]);
 
-		if (p->mode == CHECKBOX || p->mode == RADIOBOX) {
-			const char* val = (item_value(items[i]) == TRUE) ? "true" : "false";
-			fprintf(stderr,"%s=%s\n", item_name(items[i]), val);
-		} else if (p->mode == USER_INPUT) {
-			if (p->value)
-				fprintf(stderr,"%s=%s\n", item_name(items[i]), p->value);
-			else
-				fprintf(stderr,"%s=\n", item_name(items[i]));
-		}
-	}
-
+	outputValues(option_menu);
 
 	for (count = 0; count < n_choices; ++count)
 		free_item(option_items[count]);
