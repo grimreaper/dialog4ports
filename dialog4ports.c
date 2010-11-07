@@ -343,7 +343,7 @@ main(int argc, char* argv[])
 	const int licenceCols = frameCols;
 	const int licenceRowStart = exitRowStart - licenceRows;
 	// menu == sizeof(largest item) + 1 space for each item
-	const int full_licence_menu_size = (int)strlen("YES")*2+1;
+	const int full_licence_menu_size = (int)(strlen("ACCEPT")+strlen("the licence"))*2+1;
 	//Hack because menu ignores starting location
 	int licenceColStart;
       if (arginfo->outputLicenceRequest)
@@ -408,8 +408,8 @@ main(int argc, char* argv[])
 	//default to no...
 	const int licenceNO = 0;
 	const int licenceYES  = 1;
-	licenceItems[licenceNO] = new_item("NO", "");
-	licenceItems[licenceYES] = new_item("YES", "");
+	licenceItems[licenceNO] = new_item("REJECT", "the licence");
+	licenceItems[licenceYES] = new_item("ACCEPT", "the licence");
 	licenceItems[2] = (ITEM*)NULL;
 
 	ITEM* licenceSelected = licenceItems[licenceNO];
