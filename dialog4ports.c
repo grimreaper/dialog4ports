@@ -546,12 +546,6 @@ main(int argc, char* argv[])
 						else
 						{
 							p->value = getString(primaryWindow,p->value);
-							wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-							wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-							wrefresh(headWindow);
-							wrefresh(helpWindow);
-//							wrefresh(primaryWindow);
-//							refresh();
 							if (p->value != NULL && strcmp("",p->value) != 0)
 							{
 								if (item_value(curItem) != TRUE)
@@ -567,8 +561,10 @@ main(int argc, char* argv[])
 								}
 								p->value = NULL;
 							}
-
+							wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
+							wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 							wrefresh(headWindow);
+							wrefresh(helpWindow);
 							wrefresh(primaryWindow);
 						}
 					}
