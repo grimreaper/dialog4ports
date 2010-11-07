@@ -69,7 +69,6 @@ outputBinaryValue(ITEM* item, const char *key) {
 void
 outputValues(MENU *menu) {
 	ITEM **items;
-	const char* val;
 
 	items = menu_items(menu);
 	int i;
