@@ -47,3 +47,5 @@ struct ARGINFO {
 struct ARGINFO*
 parseArguments(const int argc, char * argv[]);
 
+void
+printInCenter(WINDOW *win, int row, char* str);

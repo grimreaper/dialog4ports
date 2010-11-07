@@ -12,6 +12,12 @@
 
 //TODO - display the licence in the helptext window when on the licence menu
 
+void
+printInCenter(WINDOW *win, int row, char* str) {
+	const int cols = getmaxx(win);
+      mvwaddstr(win,row ,(cols-(int)strlen(str))/2,str);
+}
+
 static char *
 getString(WINDOW *win, const char * const curVal)
 {
@@ -24,7 +30,8 @@ getString(WINDOW *win, const char * const curVal)
 	int messageLen = (int)strlen(mesg);
 	int messageStart = (col-messageLen)/2;
 
-	mvwprintw(win,row/2,messageStart,"%s",mesg);     /* print the message at the center of the screen */
+	printInCenter(win, row/2, mesg);
+//	mvwprintw(win,row/2,messageStart,"%s",mesg);     /* print the message at the center of the screen */
 	if (curVal != NULL) {
 		mvwprintw(win,row/2, messageStart + messageLen + 1," [ %s ]",curVal);
 	}
