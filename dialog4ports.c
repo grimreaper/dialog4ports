@@ -124,10 +124,18 @@ parseArguments(const int argc, char * argv[]) {
 
 	arginfo->outputLicenceRequest = false;
 
-	bool gotMode = false;
+	enum {
+		OPEN,		//we can get the next argument
+		NEXT_OPTION, //fix the struct
+		READ_LICENCE, //next thing is the licence
+		READ_PNAME, //next thing is the port name
+		READ_PCOMMENT, //next thing is the port comment
+	} stage;
+
+	stage = OPEN;
 
 	for (arg=2; arg < argc; ++arg) {
-		if (!gotMode) {
+		if (stage == OPEN) {
 			if (strcmp("--showLicence",argv[arg]) == 0) {
 				printf("we got a licence\n");
 				arginfo->outputLicenceRequest = true;
@@ -142,15 +150,20 @@ parseArguments(const int argc, char * argv[]) {
 			if (prev)
 				prev->next = curr;
 			printf("malloced!\n");
-			gotMode = true;
-			if (strcmp("--option", argv[arg]) == 0)
+			if (strcmp("--option", argv[arg]) == 0) {
 				curr->mode = CHECKBOX;
-			if (strcmp("--radio", argv[arg]) == 0)
+				stage = NEXT_OPTION;
+			}
+			if (strcmp("--radio", argv[arg]) == 0) {
 				curr->mode = RADIOBOX;
-			if (strcmp("--input", argv[arg]) == 0)
+				stage = NEXT_OPTION;
+			}
+			if (strcmp("--input", argv[arg]) == 0) {
 				curr->mode = USER_INPUT;
+				stage = NEXT_OPTION;
+			}
 		}
-		else {
+		else if (stage == NEXT_OPTION) {
 			bool gotName = false;
 			bool gotDescr = false;
 			bool gotOpts = false;
@@ -173,11 +186,11 @@ parseArguments(const int argc, char * argv[]) {
 			}
 			curr->value = NULL;
 			prev = curr;
-/*			printf("COMPLETE\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
-				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode); */
+			printf("COMPLETE\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
+				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode);
 
 			curr = curr->next;
-			gotMode = false;
+			stage = OPEN;
 		}
 
 	}
