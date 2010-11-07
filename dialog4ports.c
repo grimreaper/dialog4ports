@@ -13,7 +13,7 @@ int
 printInCenter(WINDOW *win, const int row, const char * const str) {
 	const int cols = getmaxx(win);
 	const int start = (cols-(int)strlen(str))/2;
-      if (mvwaddstr(win,row ,start,str) == ERR)
+      if (mvwaddstr(win, row, start, str) == ERR)
 		errx(EX_SOFTWARE, "unable to write string to screen for unknown reason");
 	return start;
 }
@@ -23,7 +23,7 @@ getString(WINDOW *win, const char * const curVal)
 {
 	const int bufSize = 80;
 	char mesg[]="Choose a new value: ";
-	char *str = calloc(bufSize,sizeof(char));
+	char *str = calloc(bufSize, sizeof(char));
 
 	int messageStart;
 	int row = getmaxx(win);
@@ -37,7 +37,7 @@ getString(WINDOW *win, const char * const curVal)
 	echo();
 	wmove(win,row/2 + 1, (messageStart + (int)strlen(mesg))/2);
 	waddstr(win,"==>");
-	wgetnstr(win,str, bufSize -1);				/* request the input...*/
+	wgetnstr(win, str, bufSize -1);				/* request the input...*/
 	noecho();
 	wclear(win);
 	wrefresh(win);
@@ -52,7 +52,7 @@ countChar ( const char * const input, const char c )
 	const size_t len = strlen(input);
 	size_t i;
 
-	for (i=0; i < len; ++i)
+	for (i = 0; i < len; ++i)
 		if (input[i] == c)
 			++retval;
 
@@ -62,7 +62,7 @@ countChar ( const char * const input, const char c )
 void
 outputBinaryValue(ITEM* item, const char *key) {
 	bool val = item_value(item) == TRUE;
-	printf("%s=%s\n",key,(val) ? "true" : "false");
+	printf("%s=%s\n", key, (val) ? "true" : "false");
 }
 
 void
@@ -78,9 +78,9 @@ outputValues(MENU *menu) {
 			outputBinaryValue(items[i], item_name(items[i]));
 		} else if (p->mode == USER_INPUT) {
 			if (p->value)
-				fprintf(stderr,"%s=%s\n", item_name(items[i]), p->value);
+				fprintf(stderr, "%s=%s\n", item_name(items[i]), p->value);
 			else
-				fprintf(stderr,"%s=\n", item_name(items[i]));
+				fprintf(stderr, "%s=\n", item_name(items[i]));
 		}
 	}
 }
@@ -98,10 +98,10 @@ parseArguments(const int argc, char * argv[]) {
 	const char* internal_token;
 
 	if (argc < 2)
-		errx(EX_USAGE,"We require some option type to work");
+		errx(EX_USAGE, "We require some option type to work");
 
 	if (argc < 3)
-		errx(EX_USAGE,"We need more than just a port name");
+		errx(EX_USAGE, "We need more than just a port name");
 
 	// arg=0 program name
 	// arg=1 port title & comment
@@ -136,15 +136,15 @@ parseArguments(const int argc, char * argv[]) {
 
 	for (arg=2; arg < argc; ++arg) {
 		if (stage == OPEN) {
-			if (strcmp("--showLicence",argv[arg]) == 0) {
+			if (strcmp("--showLicence", argv[arg]) == 0) {
 				printf("we got a licence\n");
 				arginfo->outputLicenceRequest = true;
 				continue;
 			}
-			printf("we don't have a mode - checking now [%s]\n",argv[arg]);
+			printf("we don't have a mode - checking now [%s]\n", argv[arg]);
 			++arginfo->nElements;
 			if ((curr = malloc (sizeof *curr)) == NULL)
-				errx(EX_OSERR,"can not malloc");
+				errx(EX_OSERR, "can not malloc");
 			if (!arginfo->head)
 				arginfo->head = curr;
 			if (prev)
@@ -176,7 +176,7 @@ parseArguments(const int argc, char * argv[]) {
 					curr->descr = internal_token;
 					gotDescr = true;
 				} else if (!gotOpts && curr->mode == RADIOBOX) {
-					arginfo->nHashMarks += countChar(internal_token,'#');
+					arginfo->nHashMarks += countChar(internal_token, '#');
 					curr->options = internal_token;
 					gotOpts = true;
 				}
@@ -203,7 +203,7 @@ printFileToWindow(WINDOW * const win, const char * const filename) {
 	//function fileToWindow ?
 	const unsigned int maxCharPerLine = 80; //NEVER - ever go above 80
 								//deal with terminal size below
-	FILE *hFile = fopen(filename,"r");
+	FILE *hFile = fopen(filename, "r");
 
 	int maxCols = getmaxx(win);
 	if (hFile == NULL)
@@ -232,6 +232,20 @@ main(int argc, char* argv[])
 
 	ITEM **option_items;
 	MENU *option_menu;
+
+	WINDOW *winGetInput = primaryWindow;
+	MENU	 *whichMenu = option_menu;
+	bool weWantMore = true;
+	bool somethingChanged = false;
+	int c;
+	ITEM *curItem;
+	WINDOW *oldwindow;
+
+	WINDOW *headWindow;
+	WINDOW *exitWindow;
+	WINDOW *licenceWindow;
+	WINDOW *primaryWindow;
+	WINDOW *helpWindow;
 
 	bool licenceAccepted = false;
 
@@ -268,8 +282,8 @@ main(int argc, char* argv[])
 			count++;
 		} else {
 			char *tmpToken;
-			char *tmpOption = calloc(strlen(curr->options)+1,sizeof(char));
-			strncpy(tmpOption,curr->options,strlen(curr->options));
+			char *tmpOption = calloc(strlen(curr->options)+1, sizeof(char));
+			strncpy(tmpOption, curr->options, strlen(curr->options));
 
 			while((tmpToken = strsep(&tmpOption, "#")) != NULL) {
 	                  option_items[count] = new_item(tmpToken, curr->descr);
@@ -327,12 +341,6 @@ main(int argc, char* argv[])
 	const int helpRows = primaryRows;
 	const int helpCols = frameCols - primaryCols - 1;
 
-
-	WINDOW *headWindow;
-	WINDOW *exitWindow;
-	WINDOW *licenceWindow;
-	WINDOW *primaryWindow;
-	WINDOW *helpWindow;
 
 	headWindow = newwin(headRows, headCols, headRowStart, headColStart);
 	exitWindow = newwin(exitRows, exitCols, exitRowStart, exitColStart);
@@ -478,19 +486,13 @@ main(int argc, char* argv[])
       menu_driver(option_menu, REQ_FIRST_ITEM);
 
 
-	WINDOW *winGetInput = primaryWindow;
-	MENU	 *whichMenu = option_menu;
-	bool weWantMore = true;
-	bool somethingChanged = false;
-	int c;
 	while(weWantMore) {
 		c = wgetch(winGetInput);
-		ITEM *curItem = current_item(whichMenu);
+		curItemm = current_item(whichMenu);
 
 		if (arginfo->outputLicenceRequest)
 			if (winGetInput == licenceWindow)
 				licenceSelected = curItem;
-		WINDOW *oldwindow;
 		switch(c)
 		{
 			case KEY_DOWN:
@@ -553,7 +555,7 @@ main(int argc, char* argv[])
 						{
 							bool setToTrue= false;
 							menu_driver(whichMenu, REQ_TOGGLE_ITEM);
-							if(item_value(curItem) == TRUE)
+							if (item_value(curItem) == TRUE)
 							{
 								setToTrue = true;
 								p->value = item_name(curItem);
