@@ -11,8 +11,6 @@
 
 
 //BUG - licence output is always false
-//BUG - licence & exit menus initially are nto background green
-//TODO - get long description support
 //user ptr to change licence!?
 
 static char *
