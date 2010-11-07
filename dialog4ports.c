@@ -75,6 +75,8 @@ outputValues(MENU *menu) {
 	ITEM **items;
       OptionEl *p;
 	const char* val;
+	OptionEl *prev = NULL, *next = NULL;
+	int arg;
 
 	items = menu_items(menu);
 	int i;
@@ -94,29 +96,23 @@ outputValues(MENU *menu) {
 }
 
 
-//parseArguments(int atg
 
+struct {
+	unsigned int nElements;
+	unsigned int nHashMarks;
+	OptionEl * head;
+} arginfo;
 
-
-int 
-main(int argc, char* argv[])
-{
-	//create the linked list that I work with later
-
-	/* culot: better use sys/queue.h instead of your own linked list implementation.
-	   It will be easier to maintain, see queue(3). */
-	OptionEl *curr = NULL;
-	OptionEl *head = NULL;
-	OptionEl *prev = NULL, *next = NULL;
-
-	ITEM **option_items;
-	MENU *option_menu;
-
+/*
+	parses the arguments and modifies arginfo
+	with some information
+*/
+void
+parseArguments(int argc, char* argv[]) {
 	int c;
-
-	unsigned int numElements = 0;
-	unsigned int n_choices = 0;
-	unsigned int hashMarks = 0;
+	int arg;
+	OptionEl *curr = NULL;
+	OptionEl *prev = NULL, *next = NULL;
 
 	if (argc < 2)
 		errx(EX_USAGE,"We require some option type to work");
@@ -124,22 +120,15 @@ main(int argc, char* argv[])
 	if (argc < 3)
 		errx(EX_USAGE,"We need more than just a port name");
 
-
-	/* Avoid C++ style declaration inside loops */
-	int arg;
-
-	const char * const portName = argv[1];
-
-
 	// arg=0 program name
 	// arg=1 port title
 	for (arg=2; arg < argc; ++arg) {
-		++numElements;
+		++arginfo.nElements;
 		if ((curr = malloc (sizeof *curr)) == NULL)
 			errx(EX_OSERR,"can not malloc");
 
-		if (!head)
-			head = curr;
+		if (!arginfo.head)
+			arginfo.head = curr;
 
 		if (prev)
 			prev->next = curr;
@@ -161,7 +150,7 @@ main(int argc, char* argv[])
 				} else if (strcmp("-", curr->options) == 0) {
 					curr->mode = USER_INPUT;
 				} else {
-					hashMarks += countChar(internal_token,'#');
+					arginfo.nHashMarks += countChar(internal_token,'#');
 					curr->mode = RADIOBOX;
 				}
 			}
@@ -171,11 +160,46 @@ main(int argc, char* argv[])
 		curr = curr->next;
 	}
 
+}
+
+
+
+int
+main(int argc, char* argv[])
+{
+	//create the linked list that I work with later
+
+	/* culot: better use sys/queue.h instead of your own linked list implementation.
+	   It will be easier to maintain, see queue(3). */
+	OptionEl *curr = NULL;
+//	OptionEl *head = NULL;
+	OptionEl *next = NULL;
+
+	ITEM **option_items;
+	MENU *option_menu;
+
+
+	unsigned int numElements = 0;
+	unsigned int n_choices = 0;
+	unsigned int hashMarks = 0;
+
+
+
+	/* Avoid C++ style declaration inside loops */
+	int arg;
+
+	const char * const portName = argv[1];
+
+
+
+	parseArguments(argc, argv);
+//	head = arginfo.head;
+
 
 	//deal with curses
-	curr = head;
+	curr = arginfo.head;
 
-	n_choices = numElements + hashMarks;
+	n_choices = arginfo.nElements + arginfo.nHashMarks;
 	//getchar();
 
 	initscr();
@@ -192,7 +216,7 @@ main(int argc, char* argv[])
 
 	option_items=(ITEM**)calloc(n_choices + 1, sizeof(ITEM *));
 
-	curr = head;
+	curr = arginfo.head;
 	unsigned int count = 0;
 
 	while(curr) {
@@ -381,6 +405,7 @@ main(int argc, char* argv[])
 	const MENU	 *whichMenu = option_menu;
 	bool weWantMore = true;
 	bool somethingChanged = false;
+	int c;
 	while(weWantMore) {
 		c = wgetch(winGetInput);
 		ITEM *curItem = current_item(whichMenu);
@@ -490,6 +515,9 @@ main(int argc, char* argv[])
 					weWantMore = false;
 				}
 				break;
+			case 27: //ESCAPE
+				weWantMore = false;
+				break;
 /*			default:
 				endwin();
 				printf("%d",c); */
@@ -515,7 +543,7 @@ main(int argc, char* argv[])
 	free_menu(option_menu);
 	free_menu(exitMenu);
 
-	curr = head;
+	curr = arginfo.head;
 	while (curr) {
 		next = curr->next;
 		free(curr);
