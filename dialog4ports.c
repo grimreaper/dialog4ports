@@ -8,6 +8,7 @@
 
 
 //TODO - display the licence in the helptext window when on the licence menu
+//TODO - add text asking user if they want to accept the licence
 
 int
 printInCenter(WINDOW *win, const int row, const char * const str) {
@@ -129,7 +130,7 @@ parseArguments(const int argc, char * argv[]) {
 	enum {
 		OPEN,		//we can get the next argument
 		NEXT_OPTION, //fix the struct
-		READ_LNAME, //next thing is the licence name
+		READ_LNAME, //next thing is the wlicence name
 		READ_LTEXT, //next thing to read is the licence text
 		READ_PNAME, //next thing is the port name
 		READ_PCOMMENT, //next thing is the port comment
@@ -271,7 +272,6 @@ main(int argc, char* argv[])
 	unsigned int n_choices = 0;
 
 	struct ARGINFO *arginfo = parseArguments(argc, argv);
-//	exit(42);
 
 	//deal with curses
 	curr = arginfo->head;
@@ -636,9 +636,6 @@ main(int argc, char* argv[])
 			case 27: //ESCAPE
 				weWantMore = false;
 				break;
-/*			default:
-				endwin();
-				printf("%d",c); */
 			}
 			/*
 				this rereads the file each time. perhaps it could be cached?
