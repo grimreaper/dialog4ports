@@ -8,7 +8,8 @@
 
 
 int
-printInCenter(WINDOW *win, const int row, const char * const str) {
+printInCenter(WINDOW *win, const int row, const char * const str)
+{
 	const int cols = getmaxx(win);
 	const int start = (cols-(int)strlen(str))/2;
       if (mvwaddstr(win, row, start, str) == ERR)
@@ -58,13 +59,15 @@ countChar ( const char * const input, const char c )
 }
 
 void
-outputBinaryValue(ITEM* item, const char *key) {
+outputBinaryValue(ITEM* item, const char *key)
+{
 	bool val = item_value(item) == TRUE;
 	printf("%s=%s\n", key, (val) ? "true" : "false");
 }
 
 void
-outputValues(MENU *menu) {
+outputValues(MENU *menu)
+{
 	ITEM **items;
 	int i;
 	items = menu_items(menu);
@@ -87,7 +90,8 @@ outputValues(MENU *menu) {
 	with some information
 */
 struct ARGINFO*
-parseArguments(const int argc, char * argv[]) {
+parseArguments(const int argc, char * argv[])
+{
 	struct ARGINFO *arginfo = malloc(sizeof(struct ARGINFO));
 	int arg = 0;
 	OptionEl *curr = NULL;
@@ -218,7 +222,8 @@ parseArguments(const int argc, char * argv[]) {
 }
 
 void
-printFileToWindow(WINDOW * const win, const char * const filename) {
+printFileToWindow(WINDOW * const win, const char * const filename)
+{
 
 	int row;
 	int maxCols;

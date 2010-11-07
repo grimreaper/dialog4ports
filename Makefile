@@ -1,9 +1,9 @@
 # To protect us from stupid errors (like running make nameclean in the root directory)
 NAME=dialog4ports
 
-CFLAGS = -pipe -O3
+CC ?= clang
 
-CC = clang
+CFLAGS += -pipe -O3
 CFLAGS += -std=c99 
 CFLAGS += -Wimplicit-function-declaration -Wbad-function-cast -Wdeclaration-after-statement
 CFLAGS += -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes
@@ -22,10 +22,6 @@ CFLAGS += -Wmissing-format-attribute
 CFLAGS += -Wimport -Wunused-macros
 
 CFLAGS += -lmenu -lncurses 
-
-#-Wunreachable-code is disabled for way too many false postives
-
-PREFIX = /usr/bin/
 
 nameclean: .NOTMAIN .USE .EXEC .IGNORE .PHONY
 	rm -f ./$(NAME)
