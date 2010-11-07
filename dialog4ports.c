@@ -124,53 +124,62 @@ parseArguments(const int argc, char * argv[]) {
 
 	arginfo->outputLicenceRequest = false;
 
+	bool gotMode = false;
+
 	for (arg=2; arg < argc; ++arg) {
-		if (strcmp("--showLicence",argv[arg]) == 0) {
-			arginfo->outputLicenceRequest = true;
-			arg++;
-			continue;
+		if (!gotMode) {
+			if (strcmp("--showLicence",argv[arg]) == 0) {
+				printf("we got a licence\n");
+				arginfo->outputLicenceRequest = true;
+				continue;
+			}
+			printf("we don't have a mode - checking now [%s]\n",argv[arg]);
+			++arginfo->nElements;
+			if ((curr = malloc (sizeof *curr)) == NULL)
+				errx(EX_OSERR,"can not malloc");
+			if (!arginfo->head)
+				arginfo->head = curr;
+			if (prev)
+				prev->next = curr;
+			printf("malloced!\n");
+			gotMode = true;
+			if (strcmp("--option", argv[arg]) == 0)
+				curr->mode = CHECKBOX;
+			if (strcmp("--radio", argv[arg]) == 0)
+				curr->mode = RADIOBOX;
+			if (strcmp("--input", argv[arg]) == 0)
+				curr->mode = USER_INPUT;
 		}
-
-		++arginfo->nElements;
-		if ((curr = malloc (sizeof *curr)) == NULL)
-			errx(EX_OSERR,"can not malloc");
-
-		if (!arginfo->head)
-			arginfo->head = curr;
-
-		if (prev)
-			prev->next = curr;
-
-		bool gotName = false;
-		bool gotDescr = false;
-		bool gotOpts = false;
-		while((internal_token = strsep(&argv[arg], "=")) != NULL) {
-			curr->longDescrFile = NULL;
-			if (!gotName) {
-				curr->name = internal_token;
-				gotName = true;
-			} else if (!gotDescr) {
-				curr->descr = internal_token;
-				gotDescr = true;
-			} else if (!gotOpts) {
-				curr->options = internal_token;
-				if (strcmp("%",curr->options) == 0) {
-					curr->mode = CHECKBOX;
-				} else if (strcmp("-", curr->options) == 0) {
-					curr->mode = USER_INPUT;
-				} else {
+		else {
+			bool gotName = false;
+			bool gotDescr = false;
+			bool gotOpts = false;
+			while((internal_token = strsep(&argv[arg], "=")) != NULL) {
+				curr->longDescrFile = NULL;
+				if (!gotName) {
+					curr->name = internal_token;
+					gotName = true;
+				} else if (!gotDescr) {
+					curr->descr = internal_token;
+					gotDescr = true;
+				} else if (!gotOpts && curr->mode == RADIOBOX) {
 					arginfo->nHashMarks += countChar(internal_token,'#');
-					curr->mode = RADIOBOX;
+					curr->options = internal_token;
+					gotOpts = true;
 				}
-				gotOpts = true;
+				else {
+					curr->longDescrFile = internal_token;
+				}
 			}
-			else {
-				curr->longDescrFile = internal_token;
-			}
+			curr->value = NULL;
+			prev = curr;
+/*			printf("COMPLETE\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
+				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode); */
+
+			curr = curr->next;
+			gotMode = false;
 		}
-		curr->value = NULL;
-		prev = curr;
-		curr = curr->next;
+
 	}
 
 	return (arginfo);
