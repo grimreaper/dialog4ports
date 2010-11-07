@@ -375,8 +375,8 @@ main(int argc, char* argv[])
       menu_driver(option_menu, REQ_FIRST_ITEM);
 
 
-	const WINDOW *winGetInput = exitWindow;
-	const MENU	 *whichMenu = exitMenu;
+	const WINDOW *winGetInput = primaryWindow;
+	const MENU	 *whichMenu = option_menu;
 	bool weWantMore = true;
 	bool somethingChanged = false;
 	while(weWantMore) {
@@ -403,9 +403,21 @@ main(int argc, char* argv[])
 			case KEY_PPAGE:
 				menu_driver(option_menu, REQ_SCR_UPAGE);
 				break;
-			case  11:
-				endwin();
-				exit(2);
+			case  9: /* tab */
+				/* it goes
+					primary -> licence -> exit -> ...
+
+					I'm not sure how to handle scrolling help text
+
+				*/
+				if (winGetInput == primaryWindow) {
+					winGetInput = exitWindow;
+					whichMenu = exitMenu;
+				}
+				else if (winGetInput == exitWindow) {
+					winGetInput = primaryWindow;
+					whichMenu = option_menu;
+				}
 				break;
 			case ' ':
 			case 10:
@@ -476,6 +488,9 @@ main(int argc, char* argv[])
 					weWantMore = false;
 				}
 				break;
+/*			default:
+				endwin();
+				printf("%d",c); */
 			}
 		}
 	unpost_menu(option_menu);
