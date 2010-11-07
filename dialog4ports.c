@@ -191,13 +191,6 @@ main(int argc, char* argv[])
 
 	option_menu = new_menu(option_items);
 
-
-
-	ITEM** exitItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
-	//exitMenu = new_menu(exitItems);
-
-
-
 /* a bunch of constants re the size of the window */
 
 
@@ -212,7 +205,7 @@ main(int argc, char* argv[])
 	const int headRows = 3;
 	const int headCols = frameCols;
 
-	const int exitRows = 3;
+	const int exitRows = 4;
 	const int exitCols = frameCols;
 	const int exitRowStart = frameRows - exitRows;
 	const int exitColStart = 0;
@@ -252,6 +245,46 @@ main(int argc, char* argv[])
 	if (frameRows < minRows || frameCols < minCols) {
 		errx(EX_UNAVAILABLE, "Terminal size is to small");
 	}
+
+
+	ITEM** exitItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
+
+	exitItems[0] = new_item("OK", "");
+	exitItems[1] = new_item("CANCEL", "");
+	exitItems[2] = (ITEM*)NULL;
+
+	MENU *exitMenu = new_menu(exitItems);
+
+      set_menu_win(exitMenu, exitWindow);
+      set_menu_sub(exitMenu, derwin(exitWindow, exitRows, exitCols, 0, 0));
+	// 1 row - 2 cols for ok/cancel
+      set_menu_format(option_menu, 1, 1);
+
+      post_menu(exitMenu);
+	wrefresh(exitWindow);
+
+
+	menu_opts_off(option_menu, O_SHOWDESC);
+	menu_opts_on(option_menu, O_NONCYCLIC);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	// we want to leave 3 lines for the title
 	const int startMenyWinRow = 3;
 
@@ -281,11 +314,10 @@ main(int argc, char* argv[])
 	/* Print a border around the main window and print a title */
 	wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 
-	mvwprintw(exitWindow, 0, (exitCols - strlen("Escape to Exit"))/2, "Escape to Exit");
-	wrefresh(exitWindow);
 	menu_opts_off(option_menu,O_ONEVALUE);
-
 	post_menu(option_menu);
+
+
 	wrefresh(headWindow);
 	wrefresh(primaryWindow);
 
@@ -305,7 +337,9 @@ main(int argc, char* argv[])
 	}
       menu_driver(option_menu, REQ_FIRST_ITEM);
 
-	while( (c = wgetch(primaryWindow)) != 27 ) {
+
+	const WINDOW *winGetInput = primaryWindow;
+	while( (c = wgetch(winGetInput)) != 27 ) {
 		ITEM *curItem = current_item(option_menu);
 
 		OptionEl *p = (OptionEl*)item_userptr(curItem);
@@ -331,52 +365,55 @@ main(int argc, char* argv[])
 				break;
 			case ' ':
 			case 10:
-				if (item_opts(curItem) & O_SELECTABLE) {
-					if (p->mode != USER_INPUT) {
-						bool setToTrue= false;
-						menu_driver(option_menu, REQ_TOGGLE_ITEM);
-						if(item_value(curItem) == TRUE) {
-							setToTrue = true;
-							p->value = item_name(curItem);
-						}
-						//if we are a radiobox - we need to disable/enable valid options
-						if (p->mode == RADIOBOX) {
-							for(count = 0; count < n_choices; ++count) {
-						            curr = (OptionEl*)item_userptr(option_items[count]);
-								// if we have the same user ptr - but we are not ourself - disable it!
-								if (curr == p) {
-									if (curItem == option_items[count] || !setToTrue)
-										item_opts_on(option_items[count], O_SELECTABLE);
-									else
-										item_opts_off(option_items[count], O_SELECTABLE);
+				if (winGetInput == primaryWindow)
+				{
+					if (item_opts(curItem) & O_SELECTABLE) {
+						if (p->mode != USER_INPUT) {
+							bool setToTrue= false;
+							menu_driver(option_menu, REQ_TOGGLE_ITEM);
+							if(item_value(curItem) == TRUE) {
+								setToTrue = true;
+								p->value = item_name(curItem);
+							}
+							//if we are a radiobox - we need to disable/enable valid options
+							if (p->mode == RADIOBOX) {
+								for(count = 0; count < n_choices; ++count) {
+							            curr = (OptionEl*)item_userptr(option_items[count]);
+									// if we have the same user ptr - but we are not ourself - disable it!
+									if (curr == p) {
+										if (curItem == option_items[count] || !setToTrue)
+											item_opts_on(option_items[count], O_SELECTABLE);
+										else
+											item_opts_off(option_items[count], O_SELECTABLE);
+									}
 								}
 							}
 						}
-					}
-					else {
-						p->value = getString(primaryWindow,p->value);
-						wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-						wrefresh(headWindow);
-//						wrefresh(primaryWindow);
-//						refresh();
-						if (p->value != NULL && strcmp("",p->value) != 0)
-						{
-							if (item_value(curItem) != TRUE)
+						else {
+							p->value = getString(primaryWindow,p->value);
+							wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
+							wrefresh(headWindow);
+//							wrefresh(primaryWindow);
+//							refresh();
+							if (p->value != NULL && strcmp("",p->value) != 0)
 							{
-								menu_driver(option_menu, REQ_TOGGLE_ITEM);
+								if (item_value(curItem) != TRUE)
+								{
+									menu_driver(option_menu, REQ_TOGGLE_ITEM);
+								}
 							}
-						}
-						else
-						{
-							if (item_value(curItem) != FALSE)
+							else
 							{
-								menu_driver(option_menu, REQ_TOGGLE_ITEM);
+								if (item_value(curItem) != FALSE)
+								{
+									menu_driver(option_menu, REQ_TOGGLE_ITEM);
+								}
+								p->value = NULL;
 							}
-							p->value = NULL;
-						}
 
-						wrefresh(headWindow);
-						wrefresh(primaryWindow);
+							wrefresh(headWindow);
+							wrefresh(primaryWindow);
+						}
 					}
 				}
 			break;
@@ -413,6 +450,7 @@ main(int argc, char* argv[])
 		free_item(option_items[count]);
 
 	free_menu(option_menu);
+	free_menu(exitMenu);
 
 	curr = head;
 	while (curr) {
