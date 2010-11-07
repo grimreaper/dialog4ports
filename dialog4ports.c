@@ -259,7 +259,6 @@ main(int argc, char* argv[])
 	const int exitRows = 4;
 	const int exitCols = frameCols;
 	const int exitRowStart = frameRows - exitRows;
-
 	// menu == sizeof(largest item) + 1 space for each item
 	const int full_exit_menu_size = strlen("CANCEL")*2+1;
 	const int exitColStart = (frameCols - full_exit_menu_size)/2;
@@ -267,7 +266,9 @@ main(int argc, char* argv[])
 	const int licenceRows = 3;
 	const int licenceCols = frameCols;
 	const int licenceRowStart = exitRowStart - licenceRows;
-	const int licenceColStart = 0;
+	// menu == sizeof(largest item) + 1 space for each item
+	const int full_licence_menu_size = strlen("YES")*2+1;
+	const int licenceColStart = (frameCols - full_licence_menu_size)/2;
 
 	const int primaryRowStart = headRows + 1;
 	const int primaryColStart = 0;
@@ -322,21 +323,35 @@ main(int argc, char* argv[])
 	wrefresh(exitWindow);
 
 
+	ITEM** licenceItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
+
+	//default to no...
+	const int licenceNO = 0;
+	const int licenceYES  = 1;
+	licenceItems[licenceNO] = new_item("NO", "");
+	licenceItems[licenceYES] = new_item("YES", "");
+	licenceItems[2] = (ITEM*)NULL;
+
+	MENU *licenceMenu = new_menu(licenceItems);
+
+      set_menu_win(licenceMenu, licenceWindow);
+      set_menu_sub(licenceMenu, derwin(licenceWindow, licenceRows, licenceCols, 0, 0));
+	// 1 row - 2 cols for ok/cancel
+      set_menu_format(licenceMenu, 1, 2);
+	set_menu_mark(licenceMenu, ">");
+
+      post_menu(licenceMenu);
+	wrefresh(licenceWindow);
+
+
+
+
+
+
+
+
 	menu_opts_off(option_menu, O_SHOWDESC);
 	menu_opts_on(option_menu, O_NONCYCLIC);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -438,6 +453,10 @@ main(int argc, char* argv[])
 
 				*/
 				if (winGetInput == primaryWindow) {
+					winGetInput = licenceWindow;
+					whichMenu = licenceMenu;
+				}
+				else if (winGetInput == licenceWindow) {
 					winGetInput = exitWindow;
 					whichMenu = exitMenu;
 				}
