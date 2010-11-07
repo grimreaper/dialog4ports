@@ -12,10 +12,14 @@
 
 //TODO - display the licence in the helptext window when on the licence menu
 
-void
-printInCenter(WINDOW *win, int row, char* str) {
+
+int
+printInCenter(WINDOW *win, const int row, const char * const str) {
 	const int cols = getmaxx(win);
-      mvwaddstr(win,row ,(cols-(int)strlen(str))/2,str);
+	const int start = (cols-(int)strlen(str))/2;
+      if (mvwaddstr(win,row ,start,str) == ERR)
+		errx(EX_SOFTWARE, "unable to write string to screen for unknown reason");
+	return start;
 }
 
 static char *
@@ -25,18 +29,20 @@ getString(WINDOW *win, const char * const curVal)
 	char mesg[]="Choose a new value: ";
 	char *str = calloc(bufSize,sizeof(char));
 
-	int row,col;
-	getmaxyx(win,row,col);		/* get the number of rows and columns */
-	int messageLen = (int)strlen(mesg);
-	int messageStart = (col-messageLen)/2;
+//	int row,col;
+	int messageStart;
+//	getmaxyx(win,row,col);		/* get the number of rows and columns */
+	int row = getmaxx(win);
 
 	printInCenter(win, row/2, mesg);
 //	mvwprintw(win,row/2,messageStart,"%s",mesg);     /* print the message at the center of the screen */
+
 	if (curVal != NULL) {
-		mvwprintw(win,row/2, messageStart + messageLen + 1," [ %s ]",curVal);
+		messageStart = printInCenter(win, row/2, mesg);
+		mvwprintw(win,row/2, messageStart + (int)strlen(mesg) + 1," [ %s ]",curVal);
 	}
 	echo();
-	wmove(win,row/2 + 1, (messageStart + messageLen)/2);
+	wmove(win,row/2 + 1, (messageStart + (int)strlen(mesg))/2);
 	waddstr(win,"==>");
 	wgetnstr(win,str, bufSize -1);				/* request the input...*/
 	noecho();
@@ -367,7 +373,7 @@ main(int argc, char* argv[])
 	}
 	else {
 		const char* const licenceAcceptedMessage = "The licence for this port has already been accepted or does not exist";
-		mvwaddstr(licenceWindow,1, (licenceCols-(int)strlen(licenceAcceptedMessage))/2, licenceAcceptedMessage);
+		printInCenter(licenceWindow, 1, licenceAcceptedMessage);
 	}
 	wrefresh(licenceWindow);
 
@@ -383,10 +389,10 @@ main(int argc, char* argv[])
 	const int nMenuCols = 1;
 
 	//display the title in the center of the top window
-	mvwprintw(headWindow,startMenyWinRow/2 ,(headCols-(int)strlen(arginfo->portname))/2,"%s",arginfo->portname);
+	printInCenter(headWindow, startMenyWinRow/2, arginfo->portname);
 	if (arginfo->portcomment != NULL)
 	{
-		mvwprintw(headWindow,startMenyWinRow/2 + 1,(headCols-(int)strlen(arginfo->portcomment))/2,"%s",arginfo->portcomment);
+		printInCenter(headWindow, startMenyWinRow/2 + 1, arginfo->portcomment);
 	}
 	wrefresh(headWindow);
 
