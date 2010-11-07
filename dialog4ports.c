@@ -70,9 +70,8 @@ countChar ( const char * const input, const char c )
 	return (retval);
 }
 
-
-
-void outputValues(MENU *menu) {
+void
+outputValues(MENU *menu) {
 	ITEM **items;
       OptionEl *p;
 	const char* val;
@@ -93,6 +92,9 @@ void outputValues(MENU *menu) {
 		}
 	}
 }
+
+
+//parseArguments(int atg
 
 
 
