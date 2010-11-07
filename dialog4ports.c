@@ -10,8 +10,6 @@
 //BUG - licence output is always false
 //user ptr to change licence!?
 
-//TODO - make accepting the port licence optional (or at least read from the envrioment)
-
 static char *
 getString(WINDOW *win, const char * const curVal)
 {
