@@ -274,7 +274,7 @@ main(int argc, char* argv[])
 	const int helpRowStart = headRows + 1;
 	const int helpColStart = primaryCols + 1;
 	const int helpRows = primaryRows;
-	const int helpCols = frameCols - primaryCols;
+	const int helpCols = frameCols - primaryCols - 1;
 
 
 	WINDOW *headWindow;
@@ -393,6 +393,7 @@ main(int argc, char* argv[])
 
 	/* Print a border around the main window and print a title */
 	wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
+	wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 
 	menu_opts_off(option_menu,O_ONEVALUE);
 	post_menu(option_menu);
@@ -400,6 +401,7 @@ main(int argc, char* argv[])
 
 	wrefresh(headWindow);
 	wrefresh(primaryWindow);
+	wrefresh(helpWindow);
 
 	/* toggling and truth have nothing to do with each other :-)
 	   so go thru each one, set the envrioment, and then return to top
@@ -513,7 +515,9 @@ main(int argc, char* argv[])
 						{
 							p->value = getString(primaryWindow,p->value);
 							wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
+							wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 							wrefresh(headWindow);
+							wrefresh(helpWindow);
 //							wrefresh(primaryWindow);
 //							refresh();
 							if (p->value != NULL && strcmp("",p->value) != 0)
@@ -555,9 +559,9 @@ main(int argc, char* argv[])
 				this rereads the file each time. perhaps it could be cached?
 			*/
 			wclear(helpWindow);
-			wrefresh(helpWindow);
 
-			const unsigned int maxCharPerLine = 80;
+			const unsigned int maxCharPerLine = 80; //NEVER - ever go above 80
+										//deal with terminal size below
 
 			if (winGetInput == primaryWindow ) {
 				OptionEl *p = (OptionEl*)item_userptr(current_item(whichMenu));
@@ -566,14 +570,20 @@ main(int argc, char* argv[])
 					if (hFile == NULL)
 						errx(EX_IOERR, "File specified does not exist");
 					//never read more than 80 charaters per line
-					char buf[maxCharPerLine];
+					char buf[maxCharPerLine + 1];
+					int row = 1;
 					while (fgets(buf, maxCharPerLine, hFile)) {
-						waddstr(helpWindow, buf);
+						int result = mvwaddnstr(helpWindow, row++, 1, buf, helpCols - 1);
+						if (result == ERR)
+							errx(1, "unable to write string to screen for unknown reason");
 					}
-					wrefresh(helpWindow);
+//					wrefresh(helpWindow);
 					fclose(hFile);
 				}
 			}
+			wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
+			wrefresh(helpWindow);
+
 
 		}
 	unpost_menu(option_menu);
