@@ -7,11 +7,7 @@
 #include "dialog4ports.h"
 
 
-//BUG - licence output is always false
-//user ptr to change licence!?
-
 //TODO - display the licence in the helptext window when on the licence menu
-
 
 int
 printInCenter(WINDOW *win, const int row, const char * const str) {
@@ -199,6 +195,7 @@ main(int argc, char* argv[])
 	ITEM **option_items;
 	MENU *option_menu;
 
+	bool licenceAccepted = false;
 
 	unsigned int n_choices = 0;
 
@@ -588,6 +585,7 @@ main(int argc, char* argv[])
 			*/
 			wclear(helpWindow);
 
+			//function fileToWindow ?
 			const unsigned int maxCharPerLine = 80; //NEVER - ever go above 80
 										//deal with terminal size below
 
@@ -612,7 +610,12 @@ main(int argc, char* argv[])
 			wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 			wrefresh(helpWindow);
 
-
+			if (winGetInput == licenceWindow) {
+				if (current_item(licenceMenu) == licenceItems[licenceYES])
+					licenceAccepted = true;
+				else
+					licenceAccepted = false;
+			}
 		}
 	unpost_menu(option_menu);
 	endwin(); //get out of ncurses
@@ -627,7 +630,7 @@ main(int argc, char* argv[])
 	if (somethingChanged) {
 		outputValues(option_menu);
 		if (arginfo->outputLicenceRequest)
-			outputBinaryValue(licenceItems[licenceYES], "ACCEPTED_LICENCE");
+			printf("%s=%s\n","ACCEPTED_LICENCE",(licenceAccepted) ? "true" : "false");
 	}
 
 	for (count = 0; count < n_choices; ++count)
