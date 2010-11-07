@@ -13,6 +13,8 @@
 //BUG - licence output is always false
 //user ptr to change licence!?
 
+//TODO - make accepting the port licence optional (or at least read from the envrioment)
+
 static char *
 getString(WINDOW *win, const char * const curVal)
 {
@@ -573,7 +575,7 @@ main(int argc, char* argv[])
 					while (fgets(buf, maxCharPerLine, hFile)) {
 						int result = mvwaddnstr(helpWindow, row++, 1, buf, helpCols - 1);
 						if (result == ERR)
-							errx(1, "unable to write string to screen for unknown reason");
+							errx(EX_SOFTWARE, "unable to write string to screen for unknown reason");
 					}
 //					wrefresh(helpWindow);
 					fclose(hFile);
