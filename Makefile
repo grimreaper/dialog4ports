@@ -25,7 +25,7 @@ CFLAGS += -lmenu -lncurses
 
 #-Wunreachable-code is disabled for way too many false postives
 
-PREFIX = /usr/local
+PREFIX = /usr/bin/
 
 nameclean: .NOTMAIN .USE .EXEC .IGNORE .PHONY
 	rm -f ./$(NAME)
@@ -46,6 +46,6 @@ all: $(NAME)
 rebuild: .NOTMAIN .PHONY clean $(NAME)
 
 check: .NOTMAIN
-	splint -strict-lib -showcolumn -showfunc -strict *.c *.h
+#	splint -strict-lib -showcolumn -showfunc -strict *.c *.h
 	lint -aabcehprsxH $(INCLUDE_FILES) *.c *.h
-	rats -rw3 *
+#	rats -rw3 *
