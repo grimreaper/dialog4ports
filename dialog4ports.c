@@ -90,10 +90,10 @@ outputValues(MENU *menu) {
 struct ARGINFO*
 parseArguments(const int argc, char * argv[]) {
 	struct ARGINFO *arginfo = malloc(sizeof(struct ARGINFO));
-	int arg;
+	int arg = 0;
 	OptionEl *curr = NULL;
 	OptionEl *prev = NULL;
-	const char* internal_token;
+	const char* internal_token = NULL;
 
 	if (argc < 2)
 		errx(EX_USAGE, "We require some option type to work");
