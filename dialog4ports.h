@@ -9,6 +9,7 @@ struct list_el {
 	const char *options;
 	const char *descr;
 	const char *value;		//this is user supplied
+	const char *longDescrFile;
 	enum OPTION_TYPE mode;
 	struct list_el *next;
 };

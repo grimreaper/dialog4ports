@@ -13,6 +13,7 @@
 //BUG - licence output is always false
 //BUG - licence & exit menus initially are nto background green
 //TODO - get long description support
+//user ptr to change licence!?
 
 static char *
 getString(WINDOW *win, const char * const curVal)
@@ -134,14 +135,16 @@ parseArguments(const int argc, char * argv[]) {
 
 		bool gotName = false;
 		bool gotDescr = false;
+		bool gotOpts = false;
 		while((internal_token = strsep(&argv[arg], "=")) != NULL) {
+			curr->longDescrFile = NULL;
 			if (!gotName) {
 				curr->name = internal_token;
 				gotName = true;
 			} else if (!gotDescr) {
 				curr->descr = internal_token;
 				gotDescr = true;
-			} else {
+			} else if (!gotOpts) {
 				curr->options = internal_token;
 				if (strcmp("%",curr->options) == 0) {
 					curr->mode = CHECKBOX;
@@ -151,6 +154,10 @@ parseArguments(const int argc, char * argv[]) {
 					arginfo.nHashMarks += countChar(internal_token,'#');
 					curr->mode = RADIOBOX;
 				}
+				gotOpts = true;
+			}
+			else {
+				curr->longDescrFile = internal_token;
 			}
 		}
 		curr->value = NULL;
@@ -418,6 +425,7 @@ main(int argc, char* argv[])
 	while(weWantMore) {
 		c = wgetch(winGetInput);
 		ITEM *curItem = current_item(whichMenu);
+
 		if (winGetInput == licenceWindow)
 		{
 			licenceSelected = curItem;
@@ -543,6 +551,30 @@ main(int argc, char* argv[])
 				endwin();
 				printf("%d",c); */
 			}
+			/*
+				this rereads the file each time. perhaps it could be cached?
+			*/
+			wclear(helpWindow);
+			wrefresh(helpWindow);
+
+			const unsigned int maxCharPerLine = 80;
+
+			if (winGetInput == primaryWindow ) {
+				OptionEl *p = (OptionEl*)item_userptr(current_item(whichMenu));
+				if (p->longDescrFile != NULL) {
+					FILE *hFile = fopen(p->longDescrFile,"r");
+					if (hFile == NULL)
+						errx(EX_IOERR, "File specified does not exist");
+					//never read more than 80 charaters per line
+					char buf[maxCharPerLine];
+					while (fgets(buf, maxCharPerLine, hFile)) {
+						waddstr(helpWindow, buf);
+					}
+					wrefresh(helpWindow);
+					fclose(hFile);
+				}
+			}
+
 		}
 	unpost_menu(option_menu);
 	endwin(); //get out of ncurses
