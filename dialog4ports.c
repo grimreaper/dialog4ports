@@ -123,11 +123,14 @@ parseArguments(const int argc, char * argv[]) {
 	free(programInfo);
 
 	arginfo->outputLicenceRequest = false;
+	arginfo->licenceText = NULL;
+	arginfo->licenceName = NULL;
 
 	enum {
 		OPEN,		//we can get the next argument
 		NEXT_OPTION, //fix the struct
-		READ_LICENCE, //next thing is the licence
+		READ_LNAME, //next thing is the licence name
+		READ_LTEXT, //next thing to read is the licence text
 		READ_PNAME, //next thing is the port name
 		READ_PCOMMENT, //next thing is the port comment
 	} stage;
@@ -136,11 +139,17 @@ parseArguments(const int argc, char * argv[]) {
 
 	for (arg=2; arg < argc; ++arg) {
 		if (stage == OPEN) {
-			if (strcmp("--showLicence", argv[arg]) == 0) {
-				printf("we got a licence\n");
+			if (strcmp("--licence", argv[arg]) == 0) {
 				arginfo->outputLicenceRequest = true;
+				stage = READ_LNAME;
 				continue;
 			}
+			if (strcmp("--licence-text", argv[arg]) == 0) {
+				arginfo->outputLicenceRequest = true;
+				stage = READ_LTEXT;
+				continue;
+			}
+
 			printf("we don't have a mode - checking now [%s]\n", argv[arg]);
 			++arginfo->nElements;
 			if ((curr = malloc (sizeof *curr)) == NULL)
@@ -189,7 +198,16 @@ parseArguments(const int argc, char * argv[]) {
 			printf("COMPLETE\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
 				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode);
 
+
 			curr = curr->next;
+			stage = OPEN;
+		}
+		else if (stage == READ_LNAME) {
+			arginfo->licenceName = argv[arg];
+			stage = OPEN;
+		}
+		else if (stage == READ_LTEXT) {
+			arginfo->licenceText = argv[arg];
 			stage = OPEN;
 		}
 
@@ -233,8 +251,6 @@ main(int argc, char* argv[])
 	ITEM **option_items;
 	MENU *option_menu;
 
-	WINDOW *winGetInput = primaryWindow;
-	MENU	 *whichMenu = option_menu;
 	bool weWantMore = true;
 	bool somethingChanged = false;
 	int c;
@@ -247,11 +263,15 @@ main(int argc, char* argv[])
 	WINDOW *primaryWindow;
 	WINDOW *helpWindow;
 
+	WINDOW *winGetInput;
+	MENU	 *whichMenu;
+
 	bool licenceAccepted = false;
 
 	unsigned int n_choices = 0;
 
 	struct ARGINFO *arginfo = parseArguments(argc, argv);
+//	exit(42);
 
 	//deal with curses
 	curr = arginfo->head;
@@ -486,9 +506,12 @@ main(int argc, char* argv[])
       menu_driver(option_menu, REQ_FIRST_ITEM);
 
 
+	winGetInput = primaryWindow;
+	whichMenu = option_menu;
+
 	while(weWantMore) {
 		c = wgetch(winGetInput);
-		curItemm = current_item(whichMenu);
+		curItem = current_item(whichMenu);
 
 		if (arginfo->outputLicenceRequest)
 			if (winGetInput == licenceWindow)

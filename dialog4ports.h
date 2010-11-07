@@ -42,6 +42,8 @@ struct ARGINFO {
 	const char * portname;
 	const char * portcomment;
 	bool outputLicenceRequest;
+	const char * licenceName;
+	const char * licenceText;
 };
 
 struct ARGINFO*
