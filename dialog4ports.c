@@ -233,7 +233,10 @@ main(int argc, char* argv[])
 	const int exitRows = 4;
 	const int exitCols = frameCols;
 	const int exitRowStart = frameRows - exitRows;
-	const int exitColStart = 0;
+
+	// menu == sizeof(largest item) + 1 space for each item
+	const int full_exit_menu_size = strlen("CANCEL")*2+1;
+	const int exitColStart = (frameCols - full_exit_menu_size)/2;
 
 	const int licenceRows = 3;
 	const int licenceCols = frameCols;
@@ -274,8 +277,10 @@ main(int argc, char* argv[])
 
 	ITEM** exitItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
 
-	exitItems[0] = new_item("OK", "");
-	exitItems[1] = new_item("CANCEL", "");
+	const int exitOK = 0;
+	const int exitCancel = 1;
+	exitItems[exitOK] = new_item("OK", "");
+	exitItems[exitCancel] = new_item("CANCEL", "");
 	exitItems[2] = (ITEM*)NULL;
 
 	MENU *exitMenu = new_menu(exitItems);
@@ -283,7 +288,9 @@ main(int argc, char* argv[])
       set_menu_win(exitMenu, exitWindow);
       set_menu_sub(exitMenu, derwin(exitWindow, exitRows, exitCols, 0, 0));
 	// 1 row - 2 cols for ok/cancel
-      set_menu_format(option_menu, 1, 1);
+      set_menu_format(exitMenu, 1, 2);
+	set_menu_mark(exitMenu, ">");
+
 
       post_menu(exitMenu);
 	wrefresh(exitWindow);
@@ -329,11 +336,16 @@ main(int argc, char* argv[])
 
 
 	keypad(primaryWindow, TRUE);
+	keypad(exitWindow, TRUE);
+	keypad(helpWindow, TRUE);
+	keypad(headWindow, TRUE);
+	keypad(licenceWindow, TRUE);
+
 	set_menu_mark(option_menu, " * ");
 
 	/* Set main window and sub window */
 	set_menu_win(option_menu, primaryWindow);
-	set_menu_sub(option_menu, derwin(primaryWindow, primaryRows -3, primaryCols -2, 1, 1));
+	set_menu_sub(option_menu, derwin(primaryWindow, primaryRows -3, primaryCols - 2, 1, 1));
 	set_menu_format(option_menu, nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
@@ -363,49 +375,64 @@ main(int argc, char* argv[])
       menu_driver(option_menu, REQ_FIRST_ITEM);
 
 
-	const WINDOW *winGetInput = primaryWindow;
-	while( (c = wgetch(winGetInput)) != 27 ) {
-		ITEM *curItem = current_item(option_menu);
+	const WINDOW *winGetInput = exitWindow;
+	const MENU	 *whichMenu = exitMenu;
+	bool weWantMore = true;
+	bool somethingChanged = false;
+	while(weWantMore) {
+		c = wgetch(winGetInput);
+		ITEM *curItem = current_item(whichMenu);
 
-		OptionEl *p = (OptionEl*)item_userptr(curItem);
-
-		switch(c) {
+		switch(c)
+		{
 			case KEY_DOWN:
-				menu_driver(option_menu, REQ_DOWN_ITEM);
+				menu_driver(whichMenu, REQ_DOWN_ITEM);
 				break;
 			case KEY_UP:
-				menu_driver(option_menu, REQ_UP_ITEM);
+				menu_driver(whichMenu, REQ_UP_ITEM);
 				break;
 			case KEY_LEFT:
-				menu_driver(option_menu, REQ_LEFT_ITEM);
+				menu_driver(whichMenu, REQ_LEFT_ITEM);
 				break;
 			case KEY_RIGHT:
-				menu_driver(option_menu, REQ_RIGHT_ITEM);
+				menu_driver(whichMenu, REQ_RIGHT_ITEM);
 				break;
 			case KEY_NPAGE:
-				menu_driver(option_menu, REQ_SCR_DPAGE);
+				menu_driver(whichMenu, REQ_SCR_DPAGE);
 				break;
 			case KEY_PPAGE:
 				menu_driver(option_menu, REQ_SCR_UPAGE);
 				break;
+			case  11:
+				endwin();
+				exit(2);
+				break;
 			case ' ':
 			case 10:
+			case KEY_ENTER:
 				if (winGetInput == primaryWindow)
 				{
-					if (item_opts(curItem) & O_SELECTABLE) {
-						if (p->mode != USER_INPUT) {
+					OptionEl *p = (OptionEl*)item_userptr(curItem);
+					if (item_opts(curItem) & O_SELECTABLE)
+					{
+						if (p->mode != USER_INPUT)
+						{
 							bool setToTrue= false;
-							menu_driver(option_menu, REQ_TOGGLE_ITEM);
-							if(item_value(curItem) == TRUE) {
+							menu_driver(whichMenu, REQ_TOGGLE_ITEM);
+							if(item_value(curItem) == TRUE)
+							{
 								setToTrue = true;
 								p->value = item_name(curItem);
 							}
 							//if we are a radiobox - we need to disable/enable valid options
-							if (p->mode == RADIOBOX) {
-								for(count = 0; count < n_choices; ++count) {
+							if (p->mode == RADIOBOX)
+							{
+								for(count = 0; count < n_choices; ++count)
+								{
 							            curr = (OptionEl*)item_userptr(option_items[count]);
 									// if we have the same user ptr - but we are not ourself - disable it!
-									if (curr == p) {
+									if (curr == p)
+									{
 										if (curItem == option_items[count] || !setToTrue)
 											item_opts_on(option_items[count], O_SELECTABLE);
 										else
@@ -414,7 +441,8 @@ main(int argc, char* argv[])
 								}
 							}
 						}
-						else {
+						else
+						{
 							p->value = getString(primaryWindow,p->value);
 							wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 							wrefresh(headWindow);
@@ -424,14 +452,14 @@ main(int argc, char* argv[])
 							{
 								if (item_value(curItem) != TRUE)
 								{
-									menu_driver(option_menu, REQ_TOGGLE_ITEM);
+									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
 								}
 							}
 							else
 							{
 								if (item_value(curItem) != FALSE)
 								{
-									menu_driver(option_menu, REQ_TOGGLE_ITEM);
+									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
 								}
 								p->value = NULL;
 							}
@@ -441,9 +469,15 @@ main(int argc, char* argv[])
 						}
 					}
 				}
-			break;
+				else if (winGetInput == exitWindow)
+				{
+					if (curItem == exitItems[exitOK])
+						somethingChanged = true;
+					weWantMore = false;
+				}
+				break;
+			}
 		}
-	}
 	unpost_menu(option_menu);
 	endwin(); //get out of ncurses
 
@@ -453,8 +487,10 @@ main(int argc, char* argv[])
 	delwin(licenceWindow);
 	delwin(exitWindow);
 
-
-	outputValues(option_menu);
+	if (somethingChanged)
+	{
+		outputValues(option_menu);
+	}
 
 	for (count = 0; count < n_choices; ++count)
 		free_item(option_items[count]);
@@ -469,7 +505,6 @@ main(int argc, char* argv[])
 		curr = next;
 	}
 
-
-	return (0);
+	return ((somethingChanged) ? exitOK : exitCancel);
 }
 
