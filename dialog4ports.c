@@ -206,19 +206,19 @@ main(int argc, char* argv[])
 	const int headRows = 3;
 	const int headCols = frameCols;
 
-	const int exitRows = 2;
+	const int exitRows = 3;
 	const int exitCols = frameCols;
 	const int exitRowStart = frameRows - exitRows;
 	const int exitColStart = 0;
 
-	const int licenceRows = 2;
+	const int licenceRows = 3;
 	const int licenceCols = frameCols;
 	const int licenceRowStart = exitRowStart - licenceRows;
 	const int licenceColStart = 0;
 
 	const int primaryRowStart = headRows + 1;
 	const int primaryColStart = 0;
-	const int primaryRows = frameRows - licenceRows - exitRows;
+	const int primaryRows = frameRows - licenceRows - exitRows - 4;
 	const int primaryCols = frameCols / 2;
 
 	const int helpRowStart = headRows + 1;
@@ -256,8 +256,6 @@ main(int argc, char* argv[])
 	mvwprintw(headWindow,startMenyWinRow/2 + 1,(headCols-(int)strlen(portName))/2,"%s",portName);
 	wrefresh(headWindow);
 
-
-
 	if(has_colors() == TRUE) {
 		/* Set fore ground and back ground of the menu */
 		set_menu_fore(option_menu, COLOR_PAIR(1) | A_REVERSE);
@@ -271,17 +269,14 @@ main(int argc, char* argv[])
 
 	/* Set main window and sub window */
 	set_menu_win(option_menu, primaryWindow);
-	set_menu_sub(option_menu, derwin(primaryWindow, primaryRows -3, primaryCols-2, 1, 1));
+	set_menu_sub(option_menu, derwin(primaryWindow, primaryRows -3, primaryCols -2, 1, 1));
 	set_menu_format(option_menu, nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
 	wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-	mvwaddch(primaryWindow, 2, 0, ACS_LTEE);
-	mvwhline(primaryWindow, 2, 1, ACS_HLINE, 38);
-	mvwaddch(primaryWindow, 2, 39, ACS_RTEE);
 
-
-	mvwprintw(primaryWindow, primaryRows - 2, 2, "Escape to Exit");
+	mvwprintw(exitWindow, 0, (exitCols - strlen("Escape to Exit"))/2, "Escape to Exit");
+	wrefresh(exitWindow);
 	menu_opts_off(option_menu,O_ONEVALUE);
 
 	post_menu(option_menu);
@@ -384,6 +379,11 @@ main(int argc, char* argv[])
 	unpost_menu(option_menu);
 	endwin(); //get out of ncurses
 
+	delwin(headWindow);
+	delwin(primaryWindow);
+	delwin(helpWindow);
+	delwin(licenceWindow);
+	delwin(exitWindow);
 
 	ITEM **items;
 	items = menu_items(option_menu);
