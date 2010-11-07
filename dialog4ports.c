@@ -274,6 +274,7 @@ main(int argc, char* argv[])
 	bool licenceAccepted = false;
 
 	unsigned int n_choices = 0;
+	unsigned int count;
 
 	struct ARGINFO *arginfo = parseArguments(argc, argv);
 
@@ -297,7 +298,7 @@ main(int argc, char* argv[])
 	option_items=(ITEM**)calloc(n_choices + 1, sizeof(ITEM *));
 
 	curr = arginfo->head;
-	unsigned int count = 0;
+	count = 0;
 
 	while(curr) {
 		if (curr->mode != RADIOBOX) {
