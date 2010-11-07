@@ -179,7 +179,26 @@ parseArguments(const int argc, char * argv[]) {
 	return (arginfo);
 }
 
+void
+printFileToWindow(WINDOW * const win, const char * const filename) {
+	//function fileToWindow ?
+	const unsigned int maxCharPerLine = 80; //NEVER - ever go above 80
+								//deal with terminal size below
+	FILE *hFile = fopen(filename,"r");
 
+	int maxCols = getmaxx(win);
+	if (hFile == NULL)
+		errx(EX_IOERR, "File specified does not exist");
+	//never read more than 80 charaters per line
+	char buf[maxCharPerLine + 1];
+	int row = 1;
+	while (fgets(buf, maxCharPerLine, hFile)) {
+		const int result = mvwaddnstr(win, row++, 1, buf, maxCols - 1);
+		if (result == ERR)
+			errx(EX_SOFTWARE, "unable to write string to screen for unknown reason");
+	}
+	fclose(hFile);
+}
 
 int
 main(int argc, char* argv[])
@@ -585,26 +604,10 @@ main(int argc, char* argv[])
 			*/
 			wclear(helpWindow);
 
-			//function fileToWindow ?
-			const unsigned int maxCharPerLine = 80; //NEVER - ever go above 80
-										//deal with terminal size below
-
 			if (winGetInput == primaryWindow ) {
 				OptionEl *p = (OptionEl*)item_userptr(current_item(whichMenu));
 				if (p->longDescrFile != NULL) {
-					FILE *hFile = fopen(p->longDescrFile,"r");
-					if (hFile == NULL)
-						errx(EX_IOERR, "File specified does not exist");
-					//never read more than 80 charaters per line
-					char buf[maxCharPerLine + 1];
-					int row = 1;
-					while (fgets(buf, maxCharPerLine, hFile)) {
-						int result = mvwaddnstr(helpWindow, row++, 1, buf, helpCols - 1);
-						if (result == ERR)
-							errx(EX_SOFTWARE, "unable to write string to screen for unknown reason");
-					}
-//					wrefresh(helpWindow);
-					fclose(hFile);
+					printFileToWindow(helpWindow, p->longDescrFile);
 				}
 			}
 			wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
