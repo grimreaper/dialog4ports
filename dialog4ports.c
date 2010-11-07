@@ -1,9 +1,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
-#include <curses.h>
-#include <menu.h>
 #include <err.h>
 #include <sysexits.h>
 
@@ -74,8 +71,6 @@ outputValues(MENU *menu) {
 
 		if (p->mode == CHECKBOX || p->mode == RADIOBOX) {
 			outputBinaryValue(items[i], item_name(items[i]));
-			val = (item_value(items[i]) == TRUE) ? "true" : "false";
-			fprintf(stderr,"%s=%s\n", item_name(items[i]), val);
 		} else if (p->mode == USER_INPUT) {
 			if (p->value)
 				fprintf(stderr,"%s=%s\n", item_name(items[i]), p->value);
@@ -121,8 +116,15 @@ parseArguments(const int argc, char * argv[]) {
 	}
 	free(programInfo);
 
+	arginfo.outputLicenceRequest = false;
 
 	for (arg=2; arg < argc; ++arg) {
+		if (strcmp("--showLicence",argv[arg]) == 0) {
+			arginfo.outputLicenceRequest = true;
+			arg++;
+			continue;
+		}
+
 		++arginfo.nElements;
 		if ((curr = malloc (sizeof *curr)) == NULL)
 			errx(EX_OSERR,"can not malloc");
@@ -264,7 +266,12 @@ main(int argc, char* argv[])
 	const int licenceRowStart = exitRowStart - licenceRows;
 	// menu == sizeof(largest item) + 1 space for each item
 	const int full_licence_menu_size = (int)strlen("YES")*2+1;
-	const int licenceColStart = (frameCols - full_licence_menu_size)/2;
+	//Hack because menu ignores starting location
+	int licenceColStart;
+      if (arginfo.outputLicenceRequest)
+		licenceColStart = (frameCols - full_licence_menu_size)/2;
+	else
+		licenceColStart = 0;
 
 	const int primaryRowStart = headRows + 1;
 	const int primaryColStart = 0;
@@ -335,20 +342,27 @@ main(int argc, char* argv[])
 
 	ITEM* licenceSelected = licenceItems[licenceNO];
 
-	MENU *licenceMenu = new_menu(licenceItems);
+	MENU *licenceMenu;
+	if (arginfo.outputLicenceRequest) {
+		licenceMenu = new_menu(licenceItems);
 
-      set_menu_win(licenceMenu, licenceWindow);
-      set_menu_sub(licenceMenu, derwin(licenceWindow, licenceRows, licenceCols, 0, 0));
-	// 1 row - 2 cols for ok/cancel
-      set_menu_format(licenceMenu, 1, 2);
-	set_menu_mark(licenceMenu, ">");
-	set_menu_fore(licenceMenu, COLOR_PAIR(1));
-	set_menu_back(licenceMenu, COLOR_PAIR(2));
-      set_menu_grey(licenceMenu, COLOR_PAIR(3));
+	      set_menu_win(licenceMenu, licenceWindow);
+      	set_menu_sub(licenceMenu, derwin(licenceWindow, licenceRows, licenceCols, 1, 0));
+		// 1 row - 2 cols for ok/cancel
+      	set_menu_format(licenceMenu, 1, 2);
+		set_menu_mark(licenceMenu, ">");
+		set_menu_fore(licenceMenu, COLOR_PAIR(1));
+		set_menu_back(licenceMenu, COLOR_PAIR(2));
+      	set_menu_grey(licenceMenu, COLOR_PAIR(3));
 
 
-      post_menu(licenceMenu);
-	menu_driver(licenceMenu, REQ_TOGGLE_ITEM);
+	      post_menu(licenceMenu);
+		menu_driver(licenceMenu, REQ_TOGGLE_ITEM);
+	}
+	else {
+		const char* const licenceAcceptedMessage = "The licence for this port has already been accepted or does not exist";
+		mvwaddstr(licenceWindow,1, (licenceCols-(int)strlen(licenceAcceptedMessage))/2, licenceAcceptedMessage);
+	}
 	wrefresh(licenceWindow);
 
 
@@ -382,7 +396,8 @@ main(int argc, char* argv[])
 	keypad(exitWindow, TRUE);
 	keypad(helpWindow, TRUE);
 	keypad(headWindow, TRUE);
-	keypad(licenceWindow, TRUE);
+	if (arginfo.outputLicenceRequest)
+		keypad(licenceWindow, TRUE);
 
 	set_menu_mark(option_menu, " * ");
 
@@ -428,10 +443,9 @@ main(int argc, char* argv[])
 		c = wgetch(winGetInput);
 		ITEM *curItem = current_item(whichMenu);
 
-		if (winGetInput == licenceWindow)
-		{
-			licenceSelected = curItem;
-		}
+		if (arginfo.outputLicenceRequest)
+			if (winGetInput == licenceWindow)
+				licenceSelected = curItem;
 		WINDOW *oldwindow;
 		switch(c)
 		{
@@ -455,7 +469,7 @@ main(int argc, char* argv[])
 				break;
 			case  9: /* tab */
 				/* it goes
-					primary -> licence -> exit -> ...
+					primary -> [licence] -> exit -> ...
 
 					I'm not sure how to handle scrolling help text
 
@@ -463,8 +477,14 @@ main(int argc, char* argv[])
       		      set_menu_fore(whichMenu, COLOR_PAIR(1));
 
 				if (winGetInput == primaryWindow) {
-					winGetInput = licenceWindow;
-					whichMenu = licenceMenu;
+					if (arginfo.outputLicenceRequest) {
+						winGetInput = licenceWindow;
+						whichMenu = licenceMenu;
+					}
+					else {
+						winGetInput = exitWindow;
+						whichMenu = exitMenu;
+					}
 				}
 				else if (winGetInput == licenceWindow) {
 					winGetInput = exitWindow;
@@ -598,14 +618,17 @@ main(int argc, char* argv[])
 
 	if (somethingChanged) {
 		outputValues(option_menu);
-		outputBinaryValue(licenceItems[licenceYES], "ACCEPTED_LICENCE");
+		if (arginfo.outputLicenceRequest)
+			outputBinaryValue(licenceItems[licenceYES], "ACCEPTED_LICENCE");
 	}
 
 	for (count = 0; count < n_choices; ++count)
 		free_item(option_items[count]);
 
 	free_menu(option_menu);
-	free_menu(licenceMenu);
+	if (arginfo.outputLicenceRequest)
+		free_menu(licenceMenu);
+	free_menu(exitMenu);
 
 	curr = arginfo.head;
 	while (curr) {

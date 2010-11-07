@@ -1,3 +1,7 @@
+#include <ncurses.h>
+#include <menu.h>
+#include <stdbool.h>
+
 enum OPTION_TYPE {
 	CHECKBOX,
 	RADIOBOX,
@@ -28,12 +32,16 @@ outputBinaryValue(ITEM* item, const char *key);
 void
 outputValues(MENU *menu);
 
+/*
+	this is fugly
+*/
 struct {
 	unsigned int nElements;
 	unsigned int nHashMarks;
 	OptionEl * head;
 	const char * portname;
 	const char * portcomment;
+	bool outputLicenceRequest;
 } arginfo;
 
 void
