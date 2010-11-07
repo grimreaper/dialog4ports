@@ -101,8 +101,9 @@ parseArguments(const int argc, char * argv[]) {
 	if (argc < 3)
 		errx(EX_USAGE, "We need more than just a port name");
 
-	// arg=0 program name
-	// arg=1 port title & comment
+	/* arg=0 program name
+	* arg=1 port title & comment
+	*/
 
 	char * programInfo = calloc(strlen(argv[1]), sizeof(char));
 	//we are not really being safer here :-)
