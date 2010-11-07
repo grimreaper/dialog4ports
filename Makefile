@@ -37,7 +37,9 @@ remake: .NOTMAIN .USE .EXEC .IGNORE .PHONY clean all
 
 clean: .NOTMAIN .PHONY .IGNORE nameclean coreclean objclean
 
-$(NAME): 
+$(NAME):
+
+$(NAME).c: $(NAME).h
 
 all: $(NAME)
 

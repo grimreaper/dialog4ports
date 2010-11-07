@@ -7,28 +7,12 @@
 #include <err.h>
 #include <sysexits.h>
 
+#include "dialog4ports.h"
 
 
 //BUG - licence output is always false
 //BUG - licence & exit menus initially are nto background green
 //TODO - get long description support
-
-enum OPTION_TYPE {
-	CHECKBOX,
-	RADIOBOX,
-	USER_INPUT,
-};
-
-struct list_el {
-	char *name;
-	char *options;
-	char *descr;
-	const char *value;		//this is user supplied
-	enum OPTION_TYPE mode;
-	struct list_el *next;
-};
-
-typedef struct list_el OptionEl;
 
 static char *
 getString(WINDOW *win, const char * const curVal)
@@ -80,7 +64,6 @@ outputBinaryValue(ITEM* item, const char *key) {
 void
 outputValues(MENU *menu) {
 	ITEM **items;
-      OptionEl *p;
 	const char* val;
 
 	items = menu_items(menu);
@@ -101,20 +84,12 @@ outputValues(MENU *menu) {
 	}
 }
 
-struct {
-	unsigned int nElements;
-	unsigned int nHashMarks;
-	OptionEl * head;
-	const char * portname;
-	const char * portcomment;
-} arginfo;
-
 /*
 	parses the arguments and modifies arginfo
 	with some information
 */
 void
-parseArguments(const int argc, char * const argv[]) {
+parseArguments(const int argc, char * argv[]) {
 	int arg;
 	OptionEl *curr = NULL;
 	OptionEl *prev = NULL;
@@ -423,12 +398,11 @@ main(int argc, char* argv[])
 	   so go thru each one, set the envrioment, and then return to top
 	*/
 	for(count = 0; count < n_choices; ++count) {
-
             curr = (OptionEl*)item_userptr(option_items[count]);
 		curr->value = getenv(curr->name);
 		if (curr->value != NULL)
 		{
-			set_item_value(curr, true);
+			set_item_value(option_items[count], true);
 			menu_driver(option_menu, REQ_TOGGLE_ITEM);
 		}
             menu_driver(option_menu, REQ_DOWN_ITEM);
