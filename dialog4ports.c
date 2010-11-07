@@ -10,6 +10,7 @@
 
 
 //BUG - licence output is always false
+//BUG - licence & exit menus initially are nto background green
 //TODO - get long description support
 
 enum OPTION_TYPE {
@@ -29,7 +30,6 @@ struct list_el {
 
 typedef struct list_el OptionEl;
 
-
 static char *
 getString(WINDOW *win, const char * const curVal)
 {
@@ -39,7 +39,6 @@ getString(WINDOW *win, const char * const curVal)
 
 	int row,col;
 	getmaxyx(win,row,col);		/* get the number of rows and columns */
-
 	int messageLen = (int)strlen(mesg);
 	int messageStart = (col-messageLen)/2;
 
@@ -83,8 +82,6 @@ outputValues(MENU *menu) {
 	ITEM **items;
       OptionEl *p;
 	const char* val;
-	OptionEl *prev = NULL, *next = NULL;
-	int arg;
 
 	items = menu_items(menu);
 	int i;
@@ -117,11 +114,11 @@ struct {
 	with some information
 */
 void
-parseArguments(int argc, char* argv[]) {
-	int c;
+parseArguments(const int argc, char * const argv[]) {
 	int arg;
 	OptionEl *curr = NULL;
-	OptionEl *prev = NULL, *next = NULL;
+	OptionEl *prev = NULL;
+	const char* internal_token;
 
 	if (argc < 2)
 		errx(EX_USAGE,"We require some option type to work");
@@ -130,7 +127,25 @@ parseArguments(int argc, char* argv[]) {
 		errx(EX_USAGE,"We need more than just a port name");
 
 	// arg=0 program name
-	// arg=1 port title
+	// arg=1 port title & comment
+
+	char * programInfo = calloc(strlen(argv[1]), sizeof(char));
+	//we are not really being safer here :-)
+	strncpy(programInfo, argv[1], strlen(argv[1]));
+
+	bool gotPortName = false;
+      while((internal_token = strsep(&programInfo, "=")) != NULL) {
+		if (!gotPortName) {
+			arginfo.portname = internal_token;
+			gotPortName = true;
+		}
+		else {
+			arginfo.portcomment = internal_token;
+		}
+	}
+	free(programInfo);
+
+
 	for (arg=2; arg < argc; ++arg) {
 		++arginfo.nElements;
 		if ((curr = malloc (sizeof *curr)) == NULL)
@@ -144,7 +159,6 @@ parseArguments(int argc, char* argv[]) {
 
 		bool gotName = false;
 		bool gotDescr = false;
-		char *internal_token;
 		while((internal_token = strsep(&argv[arg], "=")) != NULL) {
 			if (!gotName) {
 				curr->name = internal_token;
@@ -188,15 +202,9 @@ main(int argc, char* argv[])
 	MENU *option_menu;
 
 
-	unsigned int numElements = 0;
 	unsigned int n_choices = 0;
-	unsigned int hashMarks = 0;
 
 	/* Avoid C++ style declaration inside loops */
-
-	const char * const portName = argv[1];
-
-
 
 	parseArguments(argc, argv);
 //	head = arginfo.head;
@@ -211,9 +219,9 @@ main(int argc, char* argv[])
 	initscr();
 	if(has_colors() == TRUE) {
 		start_color();
-		init_pair(1, COLOR_GREEN, COLOR_BLACK);     //selected
+		init_pair(1, COLOR_GREEN, COLOR_BLACK);   //selected
 		init_pair(2, COLOR_YELLOW, COLOR_BLACK);	//selectable
-		init_pair(3, COLOR_RED, COLOR_BLACK); //disabled
+		init_pair(3, COLOR_RED, COLOR_BLACK); 	//disabled
 	}
 
 	cbreak();
@@ -324,8 +332,13 @@ main(int argc, char* argv[])
       set_menu_format(exitMenu, 1, 2);
 	set_menu_mark(exitMenu, ">");
 
+	set_menu_fore(exitMenu, COLOR_PAIR(1));
+	set_menu_back(exitMenu, COLOR_PAIR(2));
+      set_menu_grey(exitMenu, COLOR_PAIR(3));
 
       post_menu(exitMenu);
+      menu_driver(exitMenu, REQ_FIRST_ITEM);
+	menu_driver(exitMenu, REQ_TOGGLE_ITEM);
 	wrefresh(exitWindow);
 
 
@@ -347,24 +360,19 @@ main(int argc, char* argv[])
 	// 1 row - 2 cols for ok/cancel
       set_menu_format(licenceMenu, 1, 2);
 	set_menu_mark(licenceMenu, ">");
+	set_menu_fore(licenceMenu, COLOR_PAIR(1));
+	set_menu_back(licenceMenu, COLOR_PAIR(2));
+      set_menu_grey(licenceMenu, COLOR_PAIR(3));
+
 
       post_menu(licenceMenu);
+	menu_driver(licenceMenu, REQ_TOGGLE_ITEM);
 	wrefresh(licenceWindow);
-
-
-
-
-
 
 
 
 	menu_opts_off(option_menu, O_SHOWDESC);
 	menu_opts_on(option_menu, O_NONCYCLIC);
-
-
-
-
-
 
 	// we want to leave 3 lines for the title
 	const int startMenyWinRow = 3;
@@ -373,7 +381,11 @@ main(int argc, char* argv[])
 	const int nMenuCols = 1;
 
 	//display the title in the center of the top window
-	mvwprintw(headWindow,startMenyWinRow/2 + 1,(headCols-(int)strlen(portName))/2,"%s",portName);
+	mvwprintw(headWindow,startMenyWinRow/2 ,(headCols-(int)strlen(arginfo.portname))/2,"%s",arginfo.portname);
+	if (arginfo.portcomment != NULL)
+	{
+		mvwprintw(headWindow,startMenyWinRow/2 + 1,(headCols-(int)strlen(arginfo.portcomment))/2,"%s",arginfo.portcomment);
+	}
 	wrefresh(headWindow);
 
 	if(has_colors() == TRUE) {
@@ -425,7 +437,7 @@ main(int argc, char* argv[])
 
 
 	const WINDOW *winGetInput = primaryWindow;
-	const MENU	 *whichMenu = option_menu;
+	MENU	 *whichMenu = option_menu;
 	bool weWantMore = true;
 	bool somethingChanged = false;
 	int c;
@@ -436,6 +448,7 @@ main(int argc, char* argv[])
 		{
 			licenceSelected = curItem;
 		}
+		WINDOW *oldwindow;
 		switch(c)
 		{
 			case KEY_DOWN:
@@ -463,6 +476,8 @@ main(int argc, char* argv[])
 					I'm not sure how to handle scrolling help text
 
 				*/
+      		      set_menu_fore(whichMenu, COLOR_PAIR(1));
+
 				if (winGetInput == primaryWindow) {
 					winGetInput = licenceWindow;
 					whichMenu = licenceMenu;
@@ -475,6 +490,8 @@ main(int argc, char* argv[])
 					winGetInput = primaryWindow;
 					whichMenu = option_menu;
 				}
+      		      set_menu_fore(whichMenu, COLOR_PAIR(1) | A_REVERSE);
+				wrefresh(oldwindow);
 				break;
 			case ' ':
 			case 10:
