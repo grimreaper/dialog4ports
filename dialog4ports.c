@@ -115,10 +115,9 @@ getString(WINDOW *win, const char * const curVal)
 	if (e == ERR)
 		errx(EX_SOFTWARE, "unable to clear the screen");
 
-//	e = wrefresh(win);
-	doupdate();
+	e = doupdate();
 	if (e == ERR)
-		errx(EX_SOFTWARE, "unable to refresh the screen");
+		errx(EX_SOFTWARE, "unable to update the screen");
 
 	return (str);
 }
@@ -560,7 +559,6 @@ main(int argc, char* argv[])
       post_menu(exitMenu);
       menu_driver(exitMenu, REQ_FIRST_ITEM);
 	menu_driver(exitMenu, REQ_TOGGLE_ITEM);
-	//wrefresh(exitWindow);
 	doupdate();
 
 
@@ -598,7 +596,6 @@ main(int argc, char* argv[])
 		const char* const licenceAcceptedMessage = "The licence for this port has already been accepted or does not exist";
 		printInCenter(licenceWindow, 1, licenceAcceptedMessage);
 	}
-	//wrefresh(licenceWindow);
 	doupdate();
 
 
@@ -618,7 +615,6 @@ main(int argc, char* argv[])
 	{
 		printInCenter(headWindow, startMenyWinRow/2 + 1, arginfo->portcomment);
 	}
-	//wrefresh(headWindow);
 	doupdate();
 
 	if(has_colors() == TRUE) {
@@ -651,9 +647,6 @@ main(int argc, char* argv[])
 	post_menu(option_menu);
 
 
-	//wrefresh(headWindow);
-	//wrefresh(primaryWindow);
-	//wrefresh(helpWindow);
 	doupdate();
 
 	/* toggling and truth have nothing to do with each other :-)
@@ -741,7 +734,6 @@ main(int argc, char* argv[])
 					whichMenu = option_menu;
 				}
       		      set_menu_fore(whichMenu, COLOR_PAIR(1) | A_REVERSE);
-				//wrefresh(oldwindow);
 				doupdate();
 				break;
 			case ' ':
@@ -787,9 +779,6 @@ main(int argc, char* argv[])
 							}
 							wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 							wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-							//wrefresh(headWindow);
-							//wrefresh(helpWindow);
-							//wrefresh(primaryWindow);
 							doupdate();
 						}
 					}
@@ -824,7 +813,6 @@ main(int argc, char* argv[])
 				}
 			}
 			wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-			//wrefresh(helpWindow);
 			doupdate();
 
 			if (winGetInput == licenceWindow) {
