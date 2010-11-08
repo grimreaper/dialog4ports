@@ -173,7 +173,6 @@ parseArguments(const int argc, char * argv[])
 			}
 			else if (strcmp("--port-comment", argv[arg]) == 0) {
 				stage = READ_PCOMMENT;
-
 				continue;
 			}
 
@@ -190,13 +189,16 @@ parseArguments(const int argc, char * argv[])
 				curr->mode = CHECKBOX;
 				stage = NEXT_OPTION;
 			}
-			if (strcmp("--radio", argv[arg]) == 0) {
+			else if (strcmp("--radio", argv[arg]) == 0) {
 				curr->mode = RADIOBOX;
 				stage = NEXT_OPTION;
 			}
-			if (strcmp("--input", argv[arg]) == 0) {
+			else if (strcmp("--input", argv[arg]) == 0) {
 				curr->mode = USER_INPUT;
 				stage = NEXT_OPTION;
+			}
+			else {
+				errx(EX_USAGE,"You can't do that!");
 			}
 		}
 		else if (stage == NEXT_OPTION) {

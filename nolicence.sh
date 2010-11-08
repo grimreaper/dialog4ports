@@ -10,4 +10,3 @@ WITH_XORG=WITH_XORG	./dialog4ports \
 				--input	LANGS='use a language '=n.txt \
 				--option	XYZ='argi'		\
 				--option	AAAAZ='hello my dear' \
-				--error
