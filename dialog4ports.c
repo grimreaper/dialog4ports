@@ -33,8 +33,7 @@ other dealings in this Software without prior written authorization.
 
 #include "dialog4ports.h"
 
-//TODO	- refactor large main into smaller units
-//TODO	- add some kind of --help text
+/* TODO	- refactor large main into smaller units */
 
 int
 printInCenter(WINDOW *win, const int row, const char * const str)
