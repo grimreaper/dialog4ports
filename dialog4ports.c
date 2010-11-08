@@ -47,6 +47,7 @@ __FBSDID("$FreeBSD$");
 *	TODO	- --min --max options
 *	TODO	- --requires option
 *	TODO	- add panels code to allow for popups
+*	BUG	- buggy prompt for user data
 */
 
 
