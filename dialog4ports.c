@@ -115,7 +115,8 @@ getString(WINDOW *win, const char * const curVal)
 	if (e == ERR)
 		errx(EX_SOFTWARE, "unable to clear the screen");
 
-	e = wrefresh(win);
+//	e = wrefresh(win);
+	doupdate();
 	if (e == ERR)
 		errx(EX_SOFTWARE, "unable to refresh the screen");
 
@@ -559,7 +560,8 @@ main(int argc, char* argv[])
       post_menu(exitMenu);
       menu_driver(exitMenu, REQ_FIRST_ITEM);
 	menu_driver(exitMenu, REQ_TOGGLE_ITEM);
-	wrefresh(exitWindow);
+	//wrefresh(exitWindow);
+	doupdate();
 
 
 	licenceItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
@@ -596,7 +598,8 @@ main(int argc, char* argv[])
 		const char* const licenceAcceptedMessage = "The licence for this port has already been accepted or does not exist";
 		printInCenter(licenceWindow, 1, licenceAcceptedMessage);
 	}
-	wrefresh(licenceWindow);
+	//wrefresh(licenceWindow);
+	doupdate();
 
 
 
@@ -615,7 +618,8 @@ main(int argc, char* argv[])
 	{
 		printInCenter(headWindow, startMenyWinRow/2 + 1, arginfo->portcomment);
 	}
-	wrefresh(headWindow);
+	//wrefresh(headWindow);
+	doupdate();
 
 	if(has_colors() == TRUE) {
 		/* Set fore ground and back ground of the menu */
@@ -647,9 +651,10 @@ main(int argc, char* argv[])
 	post_menu(option_menu);
 
 
-	wrefresh(headWindow);
-	wrefresh(primaryWindow);
-	wrefresh(helpWindow);
+	//wrefresh(headWindow);
+	//wrefresh(primaryWindow);
+	//wrefresh(helpWindow);
+	doupdate();
 
 	/* toggling and truth have nothing to do with each other :-)
 	   so go thru each one, set the envrioment, and then return to top
@@ -736,7 +741,8 @@ main(int argc, char* argv[])
 					whichMenu = option_menu;
 				}
       		      set_menu_fore(whichMenu, COLOR_PAIR(1) | A_REVERSE);
-				wrefresh(oldwindow);
+				//wrefresh(oldwindow);
+				doupdate();
 				break;
 			case ' ':
 			case 10:
@@ -781,9 +787,10 @@ main(int argc, char* argv[])
 							}
 							wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 							wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-							wrefresh(headWindow);
-							wrefresh(helpWindow);
-							wrefresh(primaryWindow);
+							//wrefresh(headWindow);
+							//wrefresh(helpWindow);
+							//wrefresh(primaryWindow);
+							doupdate();
 						}
 					}
 				}
@@ -817,7 +824,8 @@ main(int argc, char* argv[])
 				}
 			}
 			wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-			wrefresh(helpWindow);
+			//wrefresh(helpWindow);
+			doupdate();
 
 			if (winGetInput == licenceWindow) {
 				if (current_item(licenceMenu) == licenceItems[licenceYES])
