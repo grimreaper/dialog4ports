@@ -1,40 +1,53 @@
-/*
-Copyright 2010 by Eitan Adler
-Copyright 2001 by Pradeep Padala.
+/*-
+* Copyright 2010 by Eitan Adler
+* Copyright 2001 by Pradeep Padala.
 
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation files
-(the "Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge,
-publish, distribute, distribute with modifications, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
-IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-Except as contained in this notice, the name(s) of the above copyright holders
-shall not be used in advertising or otherwise to promote the sale, use or
-other dealings in this Software without prior written authorization.
+* Permission is hereby granted, free of charge, to any person
+* obtaining a copy of this software and associated documentation files
+* (the "Software"), to deal in the Software without restriction, including
+* without limitation the rights to use, copy, modify, merge,
+* publish, distribute, distribute with modifications, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+* WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+* IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*
+* Except as contained in this notice, the name(s) of the above copyright holders
+* shall not be used in advertising or otherwise to promote the sale, use or
+* other dealings in this Software without prior written authorization.
+*
 */
 
+#if 0
+#ifndef lint
+static char sccsid[] = "@(#)style       1.14 (Berkeley) 4/28/95";
+#endif /* not lint */
+#endif
+
+#include <sys/cdefs.h>
+__FBSDID("$FreeBSD$");
+
+#include <err.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <err.h>
 #include <sysexits.h>
 
 #include "dialog4ports.h"
 
 /* TODO	- refactor large main into smaller units */
 
+/*
+* Prints some text in the center of a specified line and window
+*/
 int
 printInCenter(WINDOW *win, const int row, const char * const str)
 {
@@ -45,6 +58,9 @@ printInCenter(WINDOW *win, const int row, const char * const str)
 	return (start);
 }
 
+/*
+* Asks the user for some data and returns the data entered
+*/
 static char *
 getString(WINDOW *win, const char * const curVal)
 {
@@ -72,6 +88,9 @@ getString(WINDOW *win, const char * const curVal)
 	return (str);
 }
 
+/*
+* counts the occurences of a specified character in a string
+*/
 static unsigned int
 countChar ( const char * const input, const char c )
 {
@@ -86,6 +105,9 @@ countChar ( const char * const input, const char c )
 	return (retval);
 }
 
+/*
+*	Outputs binary values in a true/false form
+*/
 void
 outputBinaryValue(ITEM* item, const char *key)
 {
@@ -93,6 +115,9 @@ outputBinaryValue(ITEM* item, const char *key)
 	printf("%s=%s\n", key, (val) ? "true" : "false");
 }
 
+/*
+* loops thru a menu and outputs selected values
+*/
 void
 outputValues(MENU *menu)
 {
@@ -114,8 +139,8 @@ outputValues(MENU *menu)
 }
 
 /*
-	parses the arguments and modifies arginfo
-	with some information
+*	parses the arguments and modifies arginfo
+*	with some information
 */
 struct ARGINFO*
 parseArguments(const int argc, char * argv[])
@@ -263,6 +288,10 @@ parseArguments(const int argc, char * argv[])
 	return (arginfo);
 }
 
+/*
+* copies a specified file to specified window
+* refuses to copy more than 80 char/line or max width of the window
+*/
 void
 printFileToWindow(WINDOW * const win, const char * const filename)
 {
@@ -290,7 +319,10 @@ printFileToWindow(WINDOW * const win, const char * const filename)
 	fclose(hFile);
 }
 
-void
+/*
+* Outputs usage information and optionally errors out.
+*/
+static void
 usage(bool error) {
 	fprintf(stderr,"%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
 		"--port portname",

@@ -1,5 +1,5 @@
-#include <ncurses.h>
 #include <menu.h>
+#include <ncurses.h>
 #include <stdbool.h>
 
 enum OPTION_TYPE {
@@ -9,13 +9,13 @@ enum OPTION_TYPE {
 };
 
 struct list_el {
-	const char *name;
-	const char *options;
 	const char *descr;
-	const char *value;		/* this is user supplied */
 	const char *longDescrFile;
 	enum OPTION_TYPE mode;
+	const char *name;
 	struct list_el *next;
+	const char *options;
+	const char *value;		/* this is user supplied */
 };
 
 typedef struct list_el OptionEl;
@@ -36,14 +36,14 @@ outputValues(MENU *menu);
 	this is fugly
 */
 struct ARGINFO {
+	OptionEl *head;
+	const char *licenceName;
+	const char *licenceText;
 	unsigned int nElements;
 	unsigned int nHashMarks;
-	OptionEl * head;
-	const char * portname;
-	const char * portcomment;
 	bool outputLicenceRequest;
-	const char * licenceName;
-	const char * licenceText;
+	const char *portname;
+	const char *portcomment;
 };
 
 struct ARGINFO*
@@ -56,5 +56,5 @@ printInCenter(WINDOW * const win, const int row, const char * const str);
 void
 printFileToWindow(WINDOW * const win, const char * const filename);
 
-void
+static void
 usage(bool error);
