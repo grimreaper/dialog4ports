@@ -440,6 +440,8 @@ main(int argc, char* argv[])
 	keypad(stdscr, TRUE);
 
 	option_items=(ITEM**)calloc(n_choices + 1, sizeof(ITEM *));
+	if (option_items == NULL)
+		errx(EX_OSERR, "unable to make room for option_items");
 
 	curr = arginfo->head;
 	count = 0;
@@ -452,6 +454,8 @@ main(int argc, char* argv[])
 		} else {
 			char *tmpToken;
 			char *tmpOption = calloc(strlen(curr->options)+1, sizeof(char));
+			if (tmpOption == NULL)
+				errx(EX_OSERR, "unable to make room for tmpOption");
 			strncpy(tmpOption, curr->options, strlen(curr->options));
 
 			while((tmpToken = strsep(&tmpOption, "#")) != NULL) {
@@ -527,6 +531,8 @@ main(int argc, char* argv[])
 
 
 	exitItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
+	if (exitItems == NULL)
+		errx(EX_OSERR, "unable to make room for exitItems");
 
 	const int exitOK = 0;
 	const int exitCancel = 1;
@@ -553,6 +559,9 @@ main(int argc, char* argv[])
 
 
 	licenceItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
+	if (licenceItems == NULL)
+		errx(EX_OSERR, "unable to make room for licenceItems");
+
 
 	/* default to no... */
 	const int licenceNO = 0;
