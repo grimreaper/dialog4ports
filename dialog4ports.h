@@ -15,6 +15,7 @@ struct list_el {
 	const char *name;
 	struct list_el *next;
 	const char *options;
+	bool required;
 	const char *value;		/* this is user supplied */
 };
 

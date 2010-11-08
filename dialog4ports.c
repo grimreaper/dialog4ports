@@ -43,7 +43,12 @@ __FBSDID("$FreeBSD$");
 
 #include "dialog4ports.h"
 
-/* TODO	- refactor large main into smaller units */
+/*	TODO	- refactor large main into smaller units
+*	TODO	- --min --max options
+*	TODO	- --requires option
+*	TODO	- add panels code to allow for popups
+*/
+
 
 /*
 * Prints some text in the center of a specified line and window
@@ -52,9 +57,11 @@ int
 printInCenter(WINDOW *win, const int row, const char * const str)
 {
 	const int cols = getmaxx(win);
+	if (cols == ERR)
+		errx(EX_SOFTWARE, "unable to determine number of columns");
 	const int start = (cols-(int)strlen(str))/2;
       if (mvwaddstr(win, row, start, str) == ERR)
-		errx(EX_SOFTWARE, "unable to write string to screen for unknown reason");
+		errx(EX_SOFTWARE, "unable to write string to center of screen for unknown reason");
 	return (start);
 }
 
@@ -64,6 +71,7 @@ printInCenter(WINDOW *win, const int row, const char * const str)
 static char *
 getString(WINDOW *win, const char * const curVal)
 {
+	int e;
 	const unsigned int bufSize = 80;
 	char mesg[]="Choose a new value: ";
 	char *str = calloc(bufSize, sizeof(char));
@@ -75,11 +83,15 @@ getString(WINDOW *win, const char * const curVal)
 
 	if (curVal != NULL) {
 		messageStart = printInCenter(win, row/2, mesg);
-		mvwprintw(win,row/2, messageStart + (int)strlen(mesg) + 1," [ %s ]",curVal);
+		e = mvwprintw(win,row/2, messageStart + (int)strlen(mesg) + 1," [ %s ]",curVal);
+		if (e == ERR)
+			errx(EX_SOFTWARE, "unable to add original string for unknown reason");
 	}
 	echo();
 	wmove(win,row/2 + 1, (messageStart + (int)strlen(mesg))/2);
-	waddstr(win,"==>");
+	e = waddstr(win,"==>");
+	if (e == ERR)
+		errx(EX_SOFTWARE, "unable to add prompt for some reason");
 	wgetnstr(win, str, (int)bufSize -1);				/* request the input...*/
 	noecho();
 	wclear(win);
@@ -112,7 +124,7 @@ void
 outputBinaryValue(ITEM* item, const char *key)
 {
 	bool val = item_value(item) == TRUE;
-	printf("%s=%s\n", key, (val) ? "true" : "false");
+	fprintf(stderr, "%s=%s\n", key, (val) ? "true" : "false");
 }
 
 /*
@@ -123,10 +135,12 @@ outputValues(MENU *menu)
 {
 	ITEM **items;
 	int i;
+	bool allRequired = true;
 	items = menu_items(menu);
 	for(i = 0; i < item_count(menu); ++i) {
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
-
+		if (p->required && item_value(items[i]) != TRUE)
+			allRequired = false;
 		if (p->mode == CHECKBOX || p->mode == RADIOBOX) {
 			outputBinaryValue(items[i], item_name(items[i]));
 		} else if (p->mode == USER_INPUT) {
@@ -136,6 +150,8 @@ outputValues(MENU *menu)
 				fprintf(stderr, "%s=\n", item_name(items[i]));
 		}
 	}
+	if (!allRequired)
+		fprintf(stderr, "REQUIRED_SELECTION=false\n");
 }
 
 /*
@@ -204,6 +220,10 @@ parseArguments(const int argc, char * argv[])
 				stage = PREV_HFILE;
 				continue;
 			}
+			else if (strcmp("--required", argv[arg]) == 0) {
+				prev->required = true;
+				continue;
+			}
 
 
 			++arginfo->nElements;
@@ -251,6 +271,7 @@ parseArguments(const int argc, char * argv[])
 				}
 			}
 			curr->value = NULL;
+			curr->required = false;
 			prev = curr;
 			curr = curr->next;
 			stage = OPEN;
@@ -284,6 +305,8 @@ parseArguments(const int argc, char * argv[])
 		prev = prev->next;
 	}
 
+	if (arginfo->nElements == 0)
+		errx(EX_USAGE,"We need at least one option");
 
 	return (arginfo);
 }
@@ -313,7 +336,7 @@ printFileToWindow(WINDOW * const win, const char * const filename)
 	while (fgets(buf, maxCharPerLine, hFile)) {
 		const int result = mvwaddnstr(win, row++, 1, buf, maxCols - 1);
 		if (result == ERR)
-			errx(EX_SOFTWARE, "unable to write string to screen for unknown reason");
+			errx(EX_SOFTWARE, "Unable to write string to screen for unknown reason");
 	}
 
 	fclose(hFile);
@@ -697,6 +720,7 @@ main(int argc, char* argv[])
 							}
 						}
 						else {
+							p->value = NULL;
 							p->value = getString(primaryWindow,p->value);
 							if (p->value != NULL && strcmp("",p->value) != 0) {
 								if (item_value(curItem) != TRUE) {
