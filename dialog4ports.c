@@ -128,8 +128,6 @@ parseArguments(const int argc, char * argv[])
 	OptionEl *curr = NULL;
 	OptionEl *prev = NULL;
 	const char* internal_token = NULL;
-	char * programInfo;
-	bool gotPortName;
 
 	enum {
 		OPEN,			/* we can get the next argument */
@@ -144,45 +142,38 @@ parseArguments(const int argc, char * argv[])
 	if (argc < 2)
 		errx(EX_USAGE, "We require some option type to work");
 
-	if (argc < 3)
-		errx(EX_USAGE, "We need more than just a port name");
-
 	/* arg=0 program name
 	* arg=1 port title & comment
 	*/
 
-	programInfo = calloc(strlen(argv[1]), sizeof(char));
-	/* we are not really being safer here :-) */
-	strncpy(programInfo, argv[1], strlen(argv[1]));
-
-	gotPortName = false;
-      while((internal_token = strsep(&programInfo, "=")) != NULL) {
-		if (!gotPortName) {
-			arginfo->portname = internal_token;
-			gotPortName = true;
-		}
-		else {
-			arginfo->portcomment = internal_token;
-		}
-	}
-	free(programInfo);
-
 	arginfo->outputLicenceRequest = false;
+	arginfo->portname = NULL;
+	arginfo->portcomment = NULL;
 	arginfo->licenceText = NULL;
 	arginfo->licenceName = NULL;
 
 	stage = OPEN;
 
-	for (arg=2; arg < argc; ++arg) {
+	for (arg=1; arg < argc; ++arg) {
 		if (stage == OPEN) {
+			printf("%s\n",argv[arg]);
 			if (strcmp("--licence", argv[arg]) == 0) {
 				arginfo->outputLicenceRequest = true;
 				stage = READ_LNAME;
 				continue;
 			}
-			if (strcmp("--licence-text", argv[arg]) == 0) {
+			else if (strcmp("--licence-text", argv[arg]) == 0) {
 				arginfo->outputLicenceRequest = true;
 				stage = READ_LTEXT;
+				continue;
+			}
+			else if (strcmp("--port", argv[arg]) == 0) {
+				stage = READ_PNAME;
+				continue;
+			}
+			else if (strcmp("--port-comment", argv[arg]) == 0) {
+				stage = READ_PCOMMENT;
+
 				continue;
 			}
 
@@ -231,10 +222,8 @@ parseArguments(const int argc, char * argv[])
 			}
 			curr->value = NULL;
 			prev = curr;
-			printf("COMPLETE\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
-				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode);
-
-
+//			printf("COMPLETE\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
+//				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode);
 			curr = curr->next;
 			stage = OPEN;
 		}
@@ -246,8 +235,23 @@ parseArguments(const int argc, char * argv[])
 			arginfo->licenceText = argv[arg];
 			stage = OPEN;
 		}
-
+		else if (stage == READ_PNAME) {
+			arginfo->portname = argv[arg];
+			stage = OPEN;
+		}
+		else if (stage == READ_PCOMMENT) {
+			arginfo->portcomment = argv[arg];
+			stage = OPEN;
+		}
 	}
+
+	prev = arginfo->head;
+	while (prev) {
+		printf("YZ:\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
+				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode);
+		prev = prev->next;
+	}
+
 
 	return (arginfo);
 }
@@ -317,6 +321,7 @@ main(int argc, char* argv[])
 	unsigned int count;
 
 	struct ARGINFO *arginfo = parseArguments(argc, argv);
+	exit(42);
 
 	/* deal with curses */
 	curr = arginfo->head;

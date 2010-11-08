@@ -55,3 +55,6 @@ printInCenter(WINDOW * const win, const int row, const char * const str);
 
 void
 printFileToWindow(WINDOW * const win, const char * const filename);
+
+void
+usage();
