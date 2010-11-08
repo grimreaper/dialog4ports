@@ -133,7 +133,8 @@ parseArguments(const int argc, char * argv[])
 		READ_LNAME,		/* next thing is the wlicence name */
 		READ_LTEXT, 	/* next thing to read is the licence text */
 		READ_PNAME, 	/* next thing is the port name */
-		READ_PCOMMENT	/* next thing is the port comment */
+		READ_PCOMMENT,	/* next thing is the port comment */
+		PREV_HFILE		/* next thing is prev's hfile */
 	} stage;
 
 
@@ -175,6 +176,11 @@ parseArguments(const int argc, char * argv[])
 				stage = READ_PCOMMENT;
 				continue;
 			}
+			else if (strcmp("--hfile", argv[arg]) == 0) {
+				stage = PREV_HFILE;
+				continue;
+			}
+
 
 			++arginfo->nElements;
 			if ((curr = malloc (sizeof *curr)) == NULL)
@@ -222,8 +228,6 @@ parseArguments(const int argc, char * argv[])
 			}
 			curr->value = NULL;
 			prev = curr;
-//			printf("COMPLETE\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
-//				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode);
 			curr = curr->next;
 			stage = OPEN;
 		}
@@ -241,6 +245,10 @@ parseArguments(const int argc, char * argv[])
 		}
 		else if (stage == READ_PCOMMENT) {
 			arginfo->portcomment = argv[arg];
+			stage = OPEN;
+		}
+		else if (stage == PREV_HFILE) {
+			prev->longDescrFile = argv[arg];
 			stage = OPEN;
 		}
 	}
@@ -290,9 +298,9 @@ usage(bool error) {
 		"[--port-comment 'port comment']",
 		"[--licence name of default licence]",
 		"[--licence-text filename of licence]",
-		"--option value=optionName=description=descr-filename",
-		"--radio value=optionName=description=option1#option2=descr-filename",
-		"--input value=optionName=description=descr-filename"
+		"--option value=optionName=description [--hfile filename]",
+		"--radio value=optionName=description=option1#option2 [--hfile filename]",
+		"--input value=optionName=description [--hfile filename]"
 	);
 	if (error)
 		errx(EX_USAGE,"Error code ID 10 T");
