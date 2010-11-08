@@ -58,4 +58,4 @@ void
 printFileToWindow(WINDOW * const win, const char * const filename);
 
 static void
-usage(bool error);
+usage();

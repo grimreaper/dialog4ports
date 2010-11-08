@@ -43,13 +43,15 @@ __FBSDID("$FreeBSD$");
 
 #include "dialog4ports.h"
 
+<<<<<<< local
 /*	TODO	- refactor large main into smaller units
+*	TODO	- change -hfile to wxs's method for taking long descr
+*	 --option WITH_FOO --hfile "FOO:long description" --wh
 *	TODO	- --min --max options
 *	TODO	- --requires option
 *	TODO	- add panels code to allow for popups
 *	BUG	- buggy prompt for user data
 */
-
 
 /*
 * Prints some text in the center of a specified line and window
@@ -179,8 +181,10 @@ parseArguments(const int argc, char * argv[])
 	} stage;
 
 
-	if (argc < 2)
-		usage(false);
+	if (argc < 2) {
+		usage();
+		exit(0);
+	}
 
 	/* arg=0 program name
 	* arg=1 port title & comment
@@ -197,7 +201,8 @@ parseArguments(const int argc, char * argv[])
 	for (arg=1; arg < argc; ++arg) {
 		if (stage == OPEN) {
 			if (strcmp("--help",argv[arg]) == 0 || strcmp("-?",argv[arg]) == 0) {
-				usage(false);
+				usage();
+				exit(0);
 			}
 			else if (strcmp("--licence", argv[arg]) == 0) {
 				arginfo->outputLicenceRequest = true;
@@ -248,6 +253,7 @@ parseArguments(const int argc, char * argv[])
 			}
 			else {
 				usage(true);
+				errx(EX_USAGE,"Error code ID 10 T");
 			}
 		}
 		else if (stage == NEXT_OPTION) {
@@ -347,7 +353,7 @@ printFileToWindow(WINDOW * const win, const char * const filename)
 * Outputs usage information and optionally errors out.
 */
 static void
-usage(bool error) {
+usage() {
 	fprintf(stderr,"%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
 		"--port portname",
 		"[--port-comment 'port comment']",
@@ -357,8 +363,6 @@ usage(bool error) {
 		"--radio value=optionName=description=option1#option2 [--hfile filename]",
 		"--input value=optionName=description [--hfile filename]"
 	);
-	if (error)
-		errx(EX_USAGE,"Error code ID 10 T");
 }
 
 int
