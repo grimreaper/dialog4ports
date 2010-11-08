@@ -588,8 +588,7 @@ main(int argc, char* argv[])
 		if (arginfo->outputLicenceRequest)
 			if (winGetInput == licenceWindow)
 				licenceSelected = curItem;
-		switch(c)
-		{
+		switch(c) {
 			case KEY_DOWN:
 				menu_driver(whichMenu, REQ_DOWN_ITEM);
 				break;
@@ -641,29 +640,22 @@ main(int argc, char* argv[])
 			case ' ':
 			case 10:
 			case KEY_ENTER:
-				if (winGetInput == primaryWindow)
-				{
+				if (winGetInput == primaryWindow) {
 					OptionEl *p = (OptionEl*)item_userptr(curItem);
-					if (item_opts(curItem) & O_SELECTABLE)
-					{
-						if (p->mode != USER_INPUT)
-						{
+					if (item_opts(curItem) & O_SELECTABLE) {
+						if (p->mode != USER_INPUT) {
 							bool setToTrue= false;
 							menu_driver(whichMenu, REQ_TOGGLE_ITEM);
-							if (item_value(curItem) == TRUE)
-							{
+							if (item_value(curItem) == TRUE) {
 								setToTrue = true;
 								p->value = item_name(curItem);
 							}
 							/* if we are a radiobox - we need to disable/enable valid options */
-							if (p->mode == RADIOBOX)
-							{
-								for(count = 0; count < n_choices; ++count)
-								{
+							if (p->mode == RADIOBOX) {
+								for(count = 0; count < n_choices; ++count) {
 							            curr = (OptionEl*)item_userptr(option_items[count]);
 									/* if we have the same user ptr - but we are not ourself - disable it! */
-									if (curr == p)
-									{
+									if (curr == p) {
 										if (curItem == option_items[count] || !setToTrue)
 											item_opts_on(option_items[count], O_SELECTABLE);
 										else
@@ -672,20 +664,15 @@ main(int argc, char* argv[])
 								}
 							}
 						}
-						else
-						{
+						else {
 							p->value = getString(primaryWindow,p->value);
-							if (p->value != NULL && strcmp("",p->value) != 0)
-							{
-								if (item_value(curItem) != TRUE)
-								{
+							if (p->value != NULL && strcmp("",p->value) != 0) {
+								if (item_value(curItem) != TRUE) {
 									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
 								}
 							}
-							else
-							{
-								if (item_value(curItem) != FALSE)
-								{
+							else {
+								if (item_value(curItem) != FALSE) {
 									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
 								}
 								p->value = NULL;
@@ -698,8 +685,7 @@ main(int argc, char* argv[])
 						}
 					}
 				}
-				else if (winGetInput == exitWindow)
-				{
+				else if (winGetInput == exitWindow) {
 					if (curItem == exitItems[exitOK])
 						somethingChanged = true;
 					weWantMore = false;
