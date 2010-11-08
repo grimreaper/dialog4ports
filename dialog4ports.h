@@ -64,3 +64,6 @@ usage();
 
 bool
 requiredItemsSelected(ITEM **items);
+
+void
+fixRadioOptions(ITEM** option_items, int myIndex);

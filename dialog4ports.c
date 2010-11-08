@@ -45,6 +45,7 @@ __FBSDID("$FreeBSD$");
 *	TODO	- add panels code to allow for popups
 *	BUG	- buggy prompt for user data
 *	TODO - convert windows to an array that can be looped?!
+*	TODO - remove need for nElements ?
 */
 
 /*
@@ -175,13 +176,33 @@ requiredItemsSelected(ITEM **items)
 	int i;
 	bool allRequired = true;
 	i = 0;
-	while (items[i]) {
+	while (items[i] != NULL) {
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
 		if (p->required && item_value(items[i]) != TRUE)
 			allRequired = false;
 		i++;
 	}
 	return allRequired;
+}
+
+/*
+* sets radio items to appropriate values
+*/
+
+void
+fixRadioOptions(ITEM** option_items, int myIndex)
+{
+	int count;
+	count = 0;
+	while (option_items[count] != NULL) {
+		if (item_userptr(option_items[myIndex]) == item_userptr(option_items[count]))
+			if (myIndex == count || (item_value(option_items[myIndex]) != TRUE))
+				item_opts_on(option_items[count], O_SELECTABLE);
+			else
+				item_opts_off(option_items[count], O_SELECTABLE);
+		count++;
+	}
+
 }
 
 
@@ -258,7 +279,6 @@ parseArguments(const int argc, char * argv[])
 				prev->required = true;
 				continue;
 			}
-
 
 			++arginfo->nElements;
 			if ((curr = malloc (sizeof *curr)) == NULL)
@@ -390,6 +410,9 @@ usage() {
 		"--radio value=optionName=description=option1#option2 [--hfile filename]",
 		"--input value=optionName=description [--hfile filename]"
 	);
+}
+
+void fixRadioOption(ITEM** option_items, bool isTrue) {
 }
 
 int
@@ -761,16 +784,7 @@ main(int argc, char* argv[])
 							}
 							/* if we are a radiobox - we need to disable/enable valid options */
 							if (p->mode == RADIOBOX) {
-								for(count = 0; count < n_choices; ++count) {
-							            curr = (OptionEl*)item_userptr(option_items[count]);
-									/* if we have the same user ptr - but we are not ourself - disable it! */
-									if (curr == p) {
-										if (curItem == option_items[count] || !setToTrue)
-											item_opts_on(option_items[count], O_SELECTABLE);
-										else
-											item_opts_off(option_items[count], O_SELECTABLE);
-									}
-								}
+								fixRadioOptions(option_items, item_index(curItem));
 							}
 						}
 						else {
