@@ -77,6 +77,8 @@ getString(WINDOW *win, const char * const curVal)
 	const unsigned int bufSize = 80;
 	char mesg[]="Choose a new value: ";
 	char *str = calloc(bufSize, sizeof(char));
+	if (str == NULL)
+		errx(EX_OSERR, "Can not calloc");
 
 	int messageStart;
 	int row = getmaxx(win);
@@ -89,15 +91,31 @@ getString(WINDOW *win, const char * const curVal)
 		if (e == ERR)
 			errx(EX_SOFTWARE, "unable to add original string for unknown reason");
 	}
-	echo();
-	wmove(win,row/2 + 1, (messageStart + (int)strlen(mesg))/2);
+	e = echo();
+	if (e == ERR)
+		errx(EX_SOFTWARE, "character strokes must not echo");
+
+	e = wmove(win,row/2 + 1, (messageStart + (int)strlen(mesg))/2);
+	if (e == ERR)
+		errx(EX_SOFTWARE, "unable to move to message start location");
+
 	e = waddstr(win,"==>");
 	if (e == ERR)
 		errx(EX_SOFTWARE, "unable to add prompt for some reason");
-	wgetnstr(win, str, (int)bufSize -1);				/* request the input...*/
-	noecho();
-	wclear(win);
-	wrefresh(win);
+	e= wgetnstr(win, str, (int)bufSize -1);				/* request the input...*/
+	if (e == ERR)
+		errx(EX_SOFTWARE, "error when attempting to get input");
+	e = noecho();
+	if (e == ERR)
+		errx(EX_SOFTWARE, "character strokes must echo");
+
+	e = wclear(win);
+	if (e == ERR)
+		errx(EX_SOFTWARE, "unable to clear the screen");
+
+	e = wrefresh(win);
+	if (e == ERR)
+		errx(EX_SOFTWARE, "unable to refresh the screen");
 
 	return (str);
 }
