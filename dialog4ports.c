@@ -36,6 +36,7 @@ static char sccsid[] = "@(#)style       1.14 (Berkeley) 4/28/95";
 __FBSDID("$FreeBSD$");
 
 #include <err.h>
+#include <panel.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -50,6 +51,7 @@ __FBSDID("$FreeBSD$");
 *	TODO	- --requires option
 *	TODO	- add panels code to allow for popups
 *	BUG	- buggy prompt for user data
+*	TODO - convert windows to an array that can be looped?!
 */
 
 /*
@@ -342,7 +344,6 @@ parseArguments(const int argc, char * argv[])
 void
 printFileToWindow(WINDOW * const win, const char * const filename)
 {
-
 	int row;
 	int maxCols;
 	/* function fileToWindow ? */
@@ -414,7 +415,10 @@ main(int argc, char* argv[])
 	MENU		*licenceMenu;
 	MENU		*exitMenu;
 
-	bool licenceAccepted = false;
+	bool licenceAccepted;
+
+	const int nWindows = 5;
+	PANEL *panels[nWindows];
 
 	unsigned int n_choices = 0;
 	unsigned int count;
@@ -663,8 +667,19 @@ main(int argc, char* argv[])
       menu_driver(option_menu, REQ_FIRST_ITEM);
 
 
+	licenceAccepted = false;
 	winGetInput = primaryWindow;
 	whichMenu = option_menu;
+
+	panels[0] = new_panel(headWindow);
+	panels[1] = new_panel(exitWindow);
+	panels[2] = new_panel(licenceWindow);
+	panels[3] = new_panel(primaryWindow);
+	panels[4] = new_panel(helpWindow);
+	update_panels();
+	doupdate();
+
+
 
 	while(weWantMore) {
 		c = wgetch(winGetInput);
