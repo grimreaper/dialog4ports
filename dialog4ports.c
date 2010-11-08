@@ -323,7 +323,7 @@ main(int argc, char* argv[])
 	unsigned int count;
 
 	struct ARGINFO *arginfo = parseArguments(argc, argv);
-	exit(42);
+	/*exit(42);*/
 
 	/* deal with curses */
 	curr = arginfo->head;
