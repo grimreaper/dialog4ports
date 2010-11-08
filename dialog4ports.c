@@ -35,8 +35,6 @@ other dealings in this Software without prior written authorization.
 
 //TODO	- refactor large main into smaller units
 //TODO	- add some kind of --help text
-//TODO	- make port name and port comment not depentant on argv[1] & strdup
-
 
 int
 printInCenter(WINDOW *win, const int row, const char * const str)
@@ -140,7 +138,7 @@ parseArguments(const int argc, char * argv[])
 
 
 	if (argc < 2)
-		errx(EX_USAGE, "We require some option type to work");
+		usage(false);
 
 	/* arg=0 program name
 	* arg=1 port title & comment
@@ -156,8 +154,10 @@ parseArguments(const int argc, char * argv[])
 
 	for (arg=1; arg < argc; ++arg) {
 		if (stage == OPEN) {
-			printf("%s\n",argv[arg]);
-			if (strcmp("--licence", argv[arg]) == 0) {
+			if (strcmp("--help",argv[arg]) == 0 || strcmp("-?",argv[arg]) == 0) {
+				usage(false);
+			}
+			else if (strcmp("--licence", argv[arg]) == 0) {
 				arginfo->outputLicenceRequest = true;
 				stage = READ_LNAME;
 				continue;
@@ -176,7 +176,6 @@ parseArguments(const int argc, char * argv[])
 				continue;
 			}
 
-			printf("we don't have a mode - checking now [%s]\n", argv[arg]);
 			++arginfo->nElements;
 			if ((curr = malloc (sizeof *curr)) == NULL)
 				errx(EX_OSERR, "can not malloc");
@@ -184,7 +183,6 @@ parseArguments(const int argc, char * argv[])
 				arginfo->head = curr;
 			if (prev)
 				prev->next = curr;
-			printf("malloced!\n");
 			if (strcmp("--option", argv[arg]) == 0) {
 				curr->mode = CHECKBOX;
 				stage = NEXT_OPTION;
@@ -198,7 +196,7 @@ parseArguments(const int argc, char * argv[])
 				stage = NEXT_OPTION;
 			}
 			else {
-				errx(EX_USAGE,"You can't do that!");
+				usage(true);
 			}
 		}
 		else if (stage == NEXT_OPTION) {
@@ -283,6 +281,21 @@ printFileToWindow(WINDOW * const win, const char * const filename)
 	}
 
 	fclose(hFile);
+}
+
+void
+usage(bool error) {
+	fprintf(stderr,"%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
+		"--port portname",
+		"[--port-comment 'port comment']",
+		"[--licence name of default licence]",
+		"[--licence-text filename of licence]",
+		"--option value=optionName=description=descr-filename",
+		"--radio value=optionName=description=option1#option2=descr-filename",
+		"--input value=optionName=description=descr-filename"
+	);
+	if (error)
+		errx(EX_USAGE,"Error code ID 10 T");
 }
 
 int
