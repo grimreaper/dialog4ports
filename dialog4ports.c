@@ -43,7 +43,6 @@ __FBSDID("$FreeBSD$");
 
 #include "dialog4ports.h"
 
-<<<<<<< local
 /*	TODO	- refactor large main into smaller units
 *	TODO	- change -hfile to wxs's method for taking long descr
 *	 --option WITH_FOO --hfile "FOO:long description" --wh
