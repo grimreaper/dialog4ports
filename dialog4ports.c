@@ -46,6 +46,7 @@ __FBSDID("$FreeBSD$");
 *	BUG	- buggy prompt for user data
 *	TODO - convert windows to an array that can be looped?!
 *	TODO - remove need for nElements ?
+*	TODO - change radio handling to work with set_item_term
 */
 
 /*
@@ -203,6 +204,12 @@ fixRadioOptions(ITEM** option_items, int myIndex)
 		count++;
 	}
 
+}
+
+void
+runMeOnMenuCall(MENU *menu)
+{
+	//fprintf(stderr, "life");
 }
 
 
@@ -483,7 +490,6 @@ main(int argc, char* argv[])
 
 	curr = arginfo->head;
 	count = 0;
-
 	while(curr) {
 		if (curr->mode != RADIOBOX) {
 			option_items[count] = new_item(curr->name, curr->descr);
@@ -508,6 +514,7 @@ main(int argc, char* argv[])
 	option_items[n_choices] = (ITEM *)NULL;
 
 	option_menu = new_menu(option_items);
+	set_item_term(option_menu, runMeOnMenuCall);
 
 /* a bunch of constants re the size of the window */
 
