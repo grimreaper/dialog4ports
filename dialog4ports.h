@@ -1,5 +1,7 @@
 #include <menu.h>
 #include <ncurses.h>
+#include <panel.h>
+
 #include <stdbool.h>
 
 enum OPTION_TYPE {
@@ -59,3 +61,6 @@ printFileToWindow(WINDOW * const win, const char * const filename);
 
 static void
 usage();
+
+bool
+requiredItemsSelected(ITEM **items);

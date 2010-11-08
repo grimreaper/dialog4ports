@@ -26,17 +26,10 @@
 *
 */
 
-#if 0
-#ifndef lint
-static char sccsid[] = "@(#)style       1.14 (Berkeley) 4/28/95";
-#endif /* not lint */
-#endif
-
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
 
 #include <err.h>
-#include <panel.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -157,12 +150,9 @@ outputValues(MENU *menu)
 {
 	ITEM **items;
 	int i;
-	bool allRequired = true;
 	items = menu_items(menu);
 	for(i = 0; i < item_count(menu); ++i) {
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
-		if (p->required && item_value(items[i]) != TRUE)
-			allRequired = false;
 		if (p->mode == CHECKBOX || p->mode == RADIOBOX) {
 			outputBinaryValue(items[i], item_name(items[i]));
 		} else if (p->mode == USER_INPUT) {
@@ -172,9 +162,28 @@ outputValues(MENU *menu)
 				fprintf(stderr, "%s=\n", item_name(items[i]));
 		}
 	}
-	if (!allRequired)
+	if (!requiredItemsSelected(items))
 		fprintf(stderr, "REQUIRED_SELECTION=false\n");
 }
+
+/*
+* returns true if all required items have a value
+*/
+bool
+requiredItemsSelected(ITEM **items)
+{
+	int i;
+	bool allRequired = true;
+	i = 0;
+	while (items[i]) {
+		OptionEl *p = (OptionEl*)item_userptr(items[i]);
+		if (p->required && item_value(items[i]) != TRUE)
+			allRequired = false;
+		i++;
+	}
+	return allRequired;
+}
+
 
 /*
 *	parses the arguments and modifies arginfo
@@ -418,7 +427,9 @@ main(int argc, char* argv[])
 	bool licenceAccepted;
 
 	const int nWindows = 5;
-	PANEL *panels[nWindows];
+	PANEL *windowPanels[nWindows];
+	WINDOW *confirmWindow;
+	PANEL *confirmPanel;
 
 	unsigned int n_choices = 0;
 	unsigned int count;
@@ -669,14 +680,13 @@ main(int argc, char* argv[])
 	winGetInput = primaryWindow;
 	whichMenu = option_menu;
 
-	panels[0] = new_panel(headWindow);
-	panels[1] = new_panel(exitWindow);
-	panels[2] = new_panel(licenceWindow);
-	panels[3] = new_panel(primaryWindow);
-	panels[4] = new_panel(helpWindow);
+	windowPanels[0] = new_panel(headWindow);
+	windowPanels[1] = new_panel(exitWindow);
+	windowPanels[2] = new_panel(licenceWindow);
+	windowPanels[3] = new_panel(primaryWindow);
+	windowPanels[4] = new_panel(helpWindow);
 	update_panels();
 	doupdate();
-
 
 
 	while(weWantMore) {
