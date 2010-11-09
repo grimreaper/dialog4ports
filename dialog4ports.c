@@ -178,7 +178,7 @@ requiredItemsSelected(ITEM **items)
 	i = 0;
 	while (items[i] != NULL) {
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
-		if (p->required && item_value(items[i]) != TRUE)
+		if (p->required && p->value == NULL)
 			allRequired = false;
 		i++;
 	}
@@ -190,12 +190,13 @@ requiredItemsSelected(ITEM **items)
 */
 
 void
-fixRadioOptions(ITEM** option_items, int myIndex)
+fixEnabledOptions(ITEM** option_items, int myIndex)
 {
 	int count;
 	count = 0;
 	while (option_items[count] != NULL) {
-		if (item_userptr(option_items[myIndex]) == item_userptr(option_items[count]))
+		OptionEl* p = item_userptr(option_items[count]);
+		if (item_userptr(option_items[myIndex]) == p)
 			if (myIndex == count || (item_value(option_items[myIndex]) != TRUE))
 				item_opts_on(option_items[count], O_SELECTABLE);
 			else
@@ -204,14 +205,6 @@ fixRadioOptions(ITEM** option_items, int myIndex)
 	}
 
 }
-
-/*void
-runMeOnMenuCall(MENU *menu)
-{
-	//fprintf(stderr, "life");
-}
-*/
-
 
 /*
 *	parses the arguments and modifies arginfo
@@ -658,9 +651,7 @@ main(int argc, char* argv[])
 	/* display the title in the center of the top window */
 	printInCenter(headWindow, startMenyWinRow/2, arginfo->portname);
 	if (arginfo->portcomment != NULL)
-	{
 		printInCenter(headWindow, startMenyWinRow/2 + 1, arginfo->portcomment);
-	}
 	doupdate();
 
 	if(has_colors() == TRUE) {
@@ -706,6 +697,10 @@ main(int argc, char* argv[])
 			set_item_value(option_items[count], true);
 			menu_driver(option_menu, REQ_TOGGLE_ITEM);
 		}
+		if (curr->mode == CHECKBOX && curr->required) {
+			curr->value = item_name(option_items[count]);
+			item_opts_off(option_items[count], O_SELECTABLE);
+		}
             menu_driver(option_menu, REQ_DOWN_ITEM);
 	}
       menu_driver(option_menu, REQ_FIRST_ITEM);
@@ -722,7 +717,6 @@ main(int argc, char* argv[])
 	windowPanels[4] = new_panel(helpWindow);
 	update_panels();
 	doupdate();
-
 
 	while(weWantMore) {
 		c = wgetch(winGetInput);
@@ -796,7 +790,7 @@ main(int argc, char* argv[])
 							}
 							/* if we are a radiobox - we need to disable/enable valid options */
 							if (p->mode == RADIOBOX) {
-								fixRadioOptions(option_items, item_index(curItem));
+								fixEnabledOptions(option_items, item_index(curItem));
 							}
 						}
 						else {
@@ -849,6 +843,7 @@ main(int argc, char* argv[])
 				}
 			}
 			wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
+			wrefresh(helpWindow);
 			doupdate();
 
 			if (winGetInput == licenceWindow) {

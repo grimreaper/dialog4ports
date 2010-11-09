@@ -66,7 +66,7 @@ bool
 requiredItemsSelected(ITEM **items);
 
 void
-fixRadioOptions(ITEM** option_items, int myIndex);
+fixEnabledOptions(ITEM** option_items, int myIndex);
 
 /*void
 runMeOnMenuCall(MENU *menu);*/

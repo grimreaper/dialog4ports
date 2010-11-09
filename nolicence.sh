@@ -9,5 +9,5 @@ WITH_XORG=WITH_XORG	./dialog4ports \
 				--radio	WWW_TYPE='use this for a web server!'=apache#lighttpd#god#heaven \
 				--radio	GR_TYPE='use this for a web server!'=X11#CONSOLE#evil --required \
 				--input	LANGS='use a language' --hfile n.txt \
-				--option	XYZ='argi'		\
+				--option	XYZ='argi'	--required \
 				--option	AAAAZ='hello my dear'
