@@ -206,11 +206,12 @@ fixRadioOptions(ITEM** option_items, int myIndex)
 
 }
 
-void
+/*void
 runMeOnMenuCall(MENU *menu)
 {
 	//fprintf(stderr, "life");
 }
+*/
 
 
 /*
@@ -511,7 +512,7 @@ main(int argc, char* argv[])
 	option_items[n_choices] = (ITEM *)NULL;
 
 	option_menu = new_menu(option_items);
-	set_item_term(option_menu, runMeOnMenuCall);
+	//set_item_term(option_menu, runMeOnMenuCall);
 
 /* a bunch of constants re the size of the window */
 
