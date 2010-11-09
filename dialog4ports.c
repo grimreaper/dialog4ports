@@ -226,6 +226,9 @@ parseArguments(const int argc, char * argv[])
 	OptionEl *prev = NULL;
 	const char* internal_token = NULL;
 
+	for (arg=0; arg < argc; ++arg)
+		printf("%s\n",argv[arg]);
+
 	enum {
 		OPEN,			/* we can get the next argument */
 		NEXT_OPTION, 	/* fix the struct	*/
