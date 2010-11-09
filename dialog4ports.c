@@ -78,12 +78,11 @@ getString(WINDOW *win, const char * const curVal)
 		errx(EX_OSERR, "Can not calloc");
 
 	int messageStart;
-	int row = getmaxx(win);
+	int row = getmaxy(win);
 
-	printInCenter(win, row/2, mesg);
+	messageStart = printInCenter(win, row/2, mesg);
 
 	if (curVal != NULL) {
-		messageStart = printInCenter(win, row/2, mesg);
 		e = mvwprintw(win,row/2, messageStart + (int)strlen(mesg) + 1," [ %s ]",curVal);
 		if (e == ERR)
 			errx(EX_SOFTWARE, "unable to add original string for unknown reason");
@@ -582,6 +581,11 @@ main(int argc, char* argv[])
 	exitItems[exitOK] = new_item("OK", "");
 	exitItems[exitCancel] = new_item("CANCEL", "");
 	exitItems[2] = (ITEM*)NULL;
+
+	for (c = 0; c < 1; ++c) {
+		if (exitItems[c] == NULL)
+			errx(EX_OSERR, "Bad null in  exitItems");
+	}
 
 	exitMenu = new_menu(exitItems);
 
