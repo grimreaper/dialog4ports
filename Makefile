@@ -32,7 +32,8 @@ objclean: .NOTMAIN .USE .EXEC .IGNORE .PHONY
 remake: .NOTMAIN .USE .EXEC .IGNORE .PHONY clean all
 
 clean: .NOTMAIN .PHONY .IGNORE nameclean coreclean objclean
-	rm *.orig
+	rm -fv *.orig
+	rm -fv *.tar *.tgz
 
 $(NAME):
 
@@ -46,3 +47,6 @@ check: .NOTMAIN
 #	splint -strict-lib -showcolumn -showfunc -strict *.c *.h
 	lint -aabcehprsxH $(INCLUDE_FILES) *.c *.h
 #	rats -rw3 *
+
+distribution: .PHONY clean
+	tar czf dist.tgz *
