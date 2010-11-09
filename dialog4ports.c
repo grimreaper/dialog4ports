@@ -419,9 +419,6 @@ usage() {
 	);
 }
 
-void fixRadioOption(ITEM** option_items, bool isTrue) {
-}
-
 int
 main(int argc, char* argv[])
 {

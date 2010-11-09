@@ -32,6 +32,7 @@ objclean: .NOTMAIN .USE .EXEC .IGNORE .PHONY
 remake: .NOTMAIN .USE .EXEC .IGNORE .PHONY clean all
 
 clean: .NOTMAIN .PHONY .IGNORE nameclean coreclean objclean
+	rm *.orig
 
 $(NAME):
 
