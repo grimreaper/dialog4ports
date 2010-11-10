@@ -213,7 +213,7 @@ fixEnabledOptions(ITEM** option_items, int myIndex)
 struct ARGINFO*
 parseArguments(const int argc, char * argv[])
 {
-	struct ARGINFO *arginfo = malloc(sizeof(struct ARGINFO));
+	struct ARGINFO *arginfo = malloc(sizeof(*arginfo));
 	int arg = 0;
 	OptionEl *curr = NULL;
 	OptionEl *prev = NULL;
@@ -782,12 +782,9 @@ main(int argc, char* argv[])
 					OptionEl *p = (OptionEl*)item_userptr(curItem);
 					if (item_opts(curItem) & O_SELECTABLE) {
 						if (p->mode != USER_INPUT) {
-							bool setToTrue= false;
 							menu_driver(whichMenu, REQ_TOGGLE_ITEM);
-							if (item_value(curItem) == TRUE) {
-								setToTrue = true;
+							if (item_value(curItem) == TRUE)
 								p->value = item_name(curItem);
-							}
 							/* if we are a radiobox - we need to disable/enable valid options */
 							if (p->mode == RADIOBOX)
 								fixEnabledOptions(option_items, item_index(curItem));
