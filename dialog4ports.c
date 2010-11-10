@@ -789,22 +789,19 @@ main(int argc, char* argv[])
 								p->value = item_name(curItem);
 							}
 							/* if we are a radiobox - we need to disable/enable valid options */
-							if (p->mode == RADIOBOX) {
+							if (p->mode == RADIOBOX)
 								fixEnabledOptions(option_items, item_index(curItem));
-							}
 						}
 						else {
 							p->value = NULL;
 							p->value = getString(primaryWindow,p->value);
 							if (p->value != NULL && strcmp("",p->value) != 0) {
-								if (item_value(curItem) != TRUE) {
+								if (item_value(curItem) != TRUE)
 									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
-								}
 							}
 							else {
-								if (item_value(curItem) != FALSE) {
+								if (item_value(curItem) != FALSE)
 									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
-								}
 								p->value = NULL;
 							}
 							wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
