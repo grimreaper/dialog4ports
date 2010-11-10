@@ -356,12 +356,13 @@ parseArguments(const int argc, char * argv[])
 		}
 	}
 
-	prev = arginfo->head;
+/*	prev = arginfo->head;
 	while (prev) {
 		printf("YZ:\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
 				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode);
 		prev = prev->next;
 	}
+*/
 
 	if (arginfo->nElements == 0)
 		errx(EX_USAGE,"We need at least one option");
@@ -860,7 +861,7 @@ main(int argc, char* argv[])
 	if (somethingChanged) {
 		outputValues(option_menu);
 		if (arginfo->outputLicenceRequest)
-			printf("%s=%s\n","ACCEPTED_LICENCE",(licenceAccepted) ? "true" : "false");
+			fprintf(stderr,"%s=%s\n","ACCEPTED_LICENCE",(licenceAccepted) ? "true" : "false");
 	}
 
 	for (count = 0; count < n_choices; ++count)
