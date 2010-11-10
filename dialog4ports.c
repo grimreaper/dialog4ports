@@ -43,7 +43,6 @@ __FBSDID("$FreeBSD$");
 *	TODO	- --min --max options
 *	TODO	- --requires option
 *	TODO	- add panels code to allow for popups
-*	BUG	- buggy prompt for user data
 *	TODO - convert windows to an array that can be looped?!
 *	TODO - remove need for nElements ?
 *	TODO - change radio handling to work with set_item_term
