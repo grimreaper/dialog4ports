@@ -451,8 +451,6 @@ main(int argc, char* argv[])
 
 	const int nWindows = 5;
 	PANEL *windowPanels[nWindows];
-	WINDOW *confirmWindow;
-	PANEL *confirmPanel;
 
 	unsigned int n_choices = 0;
 	unsigned int count;
@@ -698,8 +696,9 @@ main(int argc, char* argv[])
 			menu_driver(option_menu, REQ_TOGGLE_ITEM);
 		}
 		if (curr->mode == CHECKBOX && curr->required) {
+			set_item_value(option_items[count], true);
 			curr->value = item_name(option_items[count]);
-			item_opts_off(option_items[count], O_SELECTABLE);
+/*			item_opts_off(option_items[count], O_SELECTABLE);	*/
 		}
             menu_driver(option_menu, REQ_DOWN_ITEM);
 	}

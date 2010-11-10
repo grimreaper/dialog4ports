@@ -8,6 +8,6 @@ WITH_XORG=WITH_XORG	./dialog4ports \
 				--option	WITHOUT_FOO='do not use foo' --hfile info.txt \
 				--radio	WWW_TYPE='use this for a web server!'=apache#lighttpd#god#heaven \
 				--radio	GR_TYPE='use this for a web server!'=X11#CONSOLE#evil --required \
-				--input	LANGS='use a language' --hfile n.txt \
+				--input	LANGS='use a language' --hfile n.txt --required \
 				--option	XYZ='argi'	--required \
 				--option	AAAAZ='hello my dear'
