@@ -381,6 +381,9 @@ printFileToWindow(WINDOW * const win, const char * const filename)
 	/* function fileToWindow ? */
 	const unsigned int maxCharPerLine = 80; /* NEVER - ever go above 80
 								deal with terminal size below */
+
+	const int maxRows = getmaxy(win) - 1;
+
 	char buf[maxCharPerLine + 1];
 
 	FILE *hFile = fopen(filename, "r");
@@ -391,9 +394,11 @@ printFileToWindow(WINDOW * const win, const char * const filename)
 	/* never read more than 80 charaters per line */
 	row = 1;
 	while (fgets(buf, maxCharPerLine, hFile)) {
-		const int result = mvwaddnstr(win, row++, 1, buf, maxCols - 1);
-		if (result == ERR)
-			errx(EX_SOFTWARE, "Unable to write string to screen for unknown reason");
+		if (row < maxRows) {
+			const int result = mvwaddnstr(win, row++, 1, buf, maxCols - 1);
+			if (result == ERR)
+				errx(EX_SOFTWARE, "Unable to write string to screen for unknown reason");
+		}
 	}
 
 	fclose(hFile);
