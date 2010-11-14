@@ -680,8 +680,8 @@ main(int argc, char* argv[])
 	set_menu_format(option_menu, nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
-	wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-	wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
+	wborder(primaryWindow, '|', '|', '-', '-', '+', '+', '+', '+');
+	wborder(helpWindow, '|', '|', '-', '-', '+', '+', '+', '+');
 
 	menu_opts_off(option_menu,O_ONEVALUE);
 	post_menu(option_menu);
@@ -806,8 +806,8 @@ main(int argc, char* argv[])
 									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
 								p->value = NULL;
 							}
-							wborder(primaryWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
-							wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
+							wborder(primaryWindow, '|', '|', '-', '-', '+', '+', '+', '+');
+							wborder(helpWindow, '|', '|', '-', '-', '+', '+', '+', '+');
 							doupdate();
 						}
 					}
@@ -841,7 +841,7 @@ main(int argc, char* argv[])
 					printInCenter(helpWindow,helpRows/2 + 1, arginfo->licenceName);
 				}
 			}
-			wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
+			wborder(helpWindow, '|', '|', '-', '-', '+', '+', '+', '+');
 			wrefresh(helpWindow);
 			wrefresh(winGetInput);
 
