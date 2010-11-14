@@ -246,6 +246,8 @@ parseArguments(const int argc, char * argv[])
 	arginfo->portcomment = NULL;
 	arginfo->licenceText = NULL;
 	arginfo->licenceName = NULL;
+	arginfo->nElements = 0;
+	arginfo->nHashMarks = 0;
 
 	stage = OPEN;
 
