@@ -720,6 +720,7 @@ main(int argc, char* argv[])
 	windowPanels[3] = new_panel(primaryWindow);
 	windowPanels[4] = new_panel(helpWindow);
 	update_panels();
+	wrefresh(primaryWindow); // get cursor to proper location
 	doupdate();
 
 	while(weWantMore) {
@@ -842,6 +843,8 @@ main(int argc, char* argv[])
 			}
 			wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 			wrefresh(helpWindow);
+			wrefresh(primaryWindow);
+
 			doupdate();
 
 			if (winGetInput == licenceWindow) {
