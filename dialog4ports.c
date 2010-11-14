@@ -689,11 +689,11 @@ main(int argc, char* argv[])
 	/* note the '.' for scrollable direction */
 
 	if (n_choices > (unsigned int)nMenuRows)
-		wborder(primaryWindow, '|', '|', '-',  ACS_DARROW, '+', '+', '+', '+');
+		wborder(primaryWindow, '|', '|', '-',  ACS_DARROW,  0, 0, 0, 0);
 	else
-		wborder(primaryWindow, '|', '|', '-', '-', '+', '+', '+', '+');
+		wborder(primaryWindow, '|', '|', '-', '-',  0, 0, 0, 0);
 
-	wborder(helpWindow, '|', '|', '-', '-', '+', '+', '+', '+');
+	wborder(helpWindow, '|', '|', '-', '-',  ACS_ULCORNER, 0, 0, 0);
 
 	menu_opts_off(option_menu,O_ONEVALUE);
 	post_menu(option_menu);
@@ -819,8 +819,8 @@ main(int argc, char* argv[])
 									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
 								p->value = NULL;
 							}
-							//////////wborder(primaryWindow, '|', '|', '-', '-', '+', '+', '+', '+');
-							wborder(helpWindow, '|', '|', '-', '-', '+', '+', '+', '+');
+							//////////wborder(primaryWindow, '|', '|', '-', '-', 0, 0, 0, 0);
+							wborder(helpWindow, '|', '|', '-', '-', 0, 0, 0, 0);
 							doupdate();
 						}
 					}
@@ -857,7 +857,7 @@ main(int argc, char* argv[])
 					bottomChar = ACS_DARROW;
 				if (curTopRow != 0)
 					topChar = ACS_UARROW;
-				wborder(primaryWindow, '|', '|', topChar, bottomChar, '+', '+', '+', '+');
+				wborder(primaryWindow, '|', '|', topChar, bottomChar, 0, 0, 0, 0);
 			}
 			else if (winGetInput == licenceWindow) {
 				if (arginfo->licenceText != NULL)
@@ -867,7 +867,7 @@ main(int argc, char* argv[])
 					printInCenter(helpWindow,helpRows/2 + 1, arginfo->licenceName);
 				}
 			}
-			wborder(helpWindow, '|', '|', '-', '-', '+', '+', '+', '+');
+			wborder(helpWindow, '|', '|', '-', '-', 0, 0, 0, 0);
 			wrefresh(helpWindow);
 			wrefresh(winGetInput);
 			doupdate();
