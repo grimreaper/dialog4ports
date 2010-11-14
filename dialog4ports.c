@@ -219,7 +219,7 @@ parseArguments(const int argc, char * argv[])
 	const char* internal_token = NULL;
 
 	for (arg=0; arg < argc; ++arg)
-		fprintf(stderr,"%s\n",argv[arg]);
+		printf("%s\n",argv[arg]);
 
 	enum {
 		OPEN,			/* we can get the next argument */
@@ -249,108 +249,81 @@ parseArguments(const int argc, char * argv[])
 
 	stage = OPEN;
 
-	fprintf(stderr,"We made it this far!\n");
 	for (arg=1; arg < argc; ++arg) {
 		if (stage == OPEN) {
 			if (strcmp("--help",argv[arg]) == 0 || strcmp("-?",argv[arg]) == 0) {
-				fprintf(stderr,"help stage\n");
 				usage();
 				exit(0);
 			}
 			else if (strcmp("--licence", argv[arg]) == 0) {
-				fprintf(stderr,"lic stage\n");
 				arginfo->outputLicenceRequest = true;
 				stage = READ_LNAME;
 				continue;
 			}
 			else if (strcmp("--licence-text", argv[arg]) == 0) {
-				fprintf(stderr,"lic-text stage\n");
 				arginfo->outputLicenceRequest = true;
 				stage = READ_LTEXT;
 				continue;
 			}
 			else if (strcmp("--port", argv[arg]) == 0) {
-				fprintf(stderr,"port name stage\n");
 				stage = READ_PNAME;
 				continue;
 			}
 			else if (strcmp("--port-comment", argv[arg]) == 0) {
-				fprintf(stderr,"port comment stage\n");
 				stage = READ_PCOMMENT;
 				continue;
 			}
 			else if (strcmp("--hfile", argv[arg]) == 0) {
-				fprintf(stderr,"hfile stage\n");
 				stage = PREV_HFILE;
 				continue;
 			}
 			else if (strcmp("--required", argv[arg]) == 0) {
-				fprintf(stderr,"required stage\n");
 				prev->required = true;
 				continue;
 			}
 
-			fprintf(stderr,"New Element - mallocing [before:%d]\n", arginfo->nElements);
 			++arginfo->nElements;
 			if ((curr = malloc (sizeof *curr)) == NULL)
 				errx(EX_OSERR, "can not malloc");
-			fprintf(stderr,"New Element Created [after:%d] Ptr at %p\n", arginfo->nElements, curr);
-
 			if (!arginfo->head)
 				arginfo->head = curr;
 			if (prev)
 				prev->next = curr;
-
-
-			fprintf(stderr,"We past head and previous work\n");
-
 			if (strcmp("--option", argv[arg]) == 0) {
-				fprintf(stderr,"option stage \n");
-
 				curr->mode = CHECKBOX;
 				stage = NEXT_OPTION;
 			}
 			else if (strcmp("--radio", argv[arg]) == 0) {
-				fprintf(stderr,"radio stage \n");
 				curr->mode = RADIOBOX;
 				stage = NEXT_OPTION;
 			}
 			else if (strcmp("--input", argv[arg]) == 0) {
-				fprintf(stderr,"input stage \n");
 				curr->mode = USER_INPUT;
 				stage = NEXT_OPTION;
 			}
 			else {
-
-				fprintf(stderr,"error code \n");
-				usage();
+				usage(true);
 				errx(EX_USAGE,"Error code ID 10 T");
 			}
 		}
 		else if (stage == NEXT_OPTION) {
-			fprintf(stderr,"we want the next option \n");
 			bool gotName = false;
 			bool gotDescr = false;
 			bool gotOpts = false;
 			while((internal_token = strsep(&argv[arg], "=")) != NULL) {
-				fprintf(stderr,"Internal token is being read \n");
 				curr->longDescrFile = NULL;
 				if (!gotName) {
-					fprintf(stderr,"\t IT - name \n");
 					curr->name = internal_token;
 					gotName = true;
 				} else if (!gotDescr) {
-					fprintf(stderr,"\t IT - descr \n");
 					curr->descr = internal_token;
 					gotDescr = true;
 				} else if (!gotOpts && curr->mode == RADIOBOX) {
-					fprintf(stderr,"\t IT - mode \n");
 					arginfo->nHashMarks += countChar(internal_token, '#');
 					curr->options = internal_token;
 					gotOpts = true;
 				}
 				else {
-					fprintf(stderr,"\t IT - lfile descr \n");
 					curr->longDescrFile = internal_token;
 				}
 			}
@@ -361,42 +334,34 @@ parseArguments(const int argc, char * argv[])
 			stage = OPEN;
 		}
 		else if (stage == READ_LNAME) {
-			fprintf(stderr,"we want the lname \n");
 			arginfo->licenceName = argv[arg];
 			stage = OPEN;
 		}
 		else if (stage == READ_LTEXT) {
-			fprintf(stderr,"we want the ltext \n");
-
 			arginfo->licenceText = argv[arg];
 			stage = OPEN;
 		}
 		else if (stage == READ_PNAME) {
-			fprintf(stderr,"we want the pname \n");
-
 			arginfo->portname = argv[arg];
 			stage = OPEN;
 		}
 		else if (stage == READ_PCOMMENT) {
-			fprintf(stderr,"we want the pcomment \n");
 			arginfo->portcomment = argv[arg];
 			stage = OPEN;
 		}
 		else if (stage == PREV_HFILE) {
-			fprintf(stderr,"we want the hfile \n");
 			prev->longDescrFile = argv[arg];
 			stage = OPEN;
 		}
 	}
 
-	fprintf(stderr,"\n\n\n");
-	prev = arginfo->head;
+/*	prev = arginfo->head;
 	while (prev) {
-		fprintf(stderr,"YZ:\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
+		printf("YZ:\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
 				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode);
 		prev = prev->next;
 	}
-
+*/
 
 	if (arginfo->nElements == 0)
 		errx(EX_USAGE,"We need at least one option");
@@ -502,21 +467,15 @@ main(int argc, char* argv[])
 	chtype bottomChar = '-';
 
 	struct ARGINFO *arginfo = parseArguments(argc, argv);
-	/* exit(42); */
+	/*exit(42);*/
 
-	fprintf(stderr,"We made it past argument parsing");
 	/* deal with curses */
 	curr = arginfo->head;
 
 	n_choices = arginfo->nElements + arginfo->nHashMarks;
 
-	fprintf(stderr,"About to init screen");
-
 	initscr();
-	fprintf(stderr, "Screen has been init");
-
 	if(has_colors() == TRUE) {
-		fprintf(stderr, "color has been init");
 		start_color();
 		init_pair(1, COLOR_GREEN, COLOR_BLACK);   /* selected */
 		init_pair(2, COLOR_YELLOW, COLOR_BLACK);	/* selectable */
@@ -526,7 +485,6 @@ main(int argc, char* argv[])
 	cbreak();
 	noecho();
 	keypad(stdscr, TRUE);
-	fprintf(stderr, "cbreak and noecho has been init");
 
 	option_items=(ITEM**)calloc(n_choices + 1, sizeof(ITEM *));
 	if (option_items == NULL)
