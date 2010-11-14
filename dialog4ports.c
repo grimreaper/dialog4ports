@@ -242,6 +242,7 @@ parseArguments(const int argc, char * argv[])
 	*/
 
 	arginfo->outputLicenceRequest = false;
+	arginfo->head = NULL;
 	arginfo->portname = NULL;
 	arginfo->portcomment = NULL;
 	arginfo->licenceText = NULL;
