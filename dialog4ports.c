@@ -693,7 +693,7 @@ main(int argc, char* argv[])
 	else
 		wborder(primaryWindow, '|', '|', '-', '-',  0, 0, 0, 0);
 
-	wborder(helpWindow, '|', '|', '-', '-',  ACS_ULCORNER, 0, 0, 0);
+	wborder(helpWindow, '|', '|', '-', '-',  0, 0, 0, 0);
 
 	menu_opts_off(option_menu,O_ONEVALUE);
 	post_menu(option_menu);
