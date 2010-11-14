@@ -843,7 +843,7 @@ main(int argc, char* argv[])
 			}
 			wborder(helpWindow, '|', '|', '-', '-', ACS_PI, ACS_PI, ACS_PI, ACS_PI);
 			wrefresh(helpWindow);
-			wrefresh(primaryWindow);
+			wrefresh(winGetInput);
 
 			doupdate();
 
