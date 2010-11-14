@@ -457,8 +457,15 @@ main(int argc, char* argv[])
 	const int nWindows = 5;
 	PANEL *windowPanels[nWindows];
 
+
+	const unsigned char scrollIndicator= '.';
 	unsigned int n_choices = 0;
 	unsigned int count;
+
+	int curTopRow;
+
+	chtype topChar = '-';
+	chtype bottomChar = '-';
 
 	struct ARGINFO *arginfo = parseArguments(argc, argv);
 	/*exit(42);*/
@@ -680,7 +687,13 @@ main(int argc, char* argv[])
 	set_menu_format(option_menu, nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
-	wborder(primaryWindow, '|', '|', '-', '-', '+', '+', '+', '+');
+	/* note the '.' for scrollable direction */
+
+	if (n_choices > (unsigned int)nMenuRows)
+		wborder(primaryWindow, '|', '|', '-', scrollIndicator, '+', '+', '+', '+');
+	else
+		wborder(primaryWindow, '|', '|', '-', '-', '+', '+', '+', '+');
+
 	wborder(helpWindow, '|', '|', '-', '-', '+', '+', '+', '+');
 
 	menu_opts_off(option_menu,O_ONEVALUE);
@@ -724,6 +737,7 @@ main(int argc, char* argv[])
 	doupdate();
 
 	while(weWantMore) {
+
 		c = wgetch(winGetInput);
 		curItem = current_item(whichMenu);
 
@@ -806,7 +820,7 @@ main(int argc, char* argv[])
 									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
 								p->value = NULL;
 							}
-							wborder(primaryWindow, '|', '|', '-', '-', '+', '+', '+', '+');
+							//////////wborder(primaryWindow, '|', '|', '-', '-', '+', '+', '+', '+');
 							wborder(helpWindow, '|', '|', '-', '-', '+', '+', '+', '+');
 							doupdate();
 						}
@@ -832,6 +846,19 @@ main(int argc, char* argv[])
 				if (p->longDescrFile != NULL) {
 					printFileToWindow(helpWindow, p->longDescrFile);
 				}
+
+				topChar = '-';
+				bottomChar = '-';
+
+				curTopRow = top_row(whichMenu);
+				if (curTopRow == ERR)
+					errx(EX_SOFTWARE, "The current top row was unavailable");
+
+				if ((int)n_choices - curTopRow > nMenuRows)
+					bottomChar = scrollIndicator;
+				if (curTopRow != 0)
+					topChar = scrollIndicator;
+				wborder(primaryWindow, '|', '|', topChar, bottomChar, '+', '+', '+', '+');
 			}
 			else if (winGetInput == licenceWindow) {
 				if (arginfo->licenceText != NULL)
@@ -844,7 +871,6 @@ main(int argc, char* argv[])
 			wborder(helpWindow, '|', '|', '-', '-', '+', '+', '+', '+');
 			wrefresh(helpWindow);
 			wrefresh(winGetInput);
-
 			doupdate();
 
 			if (winGetInput == licenceWindow) {
