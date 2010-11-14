@@ -458,7 +458,6 @@ main(int argc, char* argv[])
 	PANEL *windowPanels[nWindows];
 
 
-	const unsigned char scrollIndicator= '.';
 	unsigned int n_choices = 0;
 	unsigned int count;
 
@@ -690,7 +689,7 @@ main(int argc, char* argv[])
 	/* note the '.' for scrollable direction */
 
 	if (n_choices > (unsigned int)nMenuRows)
-		wborder(primaryWindow, '|', '|', '-', scrollIndicator, '+', '+', '+', '+');
+		wborder(primaryWindow, '|', '|', '-',  ACS_DARROW, '+', '+', '+', '+');
 	else
 		wborder(primaryWindow, '|', '|', '-', '-', '+', '+', '+', '+');
 
@@ -855,9 +854,9 @@ main(int argc, char* argv[])
 					errx(EX_SOFTWARE, "The current top row was unavailable");
 
 				if ((int)n_choices - curTopRow > nMenuRows)
-					bottomChar = scrollIndicator;
+					bottomChar = ACS_DARROW;
 				if (curTopRow != 0)
-					topChar = scrollIndicator;
+					topChar = ACS_UARROW;
 				wborder(primaryWindow, '|', '|', topChar, bottomChar, '+', '+', '+', '+');
 			}
 			else if (winGetInput == licenceWindow) {
