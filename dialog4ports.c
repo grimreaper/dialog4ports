@@ -648,7 +648,7 @@ main(int argc, char* argv[])
 	/* we want to leave 3 lines for the title */
 	const int startMenyWinRow = 3;
 
-	const int nMenuRows = primaryRows - 1;
+	const int nMenuRows = primaryRows - 2;
 	const int nMenuCols = 1;
 
 	/* display the title in the center of the top window */
@@ -676,7 +676,7 @@ main(int argc, char* argv[])
 
 	/* Set main window and sub window */
 	set_menu_win(option_menu, primaryWindow);
-	set_menu_sub(option_menu, derwin(primaryWindow, primaryRows -3, primaryCols - 2, 1, 1));
+	set_menu_sub(option_menu, derwin(primaryWindow, nMenuRows, primaryCols - 2, 1, 1));
 	set_menu_format(option_menu, nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
