@@ -467,6 +467,8 @@ main(int argc, char* argv[])
 
 	int curTopRow;
 
+	_malloc_options = "J";
+
 	chtype topChar = '-';
 	chtype bottomChar = '-';
 
