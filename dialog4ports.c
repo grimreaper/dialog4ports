@@ -288,6 +288,7 @@ parseArguments(const int argc, char * argv[])
 			++arginfo->nElements;
 			if ((curr = malloc (sizeof *curr)) == NULL)
 				errx(EX_OSERR, "can not malloc");
+			curr->next = NULL;
 			if (!arginfo->head)
 				arginfo->head = curr;
 			if (prev)
