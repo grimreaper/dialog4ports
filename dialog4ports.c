@@ -541,7 +541,7 @@ main(int argc, char* argv[])
 	const int headRows = 3;
 	const int headCols = frameCols;
 
-	const int exitRows = 4;
+	const int exitRows = 3;
 	const int exitCols = frameCols;
 	const int exitRowStart = frameRows - exitRows;
 	/* menu == sizeof(largest item) + 1 space for each item */
