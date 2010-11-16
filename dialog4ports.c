@@ -720,10 +720,9 @@ main(int argc, char* argv[])
 	/* note the '.' for scrollable direction */
 
 	if (n_choices > (unsigned int)nMenuRows)
-		wborder(primaryWindow, '|', '|', '-',  ACS_DARROW,  0, 0, 0, 0);
-	else
-		wborder(primaryWindow, '|', '|', '-', '-',  0, 0, 0, 0);
+		bottomChar = ACS_DARROW;
 
+	wborder(primaryWindow, '|', '|', topChar, bottomChar,  0, 0, 0, 0);
 	wborder(helpWindow, '|', '|', '-', '-',  0, 0, 0, 0);
 
 	menu_opts_off(option_menu,O_ONEVALUE);
@@ -850,7 +849,7 @@ main(int argc, char* argv[])
 									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
 								p->value = NULL;
 							}
-							//////////wborder(primaryWindow, '|', '|', '-', '-', 0, 0, 0, 0);
+							wborder(primaryWindow, '|', '|', topChar, bottomChar, 0, 0, 0, 0);
 							wborder(helpWindow, '|', '|', '-', '-', 0, 0, 0, 0);
 							doupdate();
 						}
