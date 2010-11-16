@@ -43,7 +43,6 @@ struct ARGINFO {
 	const char *licenceName;
 	const char *licenceText;
 	unsigned int nElements;
-	unsigned int nHashMarks;
 	bool outputLicenceRequest;
 	const char *portname;
 	const char *portcomment;

@@ -253,7 +253,6 @@ parseArguments(const int argc, char * argv[])
 	arginfo->licenceText = NULL;
 	arginfo->licenceName = NULL;
 	arginfo->nElements = 0;
-	arginfo->nHashMarks = 0;
 
 	stage = OPEN;
 
@@ -328,7 +327,7 @@ parseArguments(const int argc, char * argv[])
 					curr->descr = internal_token;
 					gotDescr = true;
 				} else if (!gotOpts && curr->mode == RADIOBOX) {
-					arginfo->nHashMarks += countChar(internal_token, '#');
+					arginfo->nElements += countChar(internal_token, '#');
 					curr->options = internal_token;
 					gotOpts = true;
 				}
@@ -468,7 +467,6 @@ main(int argc, char* argv[])
 
 
 	const char * const colorCodes = getenv("D4PCOLOR");
-	unsigned int n_choices = 0;
 	unsigned int count;
 
 	int curTopRow;
@@ -484,7 +482,7 @@ main(int argc, char* argv[])
 	/* deal with curses */
 	curr = arginfo->head;
 
-	n_choices = arginfo->nElements + arginfo->nHashMarks;
+	arginfo->nElements = arginfo->nElements;
 
 	initscr();
 
@@ -517,7 +515,7 @@ main(int argc, char* argv[])
 	noecho();
 	keypad(stdscr, TRUE);
 
-	option_items=(ITEM**)calloc(n_choices + 1, sizeof(ITEM *));
+	option_items=(ITEM**)calloc(arginfo->nElements + 1, sizeof(ITEM *));
 	if (option_items == NULL)
 		errx(EX_OSERR, "unable to make room for option_items");
 
@@ -544,7 +542,7 @@ main(int argc, char* argv[])
 		curr = curr->next;
 	}
 
-	option_items[n_choices] = (ITEM *)NULL;
+	option_items[arginfo->nElements] = (ITEM *)NULL;
 
 	option_menu = new_menu(option_items);
 	//set_item_term(option_menu, runMeOnMenuCall);
@@ -719,7 +717,7 @@ main(int argc, char* argv[])
 	/* Print a border around the main window and print a title */
 	/* note the '.' for scrollable direction */
 
-	if (n_choices > (unsigned int)nMenuRows)
+	if (arginfo->nElements > (unsigned int)nMenuRows)
 		bottomChar = ACS_DARROW;
 
 	wborder(primaryWindow, ACS_VLINE, ACS_VLINE, topChar, bottomChar,  0, 0, 0, 0);
@@ -734,7 +732,7 @@ main(int argc, char* argv[])
 	/* toggling and truth have nothing to do with each other :-)
 	   so go thru each one, set the envrioment, and then return to top
 	*/
-	for(count = 0; count < n_choices; ++count) {
+	for(count = 0; count < arginfo->nElements; ++count) {
             curr = (OptionEl*)item_userptr(option_items[count]);
 		curr->value = getenv(curr->name);
 		if (curr->value != NULL)
@@ -883,7 +881,7 @@ main(int argc, char* argv[])
 				if (curTopRow == ERR)
 					errx(EX_SOFTWARE, "The current top row was unavailable");
 
-				if ((int)n_choices - curTopRow > nMenuRows)
+				if ((int)arginfo->nElements - curTopRow > nMenuRows)
 					bottomChar = ACS_DARROW;
 				if (curTopRow != 0)
 					topChar = ACS_UARROW;
@@ -925,7 +923,7 @@ main(int argc, char* argv[])
 			fprintf(stderr,"%s=%s\n","ACCEPTED_LICENCE",(licenceAccepted) ? "true" : "false");
 	}
 
-	for (count = 0; count < n_choices; ++count)
+	for (count = 0; count < arginfo->nElements; ++count)
 		free_item(option_items[count]);
 
 	free_menu(option_menu);
