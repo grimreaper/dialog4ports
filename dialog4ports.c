@@ -475,8 +475,8 @@ main(int argc, char* argv[])
 
 	_malloc_options = "J";
 
-	chtype topChar = '-';
-	chtype bottomChar = '-';
+	chtype topChar = ACS_HLINE;
+	chtype bottomChar = ACS_HLINE;
 
 	struct ARGINFO *arginfo = parseArguments(argc, argv);
 	/*exit(42);*/
@@ -722,8 +722,8 @@ main(int argc, char* argv[])
 	if (n_choices > (unsigned int)nMenuRows)
 		bottomChar = ACS_DARROW;
 
-	wborder(primaryWindow, '|', '|', topChar, bottomChar,  0, 0, 0, 0);
-	wborder(helpWindow, '|', '|', '-', '-',  0, 0, 0, 0);
+	wborder(primaryWindow, ACS_VLINE, ACS_VLINE, topChar, bottomChar,  0, 0, 0, 0);
+	wborder(helpWindow, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE,  0, 0, 0, 0);
 
 	menu_opts_off(option_menu,O_ONEVALUE);
 	post_menu(option_menu);
@@ -849,8 +849,8 @@ main(int argc, char* argv[])
 									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
 								p->value = NULL;
 							}
-							wborder(primaryWindow, '|', '|', topChar, bottomChar, 0, 0, 0, 0);
-							wborder(helpWindow, '|', '|', '-', '-', 0, 0, 0, 0);
+							wborder(primaryWindow, ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
+							wborder(helpWindow, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
 							doupdate();
 						}
 					}
@@ -876,8 +876,8 @@ main(int argc, char* argv[])
 					printFileToWindow(helpWindow, p->longDescrFile);
 				}
 
-				topChar = '-';
-				bottomChar = '-';
+				topChar = ACS_HLINE;
+				bottomChar = ACS_HLINE;
 
 				curTopRow = top_row(whichMenu);
 				if (curTopRow == ERR)
@@ -887,7 +887,7 @@ main(int argc, char* argv[])
 					bottomChar = ACS_DARROW;
 				if (curTopRow != 0)
 					topChar = ACS_UARROW;
-				wborder(primaryWindow, '|', '|', topChar, bottomChar, 0, 0, 0, 0);
+				wborder(primaryWindow, ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
 			}
 			else if (winGetInput == licenceWindow) {
 				if (arginfo->licenceText != NULL)
@@ -897,7 +897,7 @@ main(int argc, char* argv[])
 					printInCenter(helpWindow,helpRows/2 + 1, arginfo->licenceName);
 				}
 			}
-			wborder(helpWindow, '|', '|', '-', '-', 0, 0, 0, 0);
+			wborder(helpWindow, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
 			wnoutrefresh(helpWindow);
 			wnoutrefresh(winGetInput);
 			doupdate();
