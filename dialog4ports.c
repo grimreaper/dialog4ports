@@ -465,6 +465,7 @@ main(int argc, char* argv[])
 	PANEL *windowPanels[nWindows];
 
 
+	const char * const colorCodes = getenv("D4PCOLOR");
 	unsigned int n_choices = 0;
 	unsigned int count;
 
@@ -484,11 +485,30 @@ main(int argc, char* argv[])
 	n_choices = arginfo->nElements + arginfo->nHashMarks;
 
 	initscr();
+
+	short colorList[3][2] = { { COLOR_GREEN, COLOR_BLACK },
+					{ COLOR_YELLOW, COLOR_BLACK },
+					{ COLOR_RED, COLOR_BLACK }
+					};
+
+	if (colorCodes != NULL && strlen(colorCodes) != 6) {
+		endwin();
+		errx(EX_DATAERR, "colorCode must be exactly 6 characters long");
+	}
+	if (colorCodes != NULL) {
+		colorList[0][0] = (short)(colorCodes[0] - 0x30);
+		colorList[0][1] = (short)(colorCodes[1] - 0x30);
+		colorList[1][0] = (short)(colorCodes[2] - 0x30);
+		colorList[1][1] = (short)(colorCodes[3] - 0x30);
+		colorList[2][0] = (short)(colorCodes[4] - 0x30);
+		colorList[2][1] = (short)(colorCodes[5] - 0x30);
+	}
+
 	if(has_colors() == TRUE) {
 		start_color();
-		init_pair(1, COLOR_GREEN, COLOR_BLACK);   /* selected */
-		init_pair(2, COLOR_YELLOW, COLOR_BLACK);	/* selectable */
-		init_pair(3, COLOR_RED, COLOR_BLACK); 	/* disabled */
+		init_pair(1, colorList[0][0], COLOR_BLACK);   /* selected */
+		init_pair(2, colorList[1][0], COLOR_BLACK);	/* selectable */
+		init_pair(3, colorList[2][0], COLOR_BLACK); 	/* disabled */
 	}
 
 	cbreak();
