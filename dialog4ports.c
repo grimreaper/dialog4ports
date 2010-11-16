@@ -42,7 +42,6 @@ __FBSDID("$FreeBSD$");
 *	 --option WITH_FOO --hfile "FOO:long description" --wh
 *	TODO	- --min --max options
 *	TODO	- --requires option
-*	TODO	- add panels code to allow for popups
 *	TODO - convert windows to an array that can be looped?!
 *	TODO - change radio handling to work with set_item_term
 *	TODO - sanity check colour input
