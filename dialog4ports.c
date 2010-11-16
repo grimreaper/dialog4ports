@@ -371,7 +371,7 @@ parseArguments(const int argc, char * argv[])
 				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode);
 		prev = prev->next;
 	}
-#endif DEBUG
+#endif
 
 	if (arginfo->nElements == 0)
 		errx(EX_USAGE,"We need at least one option");
