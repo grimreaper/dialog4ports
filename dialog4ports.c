@@ -46,9 +46,11 @@ __FBSDID("$FreeBSD$");
 *	TODO - convert windows to an array that can be looped?!
 *	TODO - remove need for nElements ?
 *	TODO - change radio handling to work with set_item_term
-
-a) add indicator for user input options b) colors - black is bleh c) scrolling in help window d) differentiate selected and current items 
-I think D is a ncurses/menu bug. There is only one function to set both of those colours
+*	TODO - sanity check colour input
+*	TODO - add indicator for user input options
+*	TODO - scrolling in help window
+*	TODO - differentiate selected and current items
+*		I think this is a ncurses/menu bug. There is only one function to set both of those colours
 */
 
 /*
