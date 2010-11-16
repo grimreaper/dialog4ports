@@ -223,9 +223,10 @@ parseArguments(const int argc, char * argv[])
 	OptionEl *prev = NULL;
 	const char* internal_token = NULL;
 
+#ifdef DEBUG
 	for (arg=0; arg < argc; ++arg)
 		printf("%s\n",argv[arg]);
-
+#endif
 	enum {
 		OPEN,			/* we can get the next argument */
 		NEXT_OPTION, 	/* fix the struct	*/
@@ -363,13 +364,14 @@ parseArguments(const int argc, char * argv[])
 		}
 	}
 
-/*	prev = arginfo->head;
+#ifdef DEBUG
+	prev = arginfo->head;
 	while (prev) {
 		printf("YZ:\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
 				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode);
 		prev = prev->next;
 	}
-*/
+#endif DEBUG
 
 	if (arginfo->nElements == 0)
 		errx(EX_USAGE,"We need at least one option");
