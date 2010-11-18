@@ -157,12 +157,12 @@ outputValues(MENU *menu)
 	for(i = 0; i < item_count(menu); ++i) {
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
 		if (p->mode == CHECKBOX || p->mode == RADIOBOX) {
-			outputBinaryValue(items[i], item_name(items[i]));
+			outputBinaryValue(items[i], item_name(items[i])+strlen(preNameToken));
 		} else if (p->mode == USER_INPUT) {
 			if (p->value)
-				fprintf(stderr, "%s=%s\n", item_name(items[i]), p->value);
+				fprintf(stderr, "%s=%s\n", item_name(items[i]+strlen(preNameToken)), p->value);
 			else
-				fprintf(stderr, "%s=\n", item_name(items[i]));
+				fprintf(stderr, "%s=\n", item_name(items[i])+strlen(preNameToken));
 		}
 	}
 	if (!requiredItemsSelected(items))
@@ -314,6 +314,16 @@ parseArguments(const int argc, char * argv[])
 			}
 		}
 		else if (stage == NEXT_OPTION) {
+/*
+			if (curr->mode == RADIOBOX)
+				if (countChar(argv[arg], '=') < 2)
+      	     			errx(EX_USAGE,"Radioboxes must contain at least 2");
+			else
+				if (countChar(argv[arg], '=') != 1)
+      	     			errx(EX_USAGE,"Options must contain exactly one equals sign");
+*/
+
+
 			bool gotName = false;
 			bool gotDescr = false;
 			bool gotOpts = false;
@@ -767,7 +777,7 @@ main(int argc, char* argv[])
 	*/
 	for(count = 0; count < arginfo->nElements; ++count) {
             curr = (OptionEl*)item_userptr(option_items[count]);
-		curr->value = getenv(curr->name);
+		curr->value = getenv(curr->name + strlen(preNameToken));
 		if (curr->value != NULL)
 		{
 			set_item_value(option_items[count], true);
