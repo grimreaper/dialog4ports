@@ -517,23 +517,23 @@ main(int argc, char* argv[])
 					};
 
 	if (colorCodes != NULL && strlen(colorCodes) != 6) {
-		endwin();
 		errx(EX_DATAERR, "colorCode must be exactly 6 characters long");
 	}
 	if (colorCodes != NULL) {
-		colorList[0][0] = (short)(colorCodes[0] - 0x30);
-		colorList[0][1] = (short)(colorCodes[1] - 0x30);
-		colorList[1][0] = (short)(colorCodes[2] - 0x30);
-		colorList[1][1] = (short)(colorCodes[3] - 0x30);
-		colorList[2][0] = (short)(colorCodes[4] - 0x30);
-		colorList[2][1] = (short)(colorCodes[5] - 0x30);
+		for (c = 0; c < 6; ++c) {
+			/* get the color code to an int instead of ascii value */
+			if (colorCodes[c] - 0x30 <= 0x39)
+				colorList[c/2][c & 1] = (short)(colorCodes[c] - 0x30);
+			else
+				errx(EX_DATAERR, "colorCode must be an int between 0 and 9");
+		}
 	}
 
 	if(has_colors() == TRUE) {
 		start_color();
-		init_pair(1, colorList[0][0], COLOR_BLACK);   /* selected */
-		init_pair(2, colorList[1][0], COLOR_BLACK);	/* selectable */
-		init_pair(3, colorList[2][0], COLOR_BLACK); 	/* disabled */
+		init_pair(1, colorList[0][0], colorList[0][1]);   /* selected */
+		init_pair(2, colorList[1][0], colorList[1][1]);	/* selectable */
+		init_pair(3, colorList[2][0], colorList[2][1]); 	/* disabled */
 	}
 
 	cbreak();
