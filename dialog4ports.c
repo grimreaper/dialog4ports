@@ -465,10 +465,6 @@ main(int argc, char* argv[])
 	ITEM *curItem;
 	WINDOW *oldwindow;
 
-	WINDOW	*exitWindow;
-	WINDOW	*licenceWindow;
-	WINDOW	*primaryWindow;
-	WINDOW	*helpWindow;
 
 	WINDOW	*winGetInput;
 	MENU		*whichMenu;
@@ -582,11 +578,14 @@ main(int argc, char* argv[])
 	enum windowID {
 		HEAD,
 		PRIMARY,
+		HELP,
 		LICENCE,
 		EXIT,
 	};
-
-	WINDOW ** windowList = calloc (4, sizeof(*windowList));
+	const int numWindows = 5;
+	WINDOW ** windowList = calloc (numWindows, sizeof(*windowList));
+	if (windowList == NULL)
+		errx(EX_OSERR, "window list is unfindable");
 
 	const int frameRows = getmaxy(stdscr);
 	const int frameCols = getmaxx(stdscr);
@@ -627,10 +626,10 @@ main(int argc, char* argv[])
 
 
 	windowList[HEAD] = newwin(headRows, headCols, headRowStart, headColStart);
-	exitWindow = newwin(exitRows, exitCols, exitRowStart, exitColStart);
-	licenceWindow = newwin(licenceRows, licenceCols, licenceRowStart, licenceColStart);
-	primaryWindow = newwin(primaryRows, primaryCols, primaryRowStart, primaryColStart);
-	helpWindow = newwin(helpRows, helpCols, helpRowStart, helpColStart);
+	windowList[EXIT] = newwin(exitRows, exitCols, exitRowStart, exitColStart);
+	windowList[LICENCE] = newwin(licenceRows, licenceCols, licenceRowStart, licenceColStart);
+	windowList[PRIMARY] = newwin(primaryRows, primaryCols, primaryRowStart, primaryColStart);
+	windowList[HELP] = newwin(helpRows, helpCols, helpRowStart, helpColStart);
 
 	/*	head + primary + help + licence + exit */
 	const int minRows = headRows + licenceRows + exitRows + 1;
@@ -658,8 +657,8 @@ main(int argc, char* argv[])
 
 	exitMenu = new_menu(exitItems);
 
-      set_menu_win(exitMenu, exitWindow);
-      set_menu_sub(exitMenu, derwin(exitWindow, exitRows, exitCols, 0, 0));
+      set_menu_win(exitMenu, windowList[EXIT]);
+      set_menu_sub(exitMenu, derwin(windowList[EXIT], exitRows, exitCols, 0, 0));
 	/* 1 row - 2 cols for ok/cancel */
       set_menu_format(exitMenu, 1, 2);
 	set_menu_mark(exitMenu, ">");
@@ -691,8 +690,8 @@ main(int argc, char* argv[])
 	if (arginfo->outputLicenceRequest) {
 		licenceMenu = new_menu(licenceItems);
 
-	      set_menu_win(licenceMenu, licenceWindow);
-      	set_menu_sub(licenceMenu, derwin(licenceWindow, licenceRows, licenceCols, 1, 0));
+	      set_menu_win(licenceMenu, windowList[LICENCE]);
+      	set_menu_sub(licenceMenu, derwin(windowList[LICENCE], licenceRows, licenceCols, 1, 0));
 		/* 1 row - 2 cols for ok/cancel */
       	set_menu_format(licenceMenu, 1, 2);
 		set_menu_mark(licenceMenu, ">");
@@ -706,7 +705,7 @@ main(int argc, char* argv[])
 	}
 	else {
 		const char* const licenceAcceptedMessage = "The licence for this port has already been accepted or does not exist";
-		printInCenter(licenceWindow, 1, licenceAcceptedMessage);
+		printInCenter(windowList[LICENCE], 1, licenceAcceptedMessage);
 	}
 	doupdate();
 
@@ -735,18 +734,18 @@ main(int argc, char* argv[])
 	}
 
 
-	keypad(primaryWindow, TRUE);
-	keypad(exitWindow, TRUE);
-	keypad(helpWindow, TRUE);
+	keypad(windowList[PRIMARY], TRUE);
+	keypad(windowList[EXIT], TRUE);
+	keypad(windowList[HELP], TRUE);
 	keypad(windowList[HEAD], TRUE);
 	if (arginfo->outputLicenceRequest)
-		keypad(licenceWindow, TRUE);
+		keypad(windowList[LICENCE], TRUE);
 
 	set_menu_mark(option_menu, "");
 
 	/* Set main window and sub window */
-	set_menu_win(option_menu, primaryWindow);
-	set_menu_sub(option_menu, derwin(primaryWindow, nMenuRows, primaryCols - 2, 1, 1));
+	set_menu_win(option_menu, windowList[PRIMARY]);
+	set_menu_sub(option_menu, derwin(windowList[PRIMARY], nMenuRows, primaryCols - 2, 1, 1));
 	set_menu_format(option_menu, nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
@@ -755,8 +754,8 @@ main(int argc, char* argv[])
 	if (arginfo->nElements > (unsigned int)nMenuRows)
 		bottomChar = ACS_DARROW;
 
-	wborder(primaryWindow, ACS_VLINE, ACS_VLINE, topChar, bottomChar,  0, 0, 0, 0);
-	wborder(helpWindow, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE,  0, 0, 0, 0);
+	wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar,  0, 0, 0, 0);
+	wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE,  0, 0, 0, 0);
 
 	menu_opts_off(option_menu,O_ONEVALUE);
 	post_menu(option_menu);
@@ -786,16 +785,16 @@ main(int argc, char* argv[])
 
 
 	licenceAccepted = false;
-	winGetInput = primaryWindow;
+	winGetInput = windowList[PRIMARY];
 	whichMenu = option_menu;
 
 	windowPanels[0] = new_panel(windowList[HEAD]);
-	windowPanels[1] = new_panel(exitWindow);
-	windowPanels[2] = new_panel(licenceWindow);
-	windowPanels[3] = new_panel(primaryWindow);
-	windowPanels[4] = new_panel(helpWindow);
+	windowPanels[1] = new_panel(windowList[EXIT]);
+	windowPanels[2] = new_panel(windowList[LICENCE]);
+	windowPanels[3] = new_panel(windowList[PRIMARY]);
+	windowPanels[4] = new_panel(windowList[HELP]);
 	update_panels();
-	wnoutrefresh(primaryWindow); // get cursor to proper location
+	wnoutrefresh(windowList[PRIMARY]); // get cursor to proper location
 	doupdate();
 
 	while(weWantMore) {
@@ -805,7 +804,7 @@ main(int argc, char* argv[])
 
 		oldwindow = winGetInput;
 		if (arginfo->outputLicenceRequest)
-			if (winGetInput == licenceWindow)
+			if (winGetInput == windowList[LICENCE])
 				licenceSelected = curItem;
 		switch(c) {
 			case KEY_DOWN:
@@ -835,22 +834,22 @@ main(int argc, char* argv[])
 				*/
       		      set_menu_fore(whichMenu, COLOR_PAIR(1));
 
-				if (winGetInput == primaryWindow) {
+				if (winGetInput == windowList[PRIMARY]) {
 					if (arginfo->outputLicenceRequest) {
-						winGetInput = licenceWindow;
+						winGetInput = windowList[LICENCE];
 						whichMenu = licenceMenu;
 					}
 					else {
-						winGetInput = exitWindow;
+						winGetInput = windowList[EXIT];
 						whichMenu = exitMenu;
 					}
 				}
-				else if (winGetInput == licenceWindow) {
-					winGetInput = exitWindow;
+				else if (winGetInput == windowList[LICENCE]) {
+					winGetInput = windowList[EXIT];
 					whichMenu = exitMenu;
 				}
-				else if (winGetInput == exitWindow) {
-					winGetInput = primaryWindow;
+				else if (winGetInput == windowList[EXIT]) {
+					winGetInput = windowList[PRIMARY];
 					whichMenu = option_menu;
 				}
       		      set_menu_fore(whichMenu, COLOR_PAIR(1) | A_REVERSE);
@@ -859,7 +858,7 @@ main(int argc, char* argv[])
 			case ' ':
 			case 10:
 			case KEY_ENTER:
-				if (winGetInput == primaryWindow) {
+				if (winGetInput == windowList[PRIMARY]) {
 					OptionEl *p = (OptionEl*)item_userptr(curItem);
 
 					if (item_opts(curItem) & O_SELECTABLE) {
@@ -873,7 +872,7 @@ main(int argc, char* argv[])
 						}
 						else {
 							p->value = NULL;
-							p->value = getString(primaryWindow,p->value);
+							p->value = getString(windowList[PRIMARY],p->value);
 							if (p->value != NULL && strcmp("",p->value) != 0) {
 								if (item_value(curItem) != TRUE)
 									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
@@ -883,8 +882,8 @@ main(int argc, char* argv[])
 									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
 								p->value = NULL;
 							}
-							wborder(primaryWindow, ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
-							wborder(helpWindow, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
+							wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
+							wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
 							doupdate();
 						}
 					}
@@ -908,7 +907,7 @@ main(int argc, char* argv[])
 					menu_driver(whichMenu, REQ_DOWN_ITEM);
 					menu_driver(whichMenu, REQ_UP_ITEM);
 				}
-				else if (winGetInput == exitWindow) {
+				else if (winGetInput == windowList[EXIT]) {
 					if (curItem == exitItems[exitOK])
 						somethingChanged = true;
 					weWantMore = false;
@@ -921,12 +920,12 @@ main(int argc, char* argv[])
 			/*
 				this rereads the file each time. perhaps it could be cached?
 			*/
-			wclear(helpWindow);
+			wclear(windowList[HELP]);
 
-			if (winGetInput == primaryWindow ) {
+			if (winGetInput == windowList[PRIMARY] ) {
 				OptionEl *p = (OptionEl*)item_userptr(current_item(whichMenu));
 				if (p->longDescrFile != NULL) {
-					printFileToWindow(helpWindow, p->longDescrFile);
+					printFileToWindow(windowList[HELP], p->longDescrFile);
 				}
 
 				topChar = ACS_HLINE;
@@ -940,22 +939,22 @@ main(int argc, char* argv[])
 					bottomChar = ACS_DARROW;
 				if (curTopRow != 0)
 					topChar = ACS_UARROW;
-				wborder(primaryWindow, ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
+				wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
 			}
-			else if (winGetInput == licenceWindow) {
+			else if (winGetInput == windowList[LICENCE]) {
 				if (arginfo->licenceText != NULL)
-					printFileToWindow(helpWindow, arginfo->licenceText);
+					printFileToWindow(windowList[HELP], arginfo->licenceText);
 				else if (arginfo->licenceName != NULL) {
-					printInCenter(helpWindow,helpRows/2, "This licence is the default");
-					printInCenter(helpWindow,helpRows/2 + 1, arginfo->licenceName);
+					printInCenter(windowList[HELP],helpRows/2, "This licence is the default");
+					printInCenter(windowList[HELP],helpRows/2 + 1, arginfo->licenceName);
 				}
 			}
-			wborder(helpWindow, ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
-			wnoutrefresh(helpWindow);
+			wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
+			wnoutrefresh(windowList[HELP]);
 			wnoutrefresh(winGetInput);
 			doupdate();
 
-			if (winGetInput == licenceWindow) {
+			if (winGetInput == windowList[LICENCE]) {
 				if (current_item(licenceMenu) == licenceItems[licenceYES])
 					licenceAccepted = true;
 				else
@@ -966,10 +965,10 @@ main(int argc, char* argv[])
 	endwin(); /* get out of ncurses */
 
 	delwin(windowList[HEAD]);
-	delwin(primaryWindow);
-	delwin(helpWindow);
-	delwin(licenceWindow);
-	delwin(exitWindow);
+	delwin(windowList[PRIMARY]);
+	delwin(windowList[HELP]);
+	delwin(windowList[LICENCE]);
+	delwin(windowList[EXIT]);
 
 
 	if (somethingChanged) {
@@ -993,7 +992,7 @@ main(int argc, char* argv[])
 		free(curr);
 		curr = next;
 	}
-
+	free(windowList);
 	free(arginfo);
 
 	return ((somethingChanged) ? exitOK : exitCancel);
