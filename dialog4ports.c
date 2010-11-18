@@ -45,6 +45,8 @@ __FBSDID("$FreeBSD$");
 *	TODO - sanity check colour input
 *	TODO - scrolling in help window
 *	TODO - Is it legal to modify the ptr after its set?
+*	TODO - turn window sizes into structs; make array of structs; turn window creation into loop
+*	TODO - turn menus into array that could be looped ( be aware of no menu for licence)
 */
 
 /*
@@ -732,12 +734,8 @@ main(int argc, char* argv[])
 	}
 
 
-	keypad(windowList[PRIMARY], TRUE);
-	keypad(windowList[EXIT], TRUE);
-	keypad(windowList[HELP], TRUE);
-	keypad(windowList[HEAD], TRUE);
-	if (arginfo->outputLicenceRequest)
-		keypad(windowList[LICENCE], TRUE);
+	for (c = 0; c < nWindows; ++c)
+		keypad(windowList[c], TRUE);
 
 	set_menu_mark(option_menu, "");
 
