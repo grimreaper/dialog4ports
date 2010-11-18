@@ -48,7 +48,6 @@ __FBSDID("$FreeBSD$");
 *	TODO - turn window sizes into structs; make array of structs; turn window creation into loop
 *	TODO - turn menus into array that could be looped ( be aware of no menu for licence)
 *	TODO - combime windowList, windowStatList, etc into one giant struct...
-*	TODO - now that the name is changed the output is wrong - fix that soon :-)
 */
 
 /*
@@ -492,7 +491,7 @@ main(int argc, char* argv[])
 
 	const char * const colorCodes = getenv("D4PCOLOR");
 
-	const char isMarked = '*';
+	const char selectedMark = '*';
 	unsigned int count;
 
 	int curTopRow;
@@ -783,17 +782,17 @@ main(int argc, char* argv[])
 			set_item_value(option_items[count], true);
 			menu_driver(option_menu, REQ_TOGGLE_ITEM);
 			if (curr->mode != RADIOBOX)
-				curr->name[1] = isMarked;
+				curr->name[1] = selectedMark;
 			else {
 				/* I highly doubt this is defined or legal behavior */
 				char * n = (char*)item_name(option_items[count]);
-				n[1] = isMarked;
+				n[1] = selectedMark;
 			}
 		}
 		if (curr->mode == CHECKBOX && curr->required) {
 			set_item_value(option_items[count], true);
 			curr->value = item_name(option_items[count]);
-			curr->name[1] = isMarked;
+			curr->name[1] = selectedMark;
 /*			item_opts_off(option_items[count], O_SELECTABLE);	*/
 		}
             menu_driver(option_menu, REQ_DOWN_ITEM);
@@ -903,7 +902,7 @@ main(int argc, char* argv[])
 					}
 					if (p->mode != RADIOBOX) {
 						if (item_value(curItem) == TRUE)
-							p->name[1] = isMarked;
+							p->name[1] = selectedMark;
 						else
 							p->name[1] = ' ';
 					}
@@ -912,7 +911,7 @@ main(int argc, char* argv[])
 
 						char * n = (char*)item_name(curItem);
 						if (item_value(curItem) == TRUE)
-							n[1] = isMarked;
+							n[1] = selectedMark;
 						else
 							n[1] = ' ';
 					}
