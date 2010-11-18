@@ -314,14 +314,14 @@ parseArguments(const int argc, char * argv[])
 			}
 		}
 		else if (stage == NEXT_OPTION) {
-/*
-			if (curr->mode == RADIOBOX)
+			if (curr->mode == RADIOBOX) {
 				if (countChar(argv[arg], '=') < 2)
       	     			errx(EX_USAGE,"Radioboxes must contain at least 2");
-			else
+			}
+			else {
 				if (countChar(argv[arg], '=') != 1)
-      	     			errx(EX_USAGE,"Options must contain exactly one equals sign");
-*/
+      	     			errx(EX_USAGE,"Options must contain exactly one equals sign [ %s ]", argv[arg]);
+			}
 
 
 			bool gotName = false;
