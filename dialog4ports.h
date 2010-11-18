@@ -71,3 +71,10 @@ fixEnabledOptions(ITEM** option_items, int myIndex);
 runMeOnMenuCall(MENU *menu);*/
 
 const char * const preNameToken = "? ? ";
+
+struct windowStats {
+	int cols;
+	int rows;
+	int colStart;
+	int rowStart;
+};

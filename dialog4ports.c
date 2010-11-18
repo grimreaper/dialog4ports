@@ -47,6 +47,7 @@ __FBSDID("$FreeBSD$");
 *	TODO - Is it legal to modify the ptr after its set?
 *	TODO - turn window sizes into structs; make array of structs; turn window creation into loop
 *	TODO - turn menus into array that could be looped ( be aware of no menu for licence)
+*	TODO - combime windowList, windowStatList, etc into one giant struct...
 */
 
 /*
@@ -590,10 +591,11 @@ main(int argc, char* argv[])
 	const int frameRows = getmaxy(stdscr);
 	const int frameCols = getmaxx(stdscr);
 
-	const int headRowStart = 0;
-	const int headColStart = 0;
-	const int headRows = 3;
-	const int headCols = frameCols;
+	struct windowStats *windowStatList = calloc(nWindows, sizeof(*windowStatList));
+	windowStatList[HEAD].rowStart = 0;
+	windowStatList[HEAD].colStart = 0;
+	windowStatList[HEAD].cols = frameCols;
+	windowStatList[HEAD].rows = 3;
 
 	const int exitRows = 3;
 	const int exitCols = frameCols;
@@ -614,29 +616,29 @@ main(int argc, char* argv[])
 	else
 		licenceColStart = 0;
 
-	const int primaryRowStart = headRows + 1;
+	const int primaryRowStart = windowStatList[HEAD].rows + 1;
 	const int primaryColStart = 0;
 	const int primaryRows = frameRows - licenceRows - exitRows - 4;
 	const int primaryCols = frameCols / 2;
 
-	const int helpRowStart = headRows + 1;
+	const int helpRowStart = windowStatList[HEAD].rows + 1;
 	const int helpColStart = primaryCols + 1;
 	const int helpRows = primaryRows;
 	const int helpCols = frameCols - primaryCols - 1;
 
 
-	windowList[HEAD] = newwin(headRows, headCols, headRowStart, headColStart);
+	windowList[HEAD] = newwin(windowStatList[HEAD].rows, windowStatList[HEAD].cols, windowStatList[HEAD].rowStart, windowStatList[HEAD].colStart);
 	windowList[EXIT] = newwin(exitRows, exitCols, exitRowStart, exitColStart);
 	windowList[LICENCE] = newwin(licenceRows, licenceCols, licenceRowStart, licenceColStart);
 	windowList[PRIMARY] = newwin(primaryRows, primaryCols, primaryRowStart, primaryColStart);
 	windowList[HELP] = newwin(helpRows, helpCols, helpRowStart, helpColStart);
 
 	/*	head + primary + help + licence + exit */
-	const int minRows = headRows + licenceRows + exitRows + 1;
-	const int minCols = headCols;
+	const int minRows = windowStatList[HEAD].rows + licenceRows + exitRows + 1;
+	const int minCols = windowStatList[HEAD].cols;
 
 	if (frameRows < minRows || frameCols < minCols) {
-		errx(EX_UNAVAILABLE, "Terminal size is to small");
+		errx(EX_UNAVAILABLE, "Terminal size is too small");
 	}
 
 
