@@ -459,7 +459,7 @@ usage() {
 	endwin if ncurses is running
 */
 void
-cleanNcursesExit(const int n);
+cleanNcursesExit(const int n)
 {
 	endwin();
 }
