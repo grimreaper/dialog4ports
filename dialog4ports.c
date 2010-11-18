@@ -441,9 +441,9 @@ usage() {
 		"[--port-comment 'port comment']",
 		"[--licence name of default licence]",
 		"[--licence-text filename of licence]",
-		"--option value=optionName=description [--hfile filename]",
-		"--radio value=optionName=description=option1#option2 [--hfile filename]",
-		"--input value=optionName=description [--hfile filename]"
+		"--option optionName=description [--hfile filename]",
+		"--radio optionName=description=option1#option2 [--hfile filename]",
+		"--input optionName=description [--hfile filename]"
 	);
 }
 
