@@ -48,6 +48,7 @@ __FBSDID("$FreeBSD$");
 *	TODO - turn window sizes into structs; make array of structs; turn window creation into loop
 *	TODO - turn menus into array that could be looped ( be aware of no menu for licence)
 *	TODO - combime windowList, windowStatList, etc into one giant struct...
+*	TODO - now that the name is changed the output is wrong - fix that soon :-)
 */
 
 /*
@@ -416,7 +417,7 @@ printFileToWindow(WINDOW * const win, const char * const filename)
 
 	maxCols = getmaxx(win);
 	if (hFile == NULL)
-		errx(EX_IOERR, "File specified does not exist");
+		errx(EX_IOERR, "File specified [%s] does not exist", filename);
 	/* never read more than 80 charaters per line */
 	row = 1;
 	while (fgets(buf, maxCharPerLine, hFile)) {
