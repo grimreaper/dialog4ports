@@ -43,12 +43,9 @@ __FBSDID("$FreeBSD$");
 *	TODO	- --min --max options
 *	TODO	- --requires option
 *	TODO - convert windows to an array that can be looped?!
-*	TODO - change radio handling to work with set_item_term
 *	TODO - sanity check colour input
-*	TODO - add indicator for user input options
 *	TODO - scrolling in help window
-*	TODO - differentiate selected and current items
-*		I think this is a ncurses/menu bug. There is only one function to set both of those colours
+*	TODO - Is it legal to modify the ptr after its set?
 */
 
 /*
@@ -77,7 +74,7 @@ getString(WINDOW *win, const char * const curVal)
 	char mesg[]="Choose a new value: ";
 	char *str = calloc(bufSize, sizeof(char));
 	if (str == NULL)
-		errx(EX_OSERR, "Can not calloc");
+		errx(EX_OSERR, "Can not calloc for getting string");
 
 	int messageStart;
 	int row = getmaxy(win);
@@ -320,7 +317,26 @@ parseArguments(const int argc, char * argv[])
 			while((internal_token = strsep(&argv[arg], "=")) != NULL) {
 				curr->longDescrFile = NULL;
 				if (!gotName) {
-					curr->name = internal_token;
+					char *useName = calloc(strlen(internal_token) + strlen(preNameToken) + 1,sizeof(char));
+					if (useName == NULL)
+						errx(EX_OSERR, "unable to make room for other useName");
+					strcpy(useName, preNameToken);
+					strcat(useName, internal_token);
+					switch (curr->mode) {
+						case CHECKBOX:
+							useName[0] = '[';
+							useName[2] = ']';
+							break;
+						case RADIOBOX:
+							useName[0] = '(';
+							useName[2] = ')';
+						break;
+						case USER_INPUT:
+							useName[0] = '{';
+							useName[2] = '}';
+						break;
+					}
+					curr->name = useName;
 					gotName = true;
 				} else if (!gotDescr) {
 					curr->descr = internal_token;
@@ -467,6 +483,8 @@ main(int argc, char* argv[])
 
 
 	const char * const colorCodes = getenv("D4PCOLOR");
+
+	const char isMarked = '*';
 	unsigned int count;
 
 	int curTopRow;
@@ -528,16 +546,24 @@ main(int argc, char* argv[])
 			count++;
 		} else {
 			char *tmpToken;
-			char *tmpOption = calloc(strlen(curr->options)+1, sizeof(char));
+			char *tmpOption = calloc(strlen(curr->options)+1, sizeof(char)); //XXX free this
 			if (tmpOption == NULL)
 				errx(EX_OSERR, "unable to make room for tmpOption");
 			strncpy(tmpOption, curr->options, strlen(curr->options));
 
 			while((tmpToken = strsep(&tmpOption, "#")) != NULL) {
-	                  option_items[count] = new_item(tmpToken, curr->descr);
+				char *useName = calloc(strlen(preNameToken) + strlen(tmpToken) + 1,sizeof(char));
+				if (useName == NULL)
+					errx(EX_OSERR, "unable to make room for useName");
+				strcpy(useName, preNameToken);
+				strcat(useName, tmpToken);
+                        useName[0] = '(';
+                        useName[2] = ')';
+	                  option_items[count] = new_item(useName, curr->descr);
 	                  set_item_userptr(option_items[count], curr);
 				count++;
 			}
+			free(tmpOption);
 		}
 		curr = curr->next;
 	}
@@ -707,7 +733,7 @@ main(int argc, char* argv[])
 	if (arginfo->outputLicenceRequest)
 		keypad(licenceWindow, TRUE);
 
-	set_menu_mark(option_menu, " * ");
+	set_menu_mark(option_menu, "");
 
 	/* Set main window and sub window */
 	set_menu_win(option_menu, primaryWindow);
@@ -826,6 +852,7 @@ main(int argc, char* argv[])
 			case KEY_ENTER:
 				if (winGetInput == primaryWindow) {
 					OptionEl *p = (OptionEl*)item_userptr(curItem);
+
 					if (item_opts(curItem) & O_SELECTABLE) {
 						if (p->mode != USER_INPUT) {
 							menu_driver(whichMenu, REQ_TOGGLE_ITEM);
@@ -852,6 +879,25 @@ main(int argc, char* argv[])
 							doupdate();
 						}
 					}
+					if (p->mode != RADIOBOX) {
+						if (item_value(curItem) == TRUE)
+							p->name[1] = isMarked;
+						else
+							p->name[1] = ' ';
+					}
+					else {
+						/* I highly doubt this is defined or legal behavior */
+
+						char * n = (char*)item_name(curItem);
+						if (item_value(curItem) == TRUE)
+							n[1] = isMarked;
+						else
+							n[1] = ' ';
+					}
+
+					/* hack to refresh menu without keystroke */
+					menu_driver(whichMenu, REQ_DOWN_ITEM);
+					menu_driver(whichMenu, REQ_UP_ITEM);
 				}
 				else if (winGetInput == exitWindow) {
 					if (curItem == exitItems[exitOK])
@@ -934,6 +980,7 @@ main(int argc, char* argv[])
 	curr = arginfo->head;
 	while (curr) {
 		next = curr->next;
+		free(curr->name);
 		free(curr);
 		curr = next;
 	}

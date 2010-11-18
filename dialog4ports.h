@@ -14,7 +14,7 @@ struct list_el {
 	const char *descr;
 	const char *longDescrFile;
 	enum OPTION_TYPE mode;
-	const char *name;
+	char *name;
 	struct list_el *next;
 	const char *options;
 	bool required;
@@ -69,3 +69,5 @@ fixEnabledOptions(ITEM** option_items, int myIndex);
 
 /*void
 runMeOnMenuCall(MENU *menu);*/
+
+const char * const preNameToken = "? ? ";
