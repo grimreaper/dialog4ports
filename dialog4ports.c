@@ -42,7 +42,6 @@ __FBSDID("$FreeBSD$");
 *	 --option WITH_FOO --hfile "FOO:long description" --wh
 *	TODO	- --min --max options
 *	TODO	- --requires option
-*	TODO - convert windows to an array that can be looped?!
 *	TODO - sanity check colour input
 *	TODO - scrolling in help window
 *	TODO - Is it legal to modify the ptr after its set?
@@ -787,11 +786,8 @@ main(int argc, char* argv[])
 	winGetInput = windowList[PRIMARY];
 	whichMenu = option_menu;
 
-	windowPanels[0] = new_panel(windowList[HEAD]);
-	windowPanels[1] = new_panel(windowList[EXIT]);
-	windowPanels[2] = new_panel(windowList[LICENCE]);
-	windowPanels[3] = new_panel(windowList[PRIMARY]);
-	windowPanels[4] = new_panel(windowList[HELP]);
+	for (c = 0; c < nWindows; ++c)
+		windowPanels[c] = new_panel(windowList[c]);
 	update_panels();
 	wnoutrefresh(windowList[PRIMARY]); // get cursor to proper location
 	doupdate();
