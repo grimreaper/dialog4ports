@@ -42,7 +42,6 @@ __FBSDID("$FreeBSD$");
 *	 --option WITH_FOO --hfile "FOO:long description" --wh
 *	TODO	- --min --max options
 *	TODO	- --requires option
-*	TODO - sanity check colour input
 *	TODO - scrolling in help window
 *	TODO - Is it legal to modify the ptr after its set?
 *	TODO - turn window sizes into structs; make array of structs; turn window creation into loop
