@@ -456,6 +456,16 @@ usage() {
 	);
 }
 
+/*
+	endwin if ncurses is running
+*/
+void
+cleanNcursesExit(const int n);
+{
+	endwin();
+}
+
+
 int
 main(int argc, char* argv[])
 {
@@ -510,6 +520,7 @@ main(int argc, char* argv[])
 	arginfo->nElements = arginfo->nElements;
 
 	initscr();
+	err_set_exit(cleanNcursesExit);
 
 	short colorList[3][2] = { { COLOR_GREEN, COLOR_BLACK },
 					{ COLOR_YELLOW, COLOR_BLACK },
@@ -976,6 +987,7 @@ main(int argc, char* argv[])
 		}
 	unpost_menu(option_menu);
 	endwin(); /* get out of ncurses */
+	err_set_exit(NULL);
 
 	for (c = 0; c < nWindows; ++c)
 		delwin(windowList[c]);

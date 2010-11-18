@@ -78,3 +78,6 @@ struct windowStats {
 	int colStart;
 	int rowStart;
 };
+
+void
+cleanNcursesExit(const int n);
