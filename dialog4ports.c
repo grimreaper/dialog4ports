@@ -769,10 +769,18 @@ main(int argc, char* argv[])
 		{
 			set_item_value(option_items[count], true);
 			menu_driver(option_menu, REQ_TOGGLE_ITEM);
+			if (curr->mode != RADIOBOX)
+				curr->name[1] = isMarked;
+			else {
+				/* I highly doubt this is defined or legal behavior */
+				char * n = (char*)item_name(option_items[count]);
+				n[1] = isMarked;
+			}
 		}
 		if (curr->mode == CHECKBOX && curr->required) {
 			set_item_value(option_items[count], true);
 			curr->value = item_name(option_items[count]);
+			curr->name[1] = isMarked;
 /*			item_opts_off(option_items[count], O_SELECTABLE);	*/
 		}
             menu_driver(option_menu, REQ_DOWN_ITEM);
