@@ -582,8 +582,7 @@ main(int argc, char* argv[])
 		LICENCE,
 		EXIT,
 	};
-	const int numWindows = 5;
-	WINDOW ** windowList = calloc (numWindows, sizeof(*windowList));
+	WINDOW ** windowList = calloc (nWindows, sizeof(*windowList));
 	if (windowList == NULL)
 		errx(EX_OSERR, "window list is unfindable");
 
@@ -964,12 +963,8 @@ main(int argc, char* argv[])
 	unpost_menu(option_menu);
 	endwin(); /* get out of ncurses */
 
-	delwin(windowList[HEAD]);
-	delwin(windowList[PRIMARY]);
-	delwin(windowList[HELP]);
-	delwin(windowList[LICENCE]);
-	delwin(windowList[EXIT]);
-
+	for (c = 0; c < nWindows; ++c)
+		delwin(windowList[c]);
 
 	if (somethingChanged) {
 		outputValues(option_menu);
