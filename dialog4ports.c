@@ -465,7 +465,6 @@ main(int argc, char* argv[])
 	ITEM *curItem;
 	WINDOW *oldwindow;
 
-	WINDOW	*headWindow;
 	WINDOW	*exitWindow;
 	WINDOW	*licenceWindow;
 	WINDOW	*primaryWindow;
@@ -579,6 +578,16 @@ main(int argc, char* argv[])
 	/*
 		maybe I should make this a struct instead?
 	*/
+
+	enum windowID {
+		HEAD,
+		PRIMARY,
+		LICENCE,
+		EXIT,
+	};
+
+	WINDOW ** windowList = calloc (4, sizeof(*windowList));
+
 	const int frameRows = getmaxy(stdscr);
 	const int frameCols = getmaxx(stdscr);
 
@@ -617,7 +626,7 @@ main(int argc, char* argv[])
 	const int helpCols = frameCols - primaryCols - 1;
 
 
-	headWindow = newwin(headRows, headCols, headRowStart, headColStart);
+	windowList[HEAD] = newwin(headRows, headCols, headRowStart, headColStart);
 	exitWindow = newwin(exitRows, exitCols, exitRowStart, exitColStart);
 	licenceWindow = newwin(licenceRows, licenceCols, licenceRowStart, licenceColStart);
 	primaryWindow = newwin(primaryRows, primaryCols, primaryRowStart, primaryColStart);
@@ -713,9 +722,9 @@ main(int argc, char* argv[])
 	const int nMenuCols = 1;
 
 	/* display the title in the center of the top window */
-	printInCenter(headWindow, startMenyWinRow/2, arginfo->portname);
+	printInCenter(windowList[HEAD], startMenyWinRow/2, arginfo->portname);
 	if (arginfo->portcomment != NULL)
-		printInCenter(headWindow, startMenyWinRow/2 + 1, arginfo->portcomment);
+		printInCenter(windowList[HEAD], startMenyWinRow/2 + 1, arginfo->portcomment);
 	doupdate();
 
 	if(has_colors() == TRUE) {
@@ -729,7 +738,7 @@ main(int argc, char* argv[])
 	keypad(primaryWindow, TRUE);
 	keypad(exitWindow, TRUE);
 	keypad(helpWindow, TRUE);
-	keypad(headWindow, TRUE);
+	keypad(windowList[HEAD], TRUE);
 	if (arginfo->outputLicenceRequest)
 		keypad(licenceWindow, TRUE);
 
@@ -780,7 +789,7 @@ main(int argc, char* argv[])
 	winGetInput = primaryWindow;
 	whichMenu = option_menu;
 
-	windowPanels[0] = new_panel(headWindow);
+	windowPanels[0] = new_panel(windowList[HEAD]);
 	windowPanels[1] = new_panel(exitWindow);
 	windowPanels[2] = new_panel(licenceWindow);
 	windowPanels[3] = new_panel(primaryWindow);
@@ -956,7 +965,7 @@ main(int argc, char* argv[])
 	unpost_menu(option_menu);
 	endwin(); /* get out of ncurses */
 
-	delwin(headWindow);
+	delwin(windowList[HEAD]);
 	delwin(primaryWindow);
 	delwin(helpWindow);
 	delwin(licenceWindow);
