@@ -812,7 +812,7 @@ main(int argc, char* argv[])
 		curItem = current_item(menuList[whichLocation]);
 
 		if (arginfo->outputLicenceRequest)
-			if (windowList[whichLocation] == windowList[LICENCE])
+			if (whichLocation == LICENCE)
 				licenceSelected = curItem;
 		switch(c) {
 			case KEY_DOWN:
@@ -858,7 +858,7 @@ main(int argc, char* argv[])
 			case ' ':
 			case 10:
 			case KEY_ENTER:
-				if (windowList[whichLocation] == windowList[PRIMARY]) {
+				if (whichLocation == PRIMARY) {
 					OptionEl *p = (OptionEl*)item_userptr(curItem);
 
 					if (item_opts(curItem) & O_SELECTABLE) {
@@ -901,7 +901,7 @@ main(int argc, char* argv[])
 					}
 					pos_menu_cursor(menuList[whichLocation]) ;
 				}
-				else if (windowList[whichLocation] == windowList[EXIT]) {
+				else if (whichLocation == EXIT) {
 					if (curItem == exitItems[exitOK])
 						somethingChanged = true;
 					weWantMore = false;
@@ -916,7 +916,7 @@ main(int argc, char* argv[])
 			*/
 			wclear(windowList[HELP]);
 
-			if (windowList[whichLocation] == windowList[PRIMARY] ) {
+			if (whichLocation == PRIMARY ) {
 				OptionEl *p = (OptionEl*)item_userptr(current_item(menuList[whichLocation]));
 				if (p->longDescrFile != NULL) {
 					printFileToWindow(windowList[HELP], p->longDescrFile);
@@ -935,7 +935,7 @@ main(int argc, char* argv[])
 					topChar = ACS_UARROW;
 				wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
 			}
-			else if (windowList[whichLocation] == windowList[LICENCE]) {
+			else if (whichLocation == LICENCE) {
 				if (arginfo->licenceText != NULL)
 					printFileToWindow(windowList[HELP], arginfo->licenceText);
 				else if (arginfo->licenceName != NULL) {
