@@ -685,10 +685,6 @@ main(int argc, char* argv[])
       set_menu_format(menuList[EXIT], 1, 2);
 	set_menu_mark(menuList[EXIT], ">");
 
-	set_menu_fore(menuList[EXIT], COLOR_PAIR(1));
-	set_menu_back(menuList[EXIT], COLOR_PAIR(2));
-      set_menu_grey(menuList[EXIT], COLOR_PAIR(3));
-
       post_menu(menuList[EXIT]);
       menu_driver(menuList[EXIT], REQ_FIRST_ITEM);
 	menu_driver(menuList[EXIT], REQ_TOGGLE_ITEM);
@@ -717,9 +713,6 @@ main(int argc, char* argv[])
 		/* 1 row - 2 cols for ok/cancel */
       	set_menu_format(menuList[LICENCE], 1, 2);
 		set_menu_mark(menuList[LICENCE], ">");
-		set_menu_fore(menuList[LICENCE], COLOR_PAIR(1));
-		set_menu_back(menuList[LICENCE], COLOR_PAIR(2));
-      	set_menu_grey(menuList[LICENCE], COLOR_PAIR(3));
 
 
 	      post_menu(menuList[LICENCE]);
@@ -749,10 +742,13 @@ main(int argc, char* argv[])
 	doupdate();
 
 	if(has_colors() == TRUE) {
-		/* Set fore ground and back ground of the menu */
-		set_menu_fore(menuList[PRIMARY], COLOR_PAIR(1) | A_REVERSE);
-		set_menu_back(menuList[PRIMARY], COLOR_PAIR(2));
-		set_menu_grey(menuList[PRIMARY], COLOR_PAIR(3));
+		for (c = 0; c < nWindows; ++c) {
+			if (menuList[c] != NULL) {
+				set_menu_fore(menuList[c], COLOR_PAIR(1) | A_REVERSE);
+				set_menu_back(menuList[c], COLOR_PAIR(2));
+				set_menu_grey(menuList[c], COLOR_PAIR(3));
+			}
+		}
 	}
 
 
