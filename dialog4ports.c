@@ -468,6 +468,14 @@ cleanNcursesExit(const int n)
 int
 main(int argc, char* argv[])
 {
+	enum windowID {
+		HEAD,
+		PRIMARY,
+		HELP,
+		LICENCE,
+		EXIT,
+	};
+
 	/* create the linked list that I work with later */
 
 	/* culot: better use sys/queue.h instead of your own linked list implementation.
@@ -476,7 +484,6 @@ main(int argc, char* argv[])
 	OptionEl *next = NULL;
 
 	ITEM	**option_items;
-	MENU	*option_menu;
 	ITEM	**exitItems;
 	ITEM	**licenceItems;
 
@@ -587,8 +594,8 @@ main(int argc, char* argv[])
 
 	option_items[arginfo->nElements] = (ITEM *)NULL;
 
-	option_menu = new_menu(option_items);
-	//set_item_term(option_menu, runMeOnMenuCall);
+	menuList[PRIMARY] = new_menu(option_items);
+	//set_item_term(menuList[PRIMARY], runMeOnMenuCall);
 
 /* a bunch of constants re the size of the window */
 
@@ -597,13 +604,6 @@ main(int argc, char* argv[])
 		maybe I should make this a struct instead?
 	*/
 
-	enum windowID {
-		HEAD,
-		PRIMARY,
-		HELP,
-		LICENCE,
-		EXIT,
-	};
 	WINDOW ** windowList = calloc (nWindows, sizeof(*windowList));
 	if (windowList == NULL)
 		errx(EX_OSERR, "window list is unfindable");
@@ -733,8 +733,8 @@ main(int argc, char* argv[])
 
 
 
-	menu_opts_off(option_menu, O_SHOWDESC);
-	menu_opts_on(option_menu, O_NONCYCLIC);
+	menu_opts_off(menuList[PRIMARY], O_SHOWDESC);
+	menu_opts_on(menuList[PRIMARY], O_NONCYCLIC);
 
 	/* we want to leave 3 lines for the title */
 	const int startMenyWinRow = 3;
@@ -750,21 +750,21 @@ main(int argc, char* argv[])
 
 	if(has_colors() == TRUE) {
 		/* Set fore ground and back ground of the menu */
-		set_menu_fore(option_menu, COLOR_PAIR(1) | A_REVERSE);
-		set_menu_back(option_menu, COLOR_PAIR(2));
-		set_menu_grey(option_menu, COLOR_PAIR(3));
+		set_menu_fore(menuList[PRIMARY], COLOR_PAIR(1) | A_REVERSE);
+		set_menu_back(menuList[PRIMARY], COLOR_PAIR(2));
+		set_menu_grey(menuList[PRIMARY], COLOR_PAIR(3));
 	}
 
 
 	for (c = 0; c < nWindows; ++c)
 		keypad(windowList[c], TRUE);
 
-	set_menu_mark(option_menu, "");
+	set_menu_mark(menuList[PRIMARY], "");
 
 	/* Set main window and sub window */
-	set_menu_win(option_menu, windowList[PRIMARY]);
-	set_menu_sub(option_menu, derwin(windowList[PRIMARY], nMenuRows, primaryCols - 2, 1, 1));
-	set_menu_format(option_menu, nMenuRows, nMenuCols);
+	set_menu_win(menuList[PRIMARY], windowList[PRIMARY]);
+	set_menu_sub(menuList[PRIMARY], derwin(windowList[PRIMARY], nMenuRows, primaryCols - 2, 1, 1));
+	set_menu_format(menuList[PRIMARY], nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
 	/* note the '.' for scrollable direction */
@@ -775,8 +775,8 @@ main(int argc, char* argv[])
 	wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar,  0, 0, 0, 0);
 	wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE,  0, 0, 0, 0);
 
-	menu_opts_off(option_menu,O_ONEVALUE);
-	post_menu(option_menu);
+	menu_opts_off(menuList[PRIMARY],O_ONEVALUE);
+	post_menu(menuList[PRIMARY]);
 
 
 	doupdate();
@@ -790,7 +790,7 @@ main(int argc, char* argv[])
 		if (curr->value != NULL)
 		{
 			set_item_value(option_items[count], true);
-			menu_driver(option_menu, REQ_TOGGLE_ITEM);
+			menu_driver(menuList[PRIMARY], REQ_TOGGLE_ITEM);
 			if (curr->mode != RADIOBOX)
 				curr->name[1] = selectedMark;
 			else {
@@ -805,14 +805,14 @@ main(int argc, char* argv[])
 			curr->name[1] = selectedMark;
 /*			item_opts_off(option_items[count], O_SELECTABLE);	*/
 		}
-            menu_driver(option_menu, REQ_DOWN_ITEM);
+            menu_driver(menuList[PRIMARY], REQ_DOWN_ITEM);
 	}
-      menu_driver(option_menu, REQ_FIRST_ITEM);
+      menu_driver(menuList[PRIMARY], REQ_FIRST_ITEM);
 
 
 	licenceAccepted = false;
 	winGetInput = windowList[PRIMARY];
-	whichMenu = option_menu;
+	whichMenu = menuList[PRIMARY];
 
 	for (c = 0; c < nWindows; ++c)
 		windowPanels[c] = new_panel(windowList[c]);
@@ -846,7 +846,7 @@ main(int argc, char* argv[])
 				menu_driver(whichMenu, REQ_SCR_DPAGE);
 				break;
 			case KEY_PPAGE:
-				menu_driver(option_menu, REQ_SCR_UPAGE);
+				menu_driver(menuList[PRIMARY], REQ_SCR_UPAGE);
 				break;
 			case  9: /* tab */
 				/* it goes
@@ -873,7 +873,7 @@ main(int argc, char* argv[])
 				}
 				else if (winGetInput == windowList[EXIT]) {
 					winGetInput = windowList[PRIMARY];
-					whichMenu = option_menu;
+					whichMenu = menuList[PRIMARY];
 				}
       		      set_menu_fore(whichMenu, COLOR_PAIR(1) | A_REVERSE);
 				doupdate();
@@ -984,7 +984,7 @@ main(int argc, char* argv[])
 					licenceAccepted = false;
 			}
 		}
-	unpost_menu(option_menu);
+	unpost_menu(menuList[PRIMARY]);
 	endwin(); /* get out of ncurses */
 	err_set_exit(NULL);
 
@@ -992,7 +992,7 @@ main(int argc, char* argv[])
 		delwin(windowList[c]);
 
 	if (somethingChanged) {
-		outputValues(option_menu);
+		outputValues(menuList[PRIMARY]);
 		if (arginfo->outputLicenceRequest)
 			fprintf(stderr,"%s=%s\n","ACCEPTED_LICENCE",(licenceAccepted) ? "true" : "false");
 	}
@@ -1000,7 +1000,7 @@ main(int argc, char* argv[])
 	for (count = 0; count < arginfo->nElements; ++count)
 		free_item(option_items[count]);
 
-	free_menu(option_menu);
+	free_menu(menuList[PRIMARY]);
 	if (arginfo->outputLicenceRequest)
 		free_menu(menuList[LICENCE]);
 	free_menu(menuList[EXIT]);
