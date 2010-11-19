@@ -43,7 +43,7 @@ __FBSDID("$FreeBSD$");
 *	TODO	- --min --max options
 *	TODO	- --requires option
 *	TODO - scrolling in help window
-*	TODO - Is it legal to modify the ptr after its set?
+*	TODO - Is it legal to modify the ptr after its set? (mitem_current)
 *	TODO - start only appears at next keystroke
 */
 
