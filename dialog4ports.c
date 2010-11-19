@@ -495,8 +495,6 @@ main(int argc, char* argv[])
 	WINDOW *oldwindow;
 
 
-	MENU		*whichMenu;
-
 	bool licenceAccepted;
 
 	const int nWindows = 5;
@@ -804,8 +802,6 @@ main(int argc, char* argv[])
 	licenceAccepted = false;
 
 	whichLocation = PRIMARY;
-	whichMenu = menuList[whichLocation];
-
 
 	for (c = 0; c < nWindows; ++c)
 		windowPanels[c] = new_panel(windowList[c]);
@@ -816,7 +812,7 @@ main(int argc, char* argv[])
 	while(weWantMore) {
 
 		c = wgetch(windowList[whichLocation]);
-		curItem = current_item(whichMenu);
+		curItem = current_item(menuList[whichLocation]);
 
 		oldwindow = windowList[whichLocation];
 		if (arginfo->outputLicenceRequest)
@@ -824,19 +820,19 @@ main(int argc, char* argv[])
 				licenceSelected = curItem;
 		switch(c) {
 			case KEY_DOWN:
-				menu_driver(whichMenu, REQ_DOWN_ITEM);
+				menu_driver(menuList[whichLocation], REQ_DOWN_ITEM);
 				break;
 			case KEY_UP:
-				menu_driver(whichMenu, REQ_UP_ITEM);
+				menu_driver(menuList[whichLocation], REQ_UP_ITEM);
 				break;
 			case KEY_LEFT:
-				menu_driver(whichMenu, REQ_LEFT_ITEM);
+				menu_driver(menuList[whichLocation], REQ_LEFT_ITEM);
 				break;
 			case KEY_RIGHT:
-				menu_driver(whichMenu, REQ_RIGHT_ITEM);
+				menu_driver(menuList[whichLocation], REQ_RIGHT_ITEM);
 				break;
 			case KEY_NPAGE:
-				menu_driver(whichMenu, REQ_SCR_DPAGE);
+				menu_driver(menuList[whichLocation], REQ_SCR_DPAGE);
 				break;
 			case KEY_PPAGE:
 				menu_driver(menuList[PRIMARY], REQ_SCR_UPAGE);
@@ -848,27 +844,19 @@ main(int argc, char* argv[])
 					I'm not sure how to handle scrolling help text
 
 				*/
-      		      set_menu_fore(whichMenu, COLOR_PAIR(1));
+      		      set_menu_fore(menuList[whichLocation], COLOR_PAIR(1));
 
 				if (whichLocation == PRIMARY) {
-					if (arginfo->outputLicenceRequest) {
+					if (arginfo->outputLicenceRequest)
 						whichLocation = LICENCE;
-						whichMenu = menuList[LICENCE];
-					}
-					else {
+					else
 						whichLocation = EXIT;
-						whichMenu = menuList[EXIT];
-					}
 				}
-				else if (whichLocation == LICENCE) {
+				else if (whichLocation == LICENCE)
 					whichLocation = EXIT;
-					whichMenu = menuList[EXIT];
-				}
-				else if (whichLocation == EXIT) {
+				else if (whichLocation == EXIT)
 					whichLocation = PRIMARY;
-					whichMenu = menuList[PRIMARY];
-				}
-      		      set_menu_fore(whichMenu, COLOR_PAIR(1) | A_REVERSE);
+      		      set_menu_fore(menuList[whichLocation], COLOR_PAIR(1) | A_REVERSE);
 				doupdate();
 				break;
 			case ' ':
@@ -879,7 +867,7 @@ main(int argc, char* argv[])
 
 					if (item_opts(curItem) & O_SELECTABLE) {
 						if (p->mode != USER_INPUT) {
-							menu_driver(whichMenu, REQ_TOGGLE_ITEM);
+							menu_driver(menuList[whichLocation], REQ_TOGGLE_ITEM);
 							if (item_value(curItem) == TRUE)
 								p->value = item_name(curItem);
 							/* if we are a radiobox - we need to disable/enable valid options */
@@ -891,11 +879,11 @@ main(int argc, char* argv[])
 							p->value = getString(windowList[PRIMARY],p->value);
 							if (p->value != NULL && strcmp("",p->value) != 0) {
 								if (item_value(curItem) != TRUE)
-									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
+									menu_driver(menuList[whichLocation], REQ_TOGGLE_ITEM);
 							}
 							else {
 								if (item_value(curItem) != FALSE)
-									menu_driver(whichMenu, REQ_TOGGLE_ITEM);
+									menu_driver(menuList[whichLocation], REQ_TOGGLE_ITEM);
 								p->value = NULL;
 							}
 							wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
@@ -920,8 +908,8 @@ main(int argc, char* argv[])
 					}
 
 					/* hack to refresh menu without keystroke */
-					menu_driver(whichMenu, REQ_DOWN_ITEM);
-					menu_driver(whichMenu, REQ_UP_ITEM);
+					menu_driver(menuList[whichLocation], REQ_DOWN_ITEM);
+					menu_driver(menuList[whichLocation], REQ_UP_ITEM);
 				}
 				else if (windowList[whichLocation] == windowList[EXIT]) {
 					if (curItem == exitItems[exitOK])
@@ -939,7 +927,7 @@ main(int argc, char* argv[])
 			wclear(windowList[HELP]);
 
 			if (windowList[whichLocation] == windowList[PRIMARY] ) {
-				OptionEl *p = (OptionEl*)item_userptr(current_item(whichMenu));
+				OptionEl *p = (OptionEl*)item_userptr(current_item(menuList[whichLocation]));
 				if (p->longDescrFile != NULL) {
 					printFileToWindow(windowList[HELP], p->longDescrFile);
 				}
@@ -947,7 +935,7 @@ main(int argc, char* argv[])
 				topChar = ACS_HLINE;
 				bottomChar = ACS_HLINE;
 
-				curTopRow = top_row(whichMenu);
+				curTopRow = top_row(menuList[whichLocation]);
 				if (curTopRow == ERR)
 					errx(EX_SOFTWARE, "The current top row was unavailable");
 
