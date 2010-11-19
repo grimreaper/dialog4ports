@@ -899,6 +899,12 @@ main(int argc, char* argv[])
 						else
 							n[1] = ' ';
 					}
+					/*
+						hack to get star to show up now instead of after next key movment
+					*/
+					menu_driver(menuList[whichLocation], REQ_DOWN_ITEM);
+					menu_driver(menuList[whichLocation], REQ_UP_ITEM);
+
 					pos_menu_cursor(menuList[whichLocation]) ;
 				}
 				else if (whichLocation == EXIT) {
