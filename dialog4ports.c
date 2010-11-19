@@ -37,16 +37,13 @@ __FBSDID("$FreeBSD$");
 
 #include "dialog4ports.h"
 
-/*	TODO	- refactor large main into smaller units
+/*
 *	TODO	- change -hfile to wxs's method for taking long descr
 *	 --option WITH_FOO --hfile "FOO:long description" --wh
 *	TODO	- --min --max options
 *	TODO	- --requires option
 *	TODO - scrolling in help window
 *	TODO - Is it legal to modify the ptr after its set?
-*	TODO - turn window sizes into structs; make array of structs; turn window creation into loop
-*	TODO - turn menus into array that could be looped ( be aware of no menu for licence)
-*	TODO - combime windowList, windowStatList, etc into one giant struct...
 */
 
 /*
