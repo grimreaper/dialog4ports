@@ -489,14 +489,14 @@ main(int argc, char* argv[])
 
 	WINDOW	*winGetInput;
 	MENU		*whichMenu;
-	MENU		*licenceMenu;
-	MENU		*exitMenu;
 
 	bool licenceAccepted;
 
 	const int nWindows = 5;
 	PANEL *windowPanels[nWindows];
-
+	MENU	**menuList = calloc(nWindows, sizeof(*menuList));
+	if (menuList == NULL)
+		errx(EX_OSERR, "unable to make room for menu list");
 
 	const char * const colorCodes = getenv("D4PCOLOR");
 
@@ -677,21 +677,21 @@ main(int argc, char* argv[])
 			errx(EX_OSERR, "Bad null in  exitItems");
 	}
 
-	exitMenu = new_menu(exitItems);
+	menuList[EXIT] = new_menu(exitItems);
 
-      set_menu_win(exitMenu, windowList[EXIT]);
-      set_menu_sub(exitMenu, derwin(windowList[EXIT], exitRows, exitCols, 0, 0));
+      set_menu_win(menuList[EXIT], windowList[EXIT]);
+      set_menu_sub(menuList[EXIT], derwin(windowList[EXIT], exitRows, exitCols, 0, 0));
 	/* 1 row - 2 cols for ok/cancel */
-      set_menu_format(exitMenu, 1, 2);
-	set_menu_mark(exitMenu, ">");
+      set_menu_format(menuList[EXIT], 1, 2);
+	set_menu_mark(menuList[EXIT], ">");
 
-	set_menu_fore(exitMenu, COLOR_PAIR(1));
-	set_menu_back(exitMenu, COLOR_PAIR(2));
-      set_menu_grey(exitMenu, COLOR_PAIR(3));
+	set_menu_fore(menuList[EXIT], COLOR_PAIR(1));
+	set_menu_back(menuList[EXIT], COLOR_PAIR(2));
+      set_menu_grey(menuList[EXIT], COLOR_PAIR(3));
 
-      post_menu(exitMenu);
-      menu_driver(exitMenu, REQ_FIRST_ITEM);
-	menu_driver(exitMenu, REQ_TOGGLE_ITEM);
+      post_menu(menuList[EXIT]);
+      menu_driver(menuList[EXIT], REQ_FIRST_ITEM);
+	menu_driver(menuList[EXIT], REQ_TOGGLE_ITEM);
 	doupdate();
 
 
@@ -710,20 +710,20 @@ main(int argc, char* argv[])
 	ITEM* licenceSelected = licenceItems[licenceNO];
 
 	if (arginfo->outputLicenceRequest) {
-		licenceMenu = new_menu(licenceItems);
+		menuList[LICENCE] = new_menu(licenceItems);
 
-	      set_menu_win(licenceMenu, windowList[LICENCE]);
-      	set_menu_sub(licenceMenu, derwin(windowList[LICENCE], licenceRows, licenceCols, 1, 0));
+	      set_menu_win(menuList[LICENCE], windowList[LICENCE]);
+      	set_menu_sub(menuList[LICENCE], derwin(windowList[LICENCE], licenceRows, licenceCols, 1, 0));
 		/* 1 row - 2 cols for ok/cancel */
-      	set_menu_format(licenceMenu, 1, 2);
-		set_menu_mark(licenceMenu, ">");
-		set_menu_fore(licenceMenu, COLOR_PAIR(1));
-		set_menu_back(licenceMenu, COLOR_PAIR(2));
-      	set_menu_grey(licenceMenu, COLOR_PAIR(3));
+      	set_menu_format(menuList[LICENCE], 1, 2);
+		set_menu_mark(menuList[LICENCE], ">");
+		set_menu_fore(menuList[LICENCE], COLOR_PAIR(1));
+		set_menu_back(menuList[LICENCE], COLOR_PAIR(2));
+      	set_menu_grey(menuList[LICENCE], COLOR_PAIR(3));
 
 
-	      post_menu(licenceMenu);
-		menu_driver(licenceMenu, REQ_TOGGLE_ITEM);
+	      post_menu(menuList[LICENCE]);
+		menu_driver(menuList[LICENCE], REQ_TOGGLE_ITEM);
 	}
 	else {
 		const char* const licenceAcceptedMessage = "The licence for this port has already been accepted or does not exist";
@@ -860,16 +860,16 @@ main(int argc, char* argv[])
 				if (winGetInput == windowList[PRIMARY]) {
 					if (arginfo->outputLicenceRequest) {
 						winGetInput = windowList[LICENCE];
-						whichMenu = licenceMenu;
+						whichMenu = menuList[LICENCE];
 					}
 					else {
 						winGetInput = windowList[EXIT];
-						whichMenu = exitMenu;
+						whichMenu = menuList[EXIT];
 					}
 				}
 				else if (winGetInput == windowList[LICENCE]) {
 					winGetInput = windowList[EXIT];
-					whichMenu = exitMenu;
+					whichMenu = menuList[EXIT];
 				}
 				else if (winGetInput == windowList[EXIT]) {
 					winGetInput = windowList[PRIMARY];
@@ -978,7 +978,7 @@ main(int argc, char* argv[])
 			doupdate();
 
 			if (winGetInput == windowList[LICENCE]) {
-				if (current_item(licenceMenu) == licenceItems[licenceYES])
+				if (current_item(menuList[LICENCE]) == licenceItems[licenceYES])
 					licenceAccepted = true;
 				else
 					licenceAccepted = false;
@@ -1002,8 +1002,8 @@ main(int argc, char* argv[])
 
 	free_menu(option_menu);
 	if (arginfo->outputLicenceRequest)
-		free_menu(licenceMenu);
-	free_menu(exitMenu);
+		free_menu(menuList[LICENCE]);
+	free_menu(menuList[EXIT]);
 
 	curr = arginfo->head;
 	while (curr) {
@@ -1013,6 +1013,7 @@ main(int argc, char* argv[])
 		curr = next;
 	}
 	free(windowList);
+	free(menuList);
 	free(arginfo);
 
 	return ((somethingChanged) ? exitOK : exitCancel);
