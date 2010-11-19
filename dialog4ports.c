@@ -881,9 +881,6 @@ main(int argc, char* argv[])
 									menu_driver(menuList[whichLocation], REQ_TOGGLE_ITEM);
 								p->value = NULL;
 							}
-							wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
-							wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
-							doupdate();
 						}
 					}
 					if (p->mode != RADIOBOX) {
