@@ -490,11 +490,11 @@ main(int argc, char* argv[])
 	bool weWantMore = true;
 	bool somethingChanged = false;
 	int c;
+	enum windowID whichLocation;
 	ITEM *curItem;
 	WINDOW *oldwindow;
 
 
-	WINDOW	*winGetInput;
 	MENU		*whichMenu;
 
 	bool licenceAccepted;
@@ -617,44 +617,39 @@ main(int argc, char* argv[])
 	windowStatList[HEAD].cols = frameCols;
 	windowStatList[HEAD].rows = 3;
 
-	const int exitRows = 3;
-	const int exitCols = frameCols;
-	const int exitRowStart = frameRows - exitRows;
+	windowStatList[EXIT].rows = 3;
+	windowStatList[EXIT].cols = frameCols;
+	windowStatList[EXIT].rowStart = frameRows - windowStatList[EXIT].rows;
 	/* menu == sizeof(largest item) + 1 space for each item */
 	const int full_exit_menu_size = (int)strlen("CANCEL")*2+1;
-	const int exitColStart = (frameCols - full_exit_menu_size)/2;
+	windowStatList[EXIT].colStart = (frameCols - full_exit_menu_size)/2;
 
-	const int licenceRows = 3;
-	const int licenceCols = frameCols;
-	const int licenceRowStart = exitRowStart - licenceRows;
+	windowStatList[LICENCE].rows = 3;
+	windowStatList[LICENCE].cols = frameCols;
+	windowStatList[LICENCE].rowStart = windowStatList[EXIT].rowStart - windowStatList[LICENCE].rows;
 	/* menu == sizeof(largest item) + 1 space for each item */
 	const int full_licence_menu_size = (int)(strlen("ACCEPT")+strlen("the licence"))*2+1;
 	/* Hack because menu ignores starting location */
-	int licenceColStart;
       if (arginfo->outputLicenceRequest)
-		licenceColStart = (frameCols - full_licence_menu_size)/2;
+		windowStatList[LICENCE].colStart = (frameCols - full_licence_menu_size)/2;
 	else
-		licenceColStart = 0;
+		windowStatList[LICENCE].colStart = 0;
 
-	const int primaryRowStart = windowStatList[HEAD].rows + 1;
-	const int primaryColStart = 0;
-	const int primaryRows = frameRows - licenceRows - exitRows - 4;
-	const int primaryCols = frameCols / 2;
+	windowStatList[PRIMARY].rowStart = windowStatList[HEAD].rows + 1;
+	windowStatList[PRIMARY].colStart = 0;
+	windowStatList[PRIMARY].rows = frameRows - windowStatList[LICENCE].rows - windowStatList[EXIT].rows - 4;
+	windowStatList[PRIMARY].cols = frameCols / 2;
 
-	const int helpRowStart = windowStatList[HEAD].rows + 1;
-	const int helpColStart = primaryCols + 1;
-	const int helpRows = primaryRows;
-	const int helpCols = frameCols - primaryCols - 1;
+	windowStatList[HELP].rowStart = windowStatList[HEAD].rows + 1;
+	windowStatList[HELP].colStart = windowStatList[PRIMARY].cols + 1;
+	windowStatList[HELP].rows = windowStatList[PRIMARY].rows;
+	windowStatList[HELP].cols = frameCols - windowStatList[PRIMARY].cols - 1;
 
-
-	windowList[HEAD] = newwin(windowStatList[HEAD].rows, windowStatList[HEAD].cols, windowStatList[HEAD].rowStart, windowStatList[HEAD].colStart);
-	windowList[EXIT] = newwin(exitRows, exitCols, exitRowStart, exitColStart);
-	windowList[LICENCE] = newwin(licenceRows, licenceCols, licenceRowStart, licenceColStart);
-	windowList[PRIMARY] = newwin(primaryRows, primaryCols, primaryRowStart, primaryColStart);
-	windowList[HELP] = newwin(helpRows, helpCols, helpRowStart, helpColStart);
+	for (c=0; c < nWindows; ++c)
+		windowList[c] = newwin(windowStatList[c].rows, windowStatList[c].cols, windowStatList[c].rowStart, windowStatList[c].colStart);
 
 	/*	head + primary + help + licence + exit */
-	const int minRows = windowStatList[HEAD].rows + licenceRows + exitRows + 1;
+	const int minRows = windowStatList[HEAD].rows + windowStatList[LICENCE].rows + windowStatList[EXIT].rows + 1;
 	const int minCols = windowStatList[HEAD].cols;
 
 	if (frameRows < minRows || frameCols < minCols) {
@@ -680,7 +675,7 @@ main(int argc, char* argv[])
 	menuList[EXIT] = new_menu(exitItems);
 
       set_menu_win(menuList[EXIT], windowList[EXIT]);
-      set_menu_sub(menuList[EXIT], derwin(windowList[EXIT], exitRows, exitCols, 0, 0));
+      set_menu_sub(menuList[EXIT], derwin(windowList[EXIT], windowStatList[EXIT].rows, windowStatList[EXIT].cols, 0, 0));
 	/* 1 row - 2 cols for ok/cancel */
       set_menu_format(menuList[EXIT], 1, 2);
 	set_menu_mark(menuList[EXIT], ">");
@@ -709,7 +704,7 @@ main(int argc, char* argv[])
 		menuList[LICENCE] = new_menu(licenceItems);
 
 	      set_menu_win(menuList[LICENCE], windowList[LICENCE]);
-      	set_menu_sub(menuList[LICENCE], derwin(windowList[LICENCE], licenceRows, licenceCols, 1, 0));
+      	set_menu_sub(menuList[LICENCE], derwin(windowList[LICENCE], windowStatList[LICENCE].rows, windowStatList[LICENCE].cols, 1, 0));
 		/* 1 row - 2 cols for ok/cancel */
       	set_menu_format(menuList[LICENCE], 1, 2);
 		set_menu_mark(menuList[LICENCE], ">");
@@ -732,7 +727,7 @@ main(int argc, char* argv[])
 	/* we want to leave 3 lines for the title */
 	const int startMenyWinRow = 3;
 
-	const int nMenuRows = primaryRows - 2;
+	const int nMenuRows = windowStatList[PRIMARY].rows - 2;
 	const int nMenuCols = 1;
 
 	/* display the title in the center of the top window */
@@ -759,7 +754,7 @@ main(int argc, char* argv[])
 
 	/* Set main window and sub window */
 	set_menu_win(menuList[PRIMARY], windowList[PRIMARY]);
-	set_menu_sub(menuList[PRIMARY], derwin(windowList[PRIMARY], nMenuRows, primaryCols - 2, 1, 1));
+	set_menu_sub(menuList[PRIMARY], derwin(windowList[PRIMARY], nMenuRows, windowStatList[PRIMARY].cols - 2, 1, 1));
 	set_menu_format(menuList[PRIMARY], nMenuRows, nMenuCols);
 
 	/* Print a border around the main window and print a title */
@@ -807,8 +802,10 @@ main(int argc, char* argv[])
 
 
 	licenceAccepted = false;
-	winGetInput = windowList[PRIMARY];
-	whichMenu = menuList[PRIMARY];
+
+	whichLocation = PRIMARY;
+	whichMenu = menuList[whichLocation];
+
 
 	for (c = 0; c < nWindows; ++c)
 		windowPanels[c] = new_panel(windowList[c]);
@@ -818,12 +815,12 @@ main(int argc, char* argv[])
 
 	while(weWantMore) {
 
-		c = wgetch(winGetInput);
+		c = wgetch(windowList[whichLocation]);
 		curItem = current_item(whichMenu);
 
-		oldwindow = winGetInput;
+		oldwindow = windowList[whichLocation];
 		if (arginfo->outputLicenceRequest)
-			if (winGetInput == windowList[LICENCE])
+			if (windowList[whichLocation] == windowList[LICENCE])
 				licenceSelected = curItem;
 		switch(c) {
 			case KEY_DOWN:
@@ -853,22 +850,22 @@ main(int argc, char* argv[])
 				*/
       		      set_menu_fore(whichMenu, COLOR_PAIR(1));
 
-				if (winGetInput == windowList[PRIMARY]) {
+				if (whichLocation == PRIMARY) {
 					if (arginfo->outputLicenceRequest) {
-						winGetInput = windowList[LICENCE];
+						whichLocation = LICENCE;
 						whichMenu = menuList[LICENCE];
 					}
 					else {
-						winGetInput = windowList[EXIT];
+						whichLocation = EXIT;
 						whichMenu = menuList[EXIT];
 					}
 				}
-				else if (winGetInput == windowList[LICENCE]) {
-					winGetInput = windowList[EXIT];
+				else if (whichLocation == LICENCE) {
+					whichLocation = EXIT;
 					whichMenu = menuList[EXIT];
 				}
-				else if (winGetInput == windowList[EXIT]) {
-					winGetInput = windowList[PRIMARY];
+				else if (whichLocation == EXIT) {
+					whichLocation = PRIMARY;
 					whichMenu = menuList[PRIMARY];
 				}
       		      set_menu_fore(whichMenu, COLOR_PAIR(1) | A_REVERSE);
@@ -877,7 +874,7 @@ main(int argc, char* argv[])
 			case ' ':
 			case 10:
 			case KEY_ENTER:
-				if (winGetInput == windowList[PRIMARY]) {
+				if (windowList[whichLocation] == windowList[PRIMARY]) {
 					OptionEl *p = (OptionEl*)item_userptr(curItem);
 
 					if (item_opts(curItem) & O_SELECTABLE) {
@@ -926,7 +923,7 @@ main(int argc, char* argv[])
 					menu_driver(whichMenu, REQ_DOWN_ITEM);
 					menu_driver(whichMenu, REQ_UP_ITEM);
 				}
-				else if (winGetInput == windowList[EXIT]) {
+				else if (windowList[whichLocation] == windowList[EXIT]) {
 					if (curItem == exitItems[exitOK])
 						somethingChanged = true;
 					weWantMore = false;
@@ -941,7 +938,7 @@ main(int argc, char* argv[])
 			*/
 			wclear(windowList[HELP]);
 
-			if (winGetInput == windowList[PRIMARY] ) {
+			if (windowList[whichLocation] == windowList[PRIMARY] ) {
 				OptionEl *p = (OptionEl*)item_userptr(current_item(whichMenu));
 				if (p->longDescrFile != NULL) {
 					printFileToWindow(windowList[HELP], p->longDescrFile);
@@ -960,20 +957,20 @@ main(int argc, char* argv[])
 					topChar = ACS_UARROW;
 				wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
 			}
-			else if (winGetInput == windowList[LICENCE]) {
+			else if (windowList[whichLocation] == windowList[LICENCE]) {
 				if (arginfo->licenceText != NULL)
 					printFileToWindow(windowList[HELP], arginfo->licenceText);
 				else if (arginfo->licenceName != NULL) {
-					printInCenter(windowList[HELP],helpRows/2, "This licence is the default");
-					printInCenter(windowList[HELP],helpRows/2 + 1, arginfo->licenceName);
+					printInCenter(windowList[HELP],windowStatList[HELP].rows/2, "This licence is the default");
+					printInCenter(windowList[HELP],windowStatList[HELP].rows/2 + 1, arginfo->licenceName);
 				}
 			}
 			wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
 			wnoutrefresh(windowList[HELP]);
-			wnoutrefresh(winGetInput);
+			wnoutrefresh(windowList[whichLocation]);
 			doupdate();
 
-			if (winGetInput == windowList[LICENCE]) {
+			if (windowList[whichLocation] == windowList[LICENCE]) {
 				if (current_item(menuList[LICENCE]) == licenceItems[licenceYES])
 					licenceAccepted = true;
 				else
