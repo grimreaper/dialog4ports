@@ -492,7 +492,6 @@ main(int argc, char* argv[])
 	int c;
 	enum windowID whichLocation;
 	ITEM *curItem;
-	WINDOW *oldwindow;
 
 
 	bool licenceAccepted;
@@ -814,7 +813,6 @@ main(int argc, char* argv[])
 		c = wgetch(windowList[whichLocation]);
 		curItem = current_item(menuList[whichLocation]);
 
-		oldwindow = windowList[whichLocation];
 		if (arginfo->outputLicenceRequest)
 			if (windowList[whichLocation] == windowList[LICENCE])
 				licenceSelected = curItem;
