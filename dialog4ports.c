@@ -44,6 +44,7 @@ __FBSDID("$FreeBSD$");
 *	TODO	- --requires option
 *	TODO - scrolling in help window
 *	TODO - Is it legal to modify the ptr after its set?
+*	TODO - start only appears at next keystroke
 */
 
 /*
@@ -898,10 +899,7 @@ main(int argc, char* argv[])
 						else
 							n[1] = ' ';
 					}
-
-					/* hack to refresh menu without keystroke */
-					menu_driver(menuList[whichLocation], REQ_DOWN_ITEM);
-					menu_driver(menuList[whichLocation], REQ_UP_ITEM);
+					pos_menu_cursor(menuList[whichLocation]) ;
 				}
 				else if (windowList[whichLocation] == windowList[EXIT]) {
 					if (curItem == exitItems[exitOK])
