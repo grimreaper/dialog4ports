@@ -949,14 +949,13 @@ main(int argc, char* argv[])
 			wnoutrefresh(windowList[HELP]);
 			wnoutrefresh(windowList[whichLocation]);
 			doupdate();
-
-			if (windowList[whichLocation] == windowList[LICENCE]) {
-				if (current_item(menuList[LICENCE]) == licenceItems[licenceYES])
-					licenceAccepted = true;
-				else
-					licenceAccepted = false;
-			}
 		}
+	if (menuList[LICENCE] != NULL) {
+		if (current_item(menuList[LICENCE]) == licenceItems[licenceYES])
+			licenceAccepted = true;
+		else
+			licenceAccepted = false;
+	}
 	unpost_menu(menuList[PRIMARY]);
 	endwin(); /* get out of ncurses */
 	err_set_exit(NULL);
