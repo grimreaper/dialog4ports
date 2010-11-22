@@ -825,8 +825,6 @@ main(int argc, char* argv[])
 					I'm not sure how to handle scrolling help text
 
 				*/
-      		      set_menu_fore(menuList[whichLocation], COLOR_PAIR(1));
-
 				if (whichLocation == PRIMARY) {
 					if (arginfo->outputLicenceRequest)
 						whichLocation = LICENCE;
@@ -837,7 +835,6 @@ main(int argc, char* argv[])
 					whichLocation = EXIT;
 				else if (whichLocation == EXIT)
 					whichLocation = PRIMARY;
-      		      set_menu_fore(menuList[whichLocation], COLOR_PAIR(1) | A_REVERSE);
 				break;
 			case ' ':
 			case 10:
