@@ -194,7 +194,7 @@ fixEnabledOptions(ITEM** option_items, int myIndex)
 	while (option_items[count] != NULL) {
 		OptionEl* p = item_userptr(option_items[count]);
 		if (item_userptr(option_items[myIndex]) == p)
-			if (myIndex == count || (item_value(option_items[myIndex]) != TRUE))
+			if (myIndex == count || !item_value(option_items[myIndex]))
 				item_opts_on(option_items[count], O_SELECTABLE);
 			else
 				item_opts_off(option_items[count], O_SELECTABLE);
