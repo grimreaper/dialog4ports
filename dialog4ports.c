@@ -211,6 +211,8 @@ struct ARGINFO*
 parseArguments(const int argc, char * argv[])
 {
 	struct ARGINFO *arginfo = malloc(sizeof(*arginfo));
+	if (arginfo == NULL)
+		errx(EX_OSERR, "can't make space for arginfo - bailing out!");
 	int arg = 0;
 	OptionEl *curr = NULL;
 	OptionEl *prev = NULL;
@@ -432,7 +434,8 @@ printFileToWindow(WINDOW * const win, const char * const filename)
 		}
 	}
 
-	fclose(hFile);
+	if (fclose(hFile) != 0)
+		errx(EX_OSERR, "Failed to close the file - bailing out now");
 }
 
 /*
