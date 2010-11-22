@@ -226,7 +226,8 @@ parseArguments(const int argc, char * argv[])
 		READ_LTEXT, 	/* next thing to read is the licence text */
 		READ_PNAME, 	/* next thing is the port name */
 		READ_PCOMMENT,	/* next thing is the port comment */
-		PREV_HFILE		/* next thing is prev's hfile */
+		PREV_HFILE,		/* next thing is prev's hfile */
+		PREV_HTEXT		/* next thing contains literatal text for an hfile */
 	} stage;
 
 
@@ -277,6 +278,9 @@ parseArguments(const int argc, char * argv[])
 				stage = PREV_HFILE;
 				continue;
 			}
+			else if (strcmp("--htext", argv[arg]) == 0) {
+				stage = PREV_HTEXT;
+			}
 			else if (strcmp("--required", argv[arg]) == 0) {
 				prev->required = true;
 				continue;
@@ -322,7 +326,6 @@ parseArguments(const int argc, char * argv[])
 			bool gotDescr = false;
 			bool gotOpts = false;
 			while((internal_token = strsep(&argv[arg], "=")) != NULL) {
-				curr->longDescrFile = NULL;
 				if (!gotName) {
 					char *useName = calloc(strlen(internal_token) + strlen(preNameToken) + 1,sizeof(char));
 					if (useName == NULL)
@@ -353,12 +356,11 @@ parseArguments(const int argc, char * argv[])
 					curr->options = internal_token;
 					gotOpts = true;
 				}
-				else {
-					curr->longDescrFile = internal_token;
-				}
 			}
 			curr->value = NULL;
 			curr->required = false;
+			curr->longDescrFile = NULL;
+			curr->longDescrText = NULL;
 			prev = curr;
 			curr = curr->next;
 			stage = OPEN;
@@ -381,6 +383,10 @@ parseArguments(const int argc, char * argv[])
 		}
 		else if (stage == PREV_HFILE) {
 			prev->longDescrFile = argv[arg];
+			stage = OPEN;
+		}
+		else if (stage == PREV_HTEXT) {
+			prev->longDescrText = argv[arg];
 			stage = OPEN;
 		}
 	}

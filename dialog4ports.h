@@ -14,6 +14,7 @@ enum OPTION_TYPE {
 struct list_el {
 	const char *descr;
 	const char *longDescrFile;
+	const char *longDescrText;
 	enum OPTION_TYPE mode;
 	char *name;
 	struct list_el *next;
