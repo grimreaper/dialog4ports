@@ -136,8 +136,7 @@ countChar ( const char * const input, const char c )
 void
 outputBinaryValue(ITEM* item, const char *key)
 {
-	bool val = item_value(item) == TRUE;
-	fprintf(stderr, "%s=%s\n", key, (val) ? "true" : "false");
+	fprintf(stderr, "%s=%s\n", key, (item_value(item)) ? "true" : "false");
 }
 
 /*
