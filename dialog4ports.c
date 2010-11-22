@@ -68,7 +68,7 @@ getString(WINDOW *win, const char * const curVal)
 {
 	int e;
 	int messageStart;
-	const unsigned int bufSize = 80;
+	const size_t bufSize = 80u;
 	int row;
 	char mesg[]="Choose a new value: ";
 	char *str = calloc(bufSize, sizeof(char));
@@ -304,7 +304,7 @@ parseArguments(const int argc, char * argv[])
 				stage = NEXT_OPTION;
 			}
 			else {
-				usage(true);
+				usage();
 				errx(EX_USAGE,"Error code ID 10 T");
 			}
 		}
@@ -439,7 +439,7 @@ printFileToWindow(WINDOW * const win, const char * const filename)
 * Outputs usage information and optionally errors out.
 */
 static void
-usage() {
+usage(void) {
 	fprintf(stderr,"%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
 		"--port portname",
 		"[--port-comment 'port comment']",
