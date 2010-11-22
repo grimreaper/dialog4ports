@@ -593,13 +593,6 @@ main(int argc, char* argv[])
 	menuList[PRIMARY] = new_menu(option_items);
 	//set_item_term(menuList[PRIMARY], runMeOnMenuCall);
 
-/* a bunch of constants re the size of the window */
-
-
-	/*
-		maybe I should make this a struct instead?
-	*/
-
 	windowList = calloc (nWindows, sizeof(*windowList));
 	if (windowList == NULL)
 		errx(EX_OSERR, "window list is unfindable");
@@ -952,6 +945,7 @@ main(int argc, char* argv[])
 			licenceAccepted = false;
 	}
 	unpost_menu(menuList[PRIMARY]);
+	/* XXX should be unpost all the menus? */
 	endwin(); /* get out of ncurses */
 	err_set_exit(NULL);
 
