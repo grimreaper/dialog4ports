@@ -882,25 +882,21 @@ main(int argc, char* argv[])
 			case 27: /* ESCAPE */
 				weWantMore = false;
 				break;
-			}
-			/*
-				this rereads the file each time. perhaps it could be cached?
-			*/
-			wclear(windowList[HELP]);
-
+		}
+		/*
+			this rereads the file each time. perhaps it could be cached?
+		*/
+		wclear(windowList[HELP]);
 			if (whichLocation == PRIMARY ) {
 				OptionEl *p = (OptionEl*)item_userptr(current_item(menuList[whichLocation]));
 				if (p->longDescrFile != NULL) {
 					printFileToWindow(windowList[HELP], p->longDescrFile);
 				}
-
 				topChar = ACS_HLINE;
 				bottomChar = ACS_HLINE;
-
 				curTopRow = top_row(menuList[whichLocation]);
 				if (curTopRow == ERR)
 					errx(EX_SOFTWARE, "The current top row was unavailable");
-
 				if ((int)arginfo->nElements - curTopRow > nMenuRows)
 					bottomChar = ACS_DARROW;
 				if (curTopRow != 0)
@@ -919,7 +915,7 @@ main(int argc, char* argv[])
 			wnoutrefresh(windowList[HELP]);
 			wnoutrefresh(windowList[whichLocation]);
 			doupdate();
-		}
+	}
 	if (menuList[LICENCE] != NULL) {
 		if (current_item(menuList[LICENCE]) == licenceItems[licenceYES])
 			licenceAccepted = true;
