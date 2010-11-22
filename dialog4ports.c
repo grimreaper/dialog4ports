@@ -38,7 +38,6 @@ __FBSDID("$FreeBSD$");
 #include "dialog4ports.h"
 
 /*
-*	TODO	- change -hfile to wxs's method for taking long descr
 *	 --option WITH_FOO --hfile "FOO:long description" --wh
 *	TODO	- --requires option
 *	TODO - scrolling in help window
@@ -227,7 +226,6 @@ parseArguments(const int argc, char * argv[])
 		READ_PNAME, 	/* next thing is the port name */
 		READ_PCOMMENT,	/* next thing is the port comment */
 		PREV_HFILE,		/* next thing is prev's hfile */
-		PREV_HTEXT		/* next thing contains literatal text for an hfile */
 	} stage;
 
 
@@ -277,9 +275,6 @@ parseArguments(const int argc, char * argv[])
 			else if (strcmp("--hfile", argv[arg]) == 0) {
 				stage = PREV_HFILE;
 				continue;
-			}
-			else if (strcmp("--htext", argv[arg]) == 0) {
-				stage = PREV_HTEXT;
 			}
 			else if (strcmp("--required", argv[arg]) == 0) {
 				prev->required = true;
@@ -383,10 +378,6 @@ parseArguments(const int argc, char * argv[])
 		}
 		else if (stage == PREV_HFILE) {
 			prev->longDescrFile = argv[arg];
-			stage = OPEN;
-		}
-		else if (stage == PREV_HTEXT) {
-			prev->longDescrText = argv[arg];
 			stage = OPEN;
 		}
 	}
