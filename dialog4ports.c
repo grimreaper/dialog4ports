@@ -491,8 +491,6 @@ main(int argc, char* argv[])
 	ITEM *curItem;
 
 
-	bool licenceAccepted;
-
 	const int nWindows = 5;
 	PANEL *windowPanels[nWindows];
 	MENU	**menuList = calloc(nWindows, sizeof(*menuList));
@@ -770,8 +768,6 @@ main(int argc, char* argv[])
       menu_driver(menuList[PRIMARY], REQ_FIRST_ITEM);
 
 
-	licenceAccepted = false;
-
 	whichLocation = PRIMARY;
 
 	for (c = 0; c < nWindows; ++c)
@@ -916,11 +912,11 @@ main(int argc, char* argv[])
 			wnoutrefresh(windowList[whichLocation]);
 			doupdate();
 	}
+	bool licenceAccepted  = false;
+
 	if (menuList[LICENCE] != NULL) {
 		if (current_item(menuList[LICENCE]) == licenceItems[licenceYES])
 			licenceAccepted = true;
-		else
-			licenceAccepted = false;
 	}
 	unpost_menu(menuList[PRIMARY]);
 	/* XXX should be unpost all the menus? */
