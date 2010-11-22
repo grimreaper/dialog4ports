@@ -822,8 +822,6 @@ main(int argc, char* argv[])
 				/* it goes
 					primary -> [licence] -> exit -> ...
 
-					I'm not sure how to handle scrolling help text
-
 				*/
 				if (whichLocation == PRIMARY) {
 					if (arginfo->outputLicenceRequest)
