@@ -154,7 +154,7 @@ outputValues(MENU *menu)
 			outputBinaryValue(items[i], item_name(items[i])+strlen(preNameToken));
 		} else if (p->mode == USER_INPUT) {
 			if (p->value)
-				fprintf(stderr, "%s=%s\n", item_name(items[i]+strlen(preNameToken)), p->value);
+				fprintf(stderr, "%s=%s\n", item_name(items[i])+strlen(preNameToken), p->value);
 			else
 				fprintf(stderr, "%s=\n", item_name(items[i])+strlen(preNameToken));
 		}
