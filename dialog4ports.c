@@ -50,10 +50,11 @@ __FBSDID("$FreeBSD$");
 int
 printInCenter(WINDOW *win, const int row, const char * const str)
 {
+	int start;
 	const int cols = getmaxx(win);
 	if (cols == ERR)
 		errx(EX_SOFTWARE, "unable to determine number of columns");
-	const int start = (cols-(int)strlen(str))/2;
+	start = (cols-(int)strlen(str))/2;
       if (mvwaddstr(win, row, start, str) == ERR)
 		errx(EX_SOFTWARE, "unable to write string to center of screen for unknown reason");
 	return (start);
@@ -66,14 +67,15 @@ static char *
 getString(WINDOW *win, const char * const curVal)
 {
 	int e;
+	int messageStart;
 	const unsigned int bufSize = 80;
+	int row;
 	char mesg[]="Choose a new value: ";
 	char *str = calloc(bufSize, sizeof(char));
 	if (str == NULL)
 		errx(EX_OSERR, "Can not calloc for getting string");
 
-	int messageStart;
-	int row = getmaxy(win);
+	row = getmaxy(win);
 
 	messageStart = printInCenter(win, row/2, mesg);
 
@@ -225,7 +227,7 @@ parseArguments(const int argc, char * argv[])
 		READ_LTEXT, 	/* next thing to read is the licence text */
 		READ_PNAME, 	/* next thing is the port name */
 		READ_PCOMMENT,	/* next thing is the port comment */
-		PREV_HFILE,		/* next thing is prev's hfile */
+		PREV_HFILE		/* next thing is prev's hfile */
 	} stage;
 
 
@@ -307,6 +309,10 @@ parseArguments(const int argc, char * argv[])
 			}
 		}
 		else if (stage == NEXT_OPTION) {
+			bool gotName = false;
+			bool gotDescr = false;
+			bool gotOpts = false;
+
 			if (curr->mode == RADIOBOX) {
 				if (countChar(argv[arg], '=') < 2)
       	     			errx(EX_USAGE,"Radioboxes must contain at least 2");
@@ -317,9 +323,6 @@ parseArguments(const int argc, char * argv[])
 			}
 
 
-			bool gotName = false;
-			bool gotDescr = false;
-			bool gotOpts = false;
 			while((internal_token = strsep(&argv[arg], "=")) != NULL) {
 				if (!gotName) {
 					char *useName = calloc(strlen(internal_token) + strlen(preNameToken) + 1,sizeof(char));
@@ -479,6 +482,7 @@ main(int argc, char* argv[])
 	ITEM	**option_items;
 	ITEM	**exitItems;
 	ITEM	**licenceItems;
+	WINDOW **windowList;
 
 	bool weWantMore = true;
 	bool somethingChanged = false;
@@ -499,6 +503,8 @@ main(int argc, char* argv[])
 
 	const char selectedMark = '*';
 	unsigned int count;
+	int frameRows;
+	int frameCols;
 
 	int curTopRow;
 
@@ -594,12 +600,12 @@ main(int argc, char* argv[])
 		maybe I should make this a struct instead?
 	*/
 
-	WINDOW ** windowList = calloc (nWindows, sizeof(*windowList));
+	windowList = calloc (nWindows, sizeof(*windowList));
 	if (windowList == NULL)
 		errx(EX_OSERR, "window list is unfindable");
 
-	const int frameRows = getmaxy(stdscr);
-	const int frameCols = getmaxx(stdscr);
+	frameRows = getmaxy(stdscr);
+	frameCols = getmaxx(stdscr);
 
 	struct windowStats *windowStatList = calloc(nWindows, sizeof(*windowStatList));
 	windowStatList[HEAD].rowStart = 0;
