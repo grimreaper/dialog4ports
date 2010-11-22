@@ -68,7 +68,7 @@ getString(WINDOW *win, const char * const curVal)
 {
 	int e;
 	int messageStart;
-	const size_t bufSize = 80u;
+	const size_t bufSize = 80;
 	int row;
 	char mesg[]="Choose a new value: ";
 	char *str = calloc(bufSize, sizeof(char));
