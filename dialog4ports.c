@@ -679,8 +679,6 @@ main(int argc, char* argv[])
       post_menu(menuList[EXIT]);
       menu_driver(menuList[EXIT], REQ_FIRST_ITEM);
 	menu_driver(menuList[EXIT], REQ_TOGGLE_ITEM);
-	doupdate();
-
 
 	licenceItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
 	if (licenceItems == NULL)
@@ -713,9 +711,6 @@ main(int argc, char* argv[])
 		const char* const licenceAcceptedMessage = "The licence for this port has already been accepted or does not exist";
 		printInCenter(windowList[LICENCE], 1, licenceAcceptedMessage);
 	}
-	doupdate();
-
-
 
 	menu_opts_off(menuList[PRIMARY], O_SHOWDESC);
 	menu_opts_on(menuList[PRIMARY], O_NONCYCLIC);
@@ -730,7 +725,6 @@ main(int argc, char* argv[])
 	printInCenter(windowList[HEAD], startMenyWinRow/2, arginfo->portname);
 	if (arginfo->portcomment != NULL)
 		printInCenter(windowList[HEAD], startMenyWinRow/2 + 1, arginfo->portcomment);
-	doupdate();
 
 	if(has_colors() == TRUE) {
 		for (c = 0; c < nWindows; ++c) {
@@ -764,9 +758,6 @@ main(int argc, char* argv[])
 
 	menu_opts_off(menuList[PRIMARY],O_ONEVALUE);
 	post_menu(menuList[PRIMARY]);
-
-
-	doupdate();
 
 	/* toggling and truth have nothing to do with each other :-)
 	   so go thru each one, set the envrioment, and then return to top
@@ -854,7 +845,6 @@ main(int argc, char* argv[])
 				else if (whichLocation == EXIT)
 					whichLocation = PRIMARY;
       		      set_menu_fore(menuList[whichLocation], COLOR_PAIR(1) | A_REVERSE);
-				doupdate();
 				break;
 			case ' ':
 			case 10:
