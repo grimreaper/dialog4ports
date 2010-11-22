@@ -634,18 +634,8 @@ main(int argc, char* argv[])
 	windowStatList[HELP].rows = windowStatList[PRIMARY].rows;
 	windowStatList[HELP].cols = frameCols - windowStatList[PRIMARY].cols - 1;
 
-	int minRows;
-	int minCols;
-	for (c=0; c < nWindows; ++c) {
+	for (c=0; c < nWindows; ++c)
 		windowList[c] = newwin(windowStatList[c].rows, windowStatList[c].cols, windowStatList[c].rowStart, windowStatList[c].colStart);
-		minRows += windowStatList[c].rows;
-		minCols += windowStatList[c].rows;
-	}
-
-	if (frameRows < minRows || frameCols < minCols) {
-		errx(EX_UNAVAILABLE, "Terminal size is too small");
-	}
-
 
 	exitItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
 	if (exitItems == NULL)
