@@ -40,11 +40,9 @@ __FBSDID("$FreeBSD$");
 /*
 *	TODO	- change -hfile to wxs's method for taking long descr
 *	 --option WITH_FOO --hfile "FOO:long description" --wh
-*	TODO	- --min --max options
 *	TODO	- --requires option
 *	TODO - scrolling in help window
 *	TODO - Is it legal to modify the ptr after its set? (mitem_current)
-*	TODO - start only appears at next keystroke
 */
 
 /*
