@@ -788,7 +788,8 @@ main(int argc, char* argv[])
 	for (c = 0; c < nWindows; ++c)
 		windowPanels[c] = new_panel(windowList[c]);
 	update_panels();
-	wnoutrefresh(windowList[PRIMARY]); // get cursor to proper location
+	/* get cursor to proper location */
+	pos_menu_cursor(menuList[whichLocation]);
 	doupdate();
 
 	while(weWantMore) {
