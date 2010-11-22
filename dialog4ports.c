@@ -676,8 +676,6 @@ main(int argc, char* argv[])
 	licenceItems[licenceYES] = new_item("ACCEPT", "the licence");
 	licenceItems[2] = (ITEM*)NULL;
 
-	ITEM* licenceSelected = licenceItems[licenceNO];
-
 	if (arginfo->outputLicenceRequest) {
 		menuList[LICENCE] = new_menu(licenceItems);
 
@@ -788,9 +786,6 @@ main(int argc, char* argv[])
 		c = wgetch(windowList[whichLocation]);
 		curItem = current_item(menuList[whichLocation]);
 
-		if (arginfo->outputLicenceRequest)
-			if (whichLocation == LICENCE)
-				licenceSelected = curItem;
 		switch(c) {
 			case KEY_DOWN:
 				menu_driver(menuList[whichLocation], REQ_DOWN_ITEM);
