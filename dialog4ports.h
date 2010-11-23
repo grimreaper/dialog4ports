@@ -25,10 +25,10 @@ struct list_el {
 
 typedef struct list_el OptionEl;
 
-static char *
+char *
 getString(WINDOW *win, const char * const curVal);
 
-static unsigned int
+unsigned int
 countChar ( const char * const input, const char c );
 
 void
@@ -60,7 +60,7 @@ printInCenter(WINDOW * const win, const int row, const char * const str);
 void
 printFileToWindow(WINDOW * const win, const char * const filename);
 
-static void
+void
 usage(void);
 
 bool

@@ -63,7 +63,7 @@ printInCenter(WINDOW *win, const int row, const char * const str)
 /*
 * Asks the user for some data and returns the data entered
 */
-static char *
+char *
 getString(WINDOW *win, const char * const curVal)
 {
 	int e;
@@ -116,7 +116,7 @@ getString(WINDOW *win, const char * const curVal)
 /*
 * counts the occurences of a specified character in a string
 */
-static unsigned int
+unsigned int
 countChar ( const char * const input, const char c )
 {
 	unsigned int retval = 0;
@@ -440,7 +440,7 @@ printFileToWindow(WINDOW * const win, const char * const filename)
 /*
 * Outputs usage information and optionally errors out.
 */
-static void
+void
 usage(void) {
 	fprintf(stderr,"%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
 		"--port portname",
