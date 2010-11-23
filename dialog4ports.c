@@ -741,7 +741,7 @@ main(int argc, char* argv[])
 	menu_opts_off(menuList[PRIMARY],O_ONEVALUE);
 	post_menu(menuList[PRIMARY]);
 
-	/* toggling and truth have nothing to do with each other :-)
+	/*
 	   so go thru each one, set the envrioment, and then return to top
 	*/
 	for(count = 0; count < arginfo->nElements; ++count) {
@@ -750,7 +750,6 @@ main(int argc, char* argv[])
 		if (curr->value != NULL)
 		{
 			set_item_value(option_items[count], true);
-			menu_driver(menuList[PRIMARY], REQ_TOGGLE_ITEM);
 			if (curr->mode != RADIOBOX)
 				curr->name[1] = selectedMark;
 			else {
