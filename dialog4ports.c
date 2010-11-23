@@ -566,7 +566,7 @@ main(int argc, char* argv[])
 			count++;
 		} else {
 			char *tmpToken;
-			char *tmpOption = calloc(strlen(curr->options)+1, sizeof(char)); //XXX free this
+			char *tmpOption = calloc(strlen(curr->options)+1, sizeof(char));
 			if (tmpOption == NULL)
 				errx(EX_OSERR, "unable to make room for tmpOption");
 			strncpy(tmpOption, curr->options, strlen(curr->options));
@@ -920,8 +920,8 @@ main(int argc, char* argv[])
 		if (current_item(menuList[LICENCE]) == licenceItems[licenceYES])
 			licenceAccepted = true;
 	}
-	unpost_menu(menuList[PRIMARY]);
-	/* XXX should be unpost all the menus? */
+	for (c=0; c < nWindows; ++c)
+		unpost_menu(menuList[c]);
 	endwin(); /* get out of ncurses */
 	err_set_exit(NULL);
 
