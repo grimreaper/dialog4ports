@@ -1,7 +1,7 @@
 # To protect us from stupid errors (like running make nameclean in the root directory)
 NAME=dialog4ports
 
-CC = clang
+CC != ./whichCC.sh
 
 CFLAGS += -pipe -O3
 CFLAGS += -std=c99 
