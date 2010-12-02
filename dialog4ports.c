@@ -834,14 +834,13 @@ main(int argc, char* argv[])
 								fixEnabledOptions(option_items, item_index(curItem));
 						}
 						else {
-							p->value = NULL;
 							p->value = getString(windowList[PRIMARY],p->value);
 							if (p->value != NULL && strcmp("",p->value) != 0) {
 								if (item_value(curItem) != TRUE)
 									menu_driver(menuList[whichLocation], REQ_TOGGLE_ITEM);
 							}
 							else {
-								if (item_value(curItem) != FALSE)
+								if (item_value(curItem) == TRUE)
 									menu_driver(menuList[whichLocation], REQ_TOGGLE_ITEM);
 								p->value = NULL;
 							}
