@@ -879,34 +879,37 @@ main(int argc, char* argv[])
 			this rereads the file each time. perhaps it could be cached?
 		*/
 		wclear(windowList[HELP]);
-			if (whichLocation == PRIMARY ) {
-				OptionEl *p = (OptionEl*)item_userptr(current_item(menuList[whichLocation]));
-				if (p->longDescrFile != NULL) {
-					printFileToWindow(windowList[HELP], p->longDescrFile);
-				}
-				topChar = ACS_HLINE;
-				bottomChar = ACS_HLINE;
-				curTopRow = top_row(menuList[whichLocation]);
-				if (curTopRow == ERR)
-					errx(EX_SOFTWARE, "The current top row was unavailable");
-				if ((int)arginfo->nElements - curTopRow > nMenuRows)
-					bottomChar = ACS_DARROW;
-				if (curTopRow != 0)
-					topChar = ACS_UARROW;
-				wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
+		if (whichLocation == PRIMARY ) {
+			OptionEl *p = (OptionEl*)item_userptr(current_item(menuList[whichLocation]));
+			if (p->longDescrFile != NULL) {
+				printFileToWindow(windowList[HELP], p->longDescrFile);
 			}
-			else if (whichLocation == LICENCE) {
-				if (arginfo->licenceText != NULL)
-					printFileToWindow(windowList[HELP], arginfo->licenceText);
-				else if (arginfo->licenceName != NULL) {
-					printInCenter(windowList[HELP],windowStatList[HELP].rows/2, "This licence is the default");
-					printInCenter(windowList[HELP],windowStatList[HELP].rows/2 + 1, arginfo->licenceName);
-				}
+			topChar = ACS_HLINE;
+			bottomChar = ACS_HLINE;
+			curTopRow = top_row(menuList[whichLocation]);
+			if (curTopRow == ERR)
+				errx(EX_SOFTWARE, "The current top row was unavailable");
+			if ((int)arginfo->nElements - curTopRow > nMenuRows)
+				bottomChar = ACS_DARROW;
+			if (curTopRow != 0)
+				topChar = ACS_UARROW;
+			wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
+		}
+		else if (whichLocation == LICENCE) {
+			if (arginfo->licenceText != NULL)
+			{
+				wclear(windowList[HELP]);
+				printFileToWindow(windowList[HELP], arginfo->licenceText);
 			}
-			wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
-			wnoutrefresh(windowList[HELP]);
-			wnoutrefresh(windowList[whichLocation]);
-			doupdate();
+			else if (arginfo->licenceName != NULL) {
+				printInCenter(windowList[HELP],windowStatList[HELP].rows/2, "This licence is the default");
+				printInCenter(windowList[HELP],windowStatList[HELP].rows/2 + 1, arginfo->licenceName);
+			}
+		}
+		wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
+		wnoutrefresh(windowList[HELP]);
+		wnoutrefresh(windowList[whichLocation]);
+		doupdate();
 	}
 	bool licenceAccepted  = false;
 
