@@ -942,10 +942,9 @@ main(int argc, char* argv[])
 	for (count = 0; count < arginfo->nElements; ++count)
 		free_item(option_items[count]);
 
-	free_menu(menuList[PRIMARY]);
-	if (arginfo->outputLicenceRequest)
-		free_menu(menuList[LICENCE]);
-	free_menu(menuList[EXIT]);
+	for (count = 0; count < nWindows; ++c)
+		if (menuList[c] != null)
+			free_menu(menuList[c]);
 
 	curr = arginfo->head;
 	while (curr) {
