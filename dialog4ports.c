@@ -169,16 +169,12 @@ outputValues(MENU *menu)
 bool
 requiredItemsSelected(ITEM **items)
 {
-	int i;
-	bool allRequired = true;
-	i = 0;
-	while (items[i] != NULL) {
+	for (int i = 0; items[i] != NULL; ++i) {
 		OptionEl *p = (OptionEl*)item_userptr(items[i]);
 		if (p->required && p->value == NULL)
-			allRequired = false;
-		i++;
+			return false;
 	}
-	return allRequired;
+	return true;
 }
 
 /*
@@ -942,9 +938,9 @@ main(int argc, char* argv[])
 	for (count = 0; count < arginfo->nElements; ++count)
 		free_item(option_items[count]);
 
-	for (count = 0; count < nWindows; ++c)
-		if (menuList[c] != null)
-			free_menu(menuList[c]);
+	for (count = 0; count < nWindows; ++count)
+		if (menuList[count] != NULL)
+			free_menu(menuList[count]);
 
 	curr = arginfo->head;
 	while (curr) {
