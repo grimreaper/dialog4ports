@@ -883,6 +883,8 @@ main(int argc, char* argv[])
 			case 27: /* ESCAPE */
 				weWantMore = false;
 				break;
+			default:
+				continue;
 		}
 		/*
 			this rereads the file each time. perhaps it could be cached?
