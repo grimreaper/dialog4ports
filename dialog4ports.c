@@ -395,6 +395,9 @@ parseArguments(const int argc, char * argv[])
 	}
 #endif
 
+	if (arginfo->portname == NULL)
+		errx(EX_USAGE,"Port name is required");
+
 	if (arginfo->nElements == 0)
 		errx(EX_USAGE,"We need at least one option");
 
@@ -442,14 +445,15 @@ printFileToWindow(WINDOW * const win, const char * const filename)
 */
 void
 usage(void) {
-	fprintf(stderr,"%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
+	fprintf(stderr,"%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
 		"--port portname",
 		"[--port-comment 'port comment']",
 		"[--licence name of default licence]",
 		"[--licence-text filename of licence]",
 		"--option optionName=description [--hfile filename]",
 		"--radio optionName=description=option1#option2 [--hfile filename]",
-		"--input optionName=description [--hfile filename]"
+		"--input optionName=description [--hfile filename]",
+		"please note that this program is intended to be used by the ports system - not the end user"
 	);
 }
 
