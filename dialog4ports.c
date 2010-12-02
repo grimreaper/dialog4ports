@@ -846,21 +846,15 @@ main(int argc, char* argv[])
 							}
 						}
 					}
-					if (p->mode != RADIOBOX) {
-						if (item_value(curItem) == TRUE)
-							p->name[1] = selectedMark;
-						else
-							p->name[1] = ' ';
-					}
-					else {
-						/* I highly doubt this is defined or legal behavior */
+					char * name = p->name;
+					if (p->mode == RADIOBOX)
+						name =  (char*)item_name(curItem);
 
-						char * n = (char*)item_name(curItem);
-						if (item_value(curItem) == TRUE)
-							n[1] = selectedMark;
-						else
-							n[1] = ' ';
-					}
+					if (item_value(curItem) == TRUE)
+						name[1] = selectedMark;
+					else
+						name[1] = ' ';
+
 					/*
 						hack to get star to show up now instead of after next key movment
 					*/
