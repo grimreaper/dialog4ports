@@ -291,6 +291,7 @@ parseArguments(const int argc, char * argv[])
 				prev->next = curr;
 			if (strcmp("--option", argv[arg]) == 0) {
 				curr->mode = CHECKBOX;
+				curr->id = 99; //doesn't matter now
 				stage = NEXT_OPTION;
 			}
 			else if (strcmp("--radio", argv[arg]) == 0) {
@@ -300,6 +301,7 @@ parseArguments(const int argc, char * argv[])
 				stage = NEXT_OPTION;
 			}
 			else if (strcmp("--input", argv[arg]) == 0) {
+				curr->id = 99; //doesn't matter now
 				curr->mode = USER_INPUT;
 				stage = NEXT_OPTION;
 			}
@@ -360,7 +362,6 @@ parseArguments(const int argc, char * argv[])
 			curr->required = false;
 			curr->longDescrFile = NULL;
 			curr->longDescrText = NULL;
-			curr->id = 0;
 			prev = curr;
 			curr = curr->next;
 			stage = OPEN;
@@ -390,8 +391,8 @@ parseArguments(const int argc, char * argv[])
 #ifdef DEBUG
 	prev = arginfo->head;
 	while (prev) {
-		printf("YZ:\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n------\n",
-				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode);
+		printf("YZ:\n \n\tname=%s \n\toptions=%s \n\tdescr=%s \n\tvalue=%s, \n\tlongDescrFile=%s \n\tmode=%d\n\tid=%d\n------\n",
+				prev->name, prev->options, prev->descr, prev->value, prev->longDescrFile, prev->mode, prev->id);
 		prev = prev->next;
 	}
 #endif
