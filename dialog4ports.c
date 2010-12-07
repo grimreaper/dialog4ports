@@ -296,6 +296,7 @@ parseArguments(const int argc, char * argv[])
 			else if (strcmp("--radio", argv[arg]) == 0) {
 				curr->mode = RADIOBOX;
 				curr->id = radioID;
+				radioID++;
 				stage = NEXT_OPTION;
 			}
 			else if (strcmp("--input", argv[arg]) == 0) {
@@ -336,6 +337,7 @@ parseArguments(const int argc, char * argv[])
 							break;
 						case RADIOBOX:
 							useName[0] = '(';
+							useName[1] = '0' + curr->id;
 							useName[2] = ')';
 						break;
 						case USER_INPUT:
@@ -750,17 +752,21 @@ main(int argc, char* argv[])
 	for(count = 0; count < arginfo->nElements; ++count) {
             curr = (OptionEl*)item_userptr(option_items[count]);
 		curr->value = getenv(curr->name + strlen(preNameToken));
+		char * n;;
+		if (curr->mode == RADIOBOX) {
+			/* I highly doubt this is defined or legal behavior */
+			n = (char*)item_name(option_items[count]);
+		}
+		else {
+			n = curr->name;
+		}
 		if (curr->value != NULL)
 		{
-			char * n;;
 			set_item_value(option_items[count], true);
-			if (curr->mode != RADIOBOX)
-				n = curr->name;
-			else {
-				/* I highly doubt this is defined or legal behavior */
-				n = (char*)item_name(option_items[count]);
-			}
 			n[1] = selectedMark;
+		}
+		else if (curr->mode == RADIOBOX ) {
+			n[1] = '0' + curr->id;
 		}
 		if (curr->mode == CHECKBOX && curr->required) {
 			set_item_value(option_items[count], true);
@@ -856,8 +862,12 @@ main(int argc, char* argv[])
 
 					if (item_value(curItem) == TRUE)
 						name[1] = selectedMark;
-					else
-						name[1] = ' ';
+					else {
+            				if (p->mode == RADIOBOX )
+                  				name[1] = '0' + p->id;
+						else
+                 					name[1] = ' ';
+					}
 
 					/*
 						hack to get star to show up now instead of after next key movment
