@@ -15,6 +15,7 @@ struct list_el {
 	const char *descr;
 	const char *longDescrFile;
 	const char *longDescrText;
+	unsigned int id;
 	enum OPTION_TYPE mode;
 	char *name;
 	struct list_el *next;

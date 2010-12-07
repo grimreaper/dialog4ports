@@ -212,6 +212,7 @@ parseArguments(const int argc, char * argv[])
 	OptionEl *curr = NULL;
 	OptionEl *prev = NULL;
 	const char* internal_token = NULL;
+	unsigned int radioID = 0;
 
 #ifdef DEBUG
 	for (arg=0; arg < argc; ++arg)
@@ -294,6 +295,7 @@ parseArguments(const int argc, char * argv[])
 			}
 			else if (strcmp("--radio", argv[arg]) == 0) {
 				curr->mode = RADIOBOX;
+				curr->id = radioID;
 				stage = NEXT_OPTION;
 			}
 			else if (strcmp("--input", argv[arg]) == 0) {
@@ -356,6 +358,7 @@ parseArguments(const int argc, char * argv[])
 			curr->required = false;
 			curr->longDescrFile = NULL;
 			curr->longDescrText = NULL;
+			curr->id = 0;
 			prev = curr;
 			curr = curr->next;
 			stage = OPEN;
@@ -749,14 +752,15 @@ main(int argc, char* argv[])
 		curr->value = getenv(curr->name + strlen(preNameToken));
 		if (curr->value != NULL)
 		{
+			char * n;;
 			set_item_value(option_items[count], true);
 			if (curr->mode != RADIOBOX)
-				curr->name[1] = selectedMark;
+				n = curr->name;
 			else {
 				/* I highly doubt this is defined or legal behavior */
-				char * n = (char*)item_name(option_items[count]);
-				n[1] = selectedMark;
+				n = (char*)item_name(option_items[count]);
 			}
+			n[1] = selectedMark;
 		}
 		if (curr->mode == CHECKBOX && curr->required) {
 			set_item_value(option_items[count], true);
