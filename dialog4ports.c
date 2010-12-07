@@ -694,7 +694,7 @@ main(int argc, char* argv[])
 		printInCenter(windowList[LICENCE], 1, licenceAcceptedMessage);
 	}
 
-	menu_opts_off(menuList[PRIMARY], O_SHOWDESC);
+	menu_opts_on(menuList[PRIMARY], O_SHOWDESC);
 	menu_opts_on(menuList[PRIMARY], O_NONCYCLIC);
 
 	/* we want to leave 3 lines for the title */
