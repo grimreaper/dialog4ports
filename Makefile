@@ -21,7 +21,7 @@ CFLAGS += -Wmissing-format-attribute
 #CFLAGS += -Wlogical-op -Wnormalized=nfc
 CFLAGS += -Wimport -Wunused-macros
 
-CFLAGS += -lpanelw -lmenuw -lncursesw
+CFLAGS += -lmenuw -lncursesw
 
 nameclean: .NOTMAIN .USE .EXEC .IGNORE .PHONY
 	rm -f ./$(NAME)

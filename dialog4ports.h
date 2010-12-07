@@ -1,7 +1,6 @@
 #define _POSIX_C_SOURCE
 #include <menu.h>
 #include <ncurses.h>
-#include <panel.h>
 
 #include <stdbool.h>
 

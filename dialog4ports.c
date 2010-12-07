@@ -500,7 +500,6 @@ main(int argc, char* argv[])
 
 
 	const int nWindows = 5;
-	PANEL *windowPanels[nWindows];
 	MENU	**menuList = calloc(nWindows, sizeof(*menuList));
 	if (menuList == NULL)
 		errx(EX_OSERR, "unable to make room for menu list");
@@ -782,9 +781,6 @@ main(int argc, char* argv[])
 
 	whichLocation = PRIMARY;
 
-	for (c = 0; c < nWindows; ++c)
-		windowPanels[c] = new_panel(windowList[c]);
-	update_panels();
 	/* get cursor to proper location */
 	pos_menu_cursor(menuList[whichLocation]);
 	doupdate();
