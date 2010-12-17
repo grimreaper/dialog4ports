@@ -783,6 +783,10 @@ main(int argc, char* argv[])
 
 	/* get cursor to proper location */
 	pos_menu_cursor(menuList[whichLocation]);
+	for (int i = 0; i < nWindows; ++i) {
+		if (windowList[i] != NULL)
+			wrefresh(windowList[i]);
+	}
 	doupdate();
 
 	while(weWantMore) {
@@ -918,8 +922,8 @@ main(int argc, char* argv[])
 			}
 		}
 		wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
-		wnoutrefresh(windowList[HELP]);
-		wnoutrefresh(windowList[whichLocation]);
+		wrefresh(windowList[HELP]);
+		wrefresh(windowList[whichLocation]);
 		doupdate();
 	}
 	bool licenceAccepted  = false;
