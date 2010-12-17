@@ -1,4 +1,4 @@
-/*-
+q/*-
 * Copyright 2010 by Eitan Adler
 * Copyright 2001 by Pradeep Padala.
 
@@ -34,6 +34,7 @@ __FBSDID("$FreeBSD$");
 #include <string.h>
 #include <stdio.h>
 #include <sysexits.h>
+#include <sys/errno.h>
 
 #include "dialog4ports.h"
 
@@ -879,6 +880,25 @@ main(int argc, char* argv[])
 					menu_driver(menuList[whichLocation], REQ_UP_ITEM);
 
 					pos_menu_cursor(menuList[whichLocation]) ;
+				}
+				else if (whichLocation == LICENCE) {
+					if (curItem == licenceItems[licenceVIEW]) {
+						char const * const pager = getenv("PAGER");
+						const int pid = fork();
+						if (pid == 0) {
+							endwin();
+							int e = execl(pager, pager, arginfo->licenceText,NULL);
+							if (e == -1)
+								errx(EX_OSERR,"failed to exec: %d", errno);
+							refresh();
+						}
+						else if (pid == -1)
+							errx(EX_OSERR, "Can't fork");
+						else {
+							wait(pid);
+							//exit(41);
+						}
+					}
 				}
 				else if (whichLocation == EXIT) {
 					if (curItem == exitItems[exitOK])
