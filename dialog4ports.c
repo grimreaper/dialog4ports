@@ -642,7 +642,7 @@ main(int argc, char* argv[])
 	for (c=0; c < nWindows; ++c)
 		windowList[c] = newwin(windowStatList[c].rows, windowStatList[c].cols, windowStatList[c].rowStart, windowStatList[c].colStart);
 
-	exitItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
+	exitItems = (ITEM**)calloc(3 + 1, sizeof(ITEM*));
 	if (exitItems == NULL)
 		errx(EX_OSERR, "unable to make room for exitItems");
 
@@ -677,9 +677,11 @@ main(int argc, char* argv[])
 	/* default to no... */
 	const int licenceNO = 0;
 	const int licenceYES  = 1;
+	const int licenceVIEW = 2;
 	licenceItems[licenceNO] = new_item("REJECT", "the licence");
 	licenceItems[licenceYES] = new_item("ACCEPT", "the licence");
-	licenceItems[2] = (ITEM*)NULL;
+	licenceItems[licenceVIEW] = new_item("VIEW", "the licence");
+	licenceItems[3] = (ITEM*)NULL;
 
 	if (arginfo->outputLicenceRequest) {
 		menuList[LICENCE] = new_menu(licenceItems);
@@ -687,7 +689,7 @@ main(int argc, char* argv[])
 	      set_menu_win(menuList[LICENCE], windowList[LICENCE]);
       	set_menu_sub(menuList[LICENCE], derwin(windowList[LICENCE], windowStatList[LICENCE].rows, windowStatList[LICENCE].cols, 1, 0));
 		/* 1 row - 2 cols for ok/cancel */
-      	set_menu_format(menuList[LICENCE], 1, 2);
+      	set_menu_format(menuList[LICENCE], 1, 3);
 		set_menu_mark(menuList[LICENCE], ">");
 
 
