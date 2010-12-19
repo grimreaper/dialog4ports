@@ -631,15 +631,16 @@ main(int argc, char* argv[])
 	else
 		windowStatList[LICENCE].colStart = 0;
 
+	windowStatList[HELP].rowStart = frameCols - windowStatList[EXIT].rows - windowStatList[LICENCE].rows;
+	windowStatList[HELP].colStart = 0 ;
+	windowStatList[HELP].rows = 4;
+	windowStatList[HELP].cols = frameCols;
+
 	windowStatList[PRIMARY].rowStart = windowStatList[HEAD].rows + 1;
 	windowStatList[PRIMARY].colStart = 0;
-	windowStatList[PRIMARY].rows = frameRows - windowStatList[LICENCE].rows - windowStatList[EXIT].rows - 4;
-	windowStatList[PRIMARY].cols = frameCols / 2;
-
-	windowStatList[HELP].rowStart = windowStatList[HEAD].rows + 1;
-	windowStatList[HELP].colStart = windowStatList[PRIMARY].cols + 1;
-	windowStatList[HELP].rows = windowStatList[PRIMARY].rows;
-	windowStatList[HELP].cols = frameCols - windowStatList[PRIMARY].cols - 1;
+	windowStatList[PRIMARY].rows = frameRows - windowStatList[LICENCE].rows -
+						windowStatList[EXIT].rows - windowStatList[HELP].rows - 4;
+	windowStatList[PRIMARY].cols = frameCols ;
 
 	for (c=0; c < nWindows; ++c)
 		windowList[c] = newwin(windowStatList[c].rows, windowStatList[c].cols, windowStatList[c].rowStart, windowStatList[c].colStart);
