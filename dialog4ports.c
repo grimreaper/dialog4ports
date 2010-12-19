@@ -35,6 +35,7 @@ __FBSDID("$FreeBSD$");
 #include <stdio.h>
 #include <sysexits.h>
 #include <sys/errno.h>
+#include <unistd.h>
 
 #include "dialog4ports.h"
 
@@ -612,14 +613,14 @@ main(int argc, char* argv[])
 	windowStatList[HEAD].cols = frameCols;
 	windowStatList[HEAD].rows = 3;
 
-	windowStatList[EXIT].rows = 3;
+	windowStatList[EXIT].rows = 2;
 	windowStatList[EXIT].cols = frameCols;
 	windowStatList[EXIT].rowStart = frameRows - windowStatList[EXIT].rows;
 	/* menu == sizeof(largest item) + 1 space for each item */
 	const int full_exit_menu_size = (int)strlen("CANCEL")*2+1;
 	windowStatList[EXIT].colStart = (frameCols - full_exit_menu_size)/2;
 
-	windowStatList[LICENCE].rows = 3;
+	windowStatList[LICENCE].rows = 2;
 	windowStatList[LICENCE].cols = frameCols;
 	windowStatList[LICENCE].rowStart = windowStatList[EXIT].rowStart - windowStatList[LICENCE].rows;
 	/* menu == sizeof(largest item) + 1 space for each item */
@@ -884,19 +885,20 @@ main(int argc, char* argv[])
 				else if (whichLocation == LICENCE) {
 					if (curItem == licenceItems[licenceVIEW]) {
 						char const * const pager = getenv("PAGER");
-						const int pid = fork();
+						const int pid = rfork(RFPROC|RFCFDG);
 						if (pid == 0) {
-							endwin();
+							//endwin();
+//							close(0);
+//							close(1);
+//							close(2);
 							int e = execl(pager, pager, arginfo->licenceText,NULL);
 							if (e == -1)
 								errx(EX_OSERR,"failed to exec: %d", errno);
-							refresh();
 						}
 						else if (pid == -1)
 							errx(EX_OSERR, "Can't fork");
 						else {
 							wait(pid);
-							//exit(41);
 						}
 					}
 				}
