@@ -965,7 +965,6 @@ main(int argc, char* argv[])
 		wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
 		wrefresh(windowList[HELP]);
 		wrefresh(windowList[whichLocation]);
-		doupdate();
 	}
 	bool licenceAccepted  = false;
 
