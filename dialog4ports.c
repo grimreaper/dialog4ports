@@ -903,10 +903,6 @@ main(int argc, char* argv[])
 						endwin();
 						const pid_t pid = fork();
 						if (pid == 0) {
-							//endwin();
-//							close(0);
-//							close(1);
-//							close(2);
 							int e = execl(pager, pager, arginfo->licenceText,NULL);
 							if (e == -1)
 								errx(EX_OSERR,"failed to exec: %d", errno);
