@@ -701,6 +701,7 @@ main(int argc, char* argv[])
 
 	if (arginfo->outputLicenceRequest) {
 		menuList[LICENCE] = new_menu(licenceItems);
+		//menu_opts_off(menuList[LICENCE], O_ONEVALUE);
 
 	      set_menu_win(menuList[LICENCE], windowList[LICENCE]);
       	set_menu_sub(menuList[LICENCE], derwin(windowList[LICENCE], windowStatList[LICENCE].rows, windowStatList[LICENCE].cols, 1, 0));
@@ -960,8 +961,6 @@ main(int argc, char* argv[])
 			}
 		}
 		wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
-		wrefresh(windowList[HELP]);
-		box(windowList[HELP], ACS_PI, ACS_PI);
 		wrefresh(windowList[HELP]);
 		wrefresh(windowList[whichLocation]);
 		doupdate();
