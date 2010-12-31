@@ -385,6 +385,8 @@ parseArguments(const int argc, char * argv[])
 			stage = OPEN;
 		}
 		else if (stage == PREV_HFILE) {
+			if (prev == NULL)
+				errx(EX_USAGE, "--hfile requires previous --option, --radio or --input option.");
 			prev->longDescrFile = argv[arg];
 			stage = OPEN;
 		}
@@ -632,7 +634,7 @@ main(int argc, char* argv[])
 	else
 		windowStatList[LICENCE].colStart = 0;
 
-	windowStatList[HELP].rowStart = frameCols - windowStatList[EXIT].rows - windowStatList[LICENCE].rows;
+	windowStatList[HELP].rowStart = frameRows - windowStatList[EXIT].rows - windowStatList[LICENCE].rows;
 	windowStatList[HELP].colStart = 0 ;
 	windowStatList[HELP].rows = 6;
 	windowStatList[HELP].cols = frameCols;
