@@ -35,6 +35,8 @@ __FBSDID("$FreeBSD$");
 #include <stdio.h>
 #include <sysexits.h>
 #include <sys/errno.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 #include <unistd.h>
 
 #include "dialog4ports.h"
@@ -897,10 +899,9 @@ main(int argc, char* argv[])
 				else if (whichLocation == LICENCE) {
 					if (curItem == licenceItems[licenceVIEW]) {
 						char const * const pager = getenv("PAGER");
-						//const int pid = rfork(RFPROC|RFCFDG);
 						def_prog_mode();
 						endwin();
-						const int pid = fork();
+						const pid_t pid = fork();
 						if (pid == 0) {
 							//endwin();
 //							close(0);
@@ -913,7 +914,7 @@ main(int argc, char* argv[])
 						else if (pid == -1)
 							errx(EX_OSERR, "Can't fork");
 						else {
-							wait(pid);
+							waitpid(pid, NULL, 0);
 						}
 						reset_prog_mode();
 						wrefresh(curscr);
