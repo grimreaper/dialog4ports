@@ -634,20 +634,28 @@ main(int argc, char* argv[])
 	else
 		windowStatList[LICENCE].colStart = 0;
 
-	windowStatList[HELP].rowStart = frameRows - windowStatList[EXIT].rows - windowStatList[LICENCE].rows;
-	windowStatList[HELP].colStart = 0 ;
 	windowStatList[HELP].rows = 6;
 	windowStatList[HELP].cols = frameCols;
+	windowStatList[HELP].rowStart = windowStatList[LICENCE].rowStart - windowStatList[HELP].rows;
+	windowStatList[HELP].colStart = 0 ;
 
 	windowStatList[PRIMARY].rowStart = windowStatList[HEAD].rows + 1;
 	windowStatList[PRIMARY].colStart = 0;
-	windowStatList[PRIMARY].rows = frameRows - windowStatList[LICENCE].rows -
-						windowStatList[EXIT].rows - windowStatList[HELP].rows - 8;
+	windowStatList[PRIMARY].rows = windowStatList[HELP].rowStart - windowStatList[HEAD].rows;
 	windowStatList[PRIMARY].cols = frameCols ;
 
-	for (c=0; c < nWindows; ++c)
+//	endwin();
+	printf("FrameRows: %d\n",frameRows);
+	for (c=0; c < nWindows; ++c) {
 		windowList[c] = newwin(windowStatList[c].rows, windowStatList[c].cols, windowStatList[c].rowStart, windowStatList[c].colStart);
-	box(windowList[HELP],ACS_PI,ACS_PI);
+		if (windowList[c] == NULL)
+			errx(EX_OSERR,"Ahh! a window has not been created!");
+		printf("Window %d\n\t rows = %d\n\t cols = %d \n\t rowStart = %d \n\t colStart = %d \n" ,
+			c,windowStatList[c].rows, windowStatList[c].cols, windowStatList[c].rowStart, windowStatList[c].colStart);
+	}
+	printf("0 HEAD, 1 PRIMARY, 2 HELP, 3 LICENCE, 4 EXIT");
+//	exit(42);
+	//box(windowList[HELP],ACS_PI,ACS_PI);
 	exitItems = (ITEM**)calloc(3 + 1, sizeof(ITEM*));
 	if (exitItems == NULL)
 		errx(EX_OSERR, "unable to make room for exitItems");
