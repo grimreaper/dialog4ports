@@ -415,6 +415,7 @@ parseArguments(const int argc, char * argv[])
 void
 printFileToWindow(WINDOW * const win, const char * const filename)
 {
+	//exit (99);
 	int row;
 	int maxCols;
 	/* function fileToWindow ? */
@@ -633,18 +634,18 @@ main(int argc, char* argv[])
 
 	windowStatList[HELP].rowStart = frameCols - windowStatList[EXIT].rows - windowStatList[LICENCE].rows;
 	windowStatList[HELP].colStart = 0 ;
-	windowStatList[HELP].rows = 4;
+	windowStatList[HELP].rows = 6;
 	windowStatList[HELP].cols = frameCols;
 
 	windowStatList[PRIMARY].rowStart = windowStatList[HEAD].rows + 1;
 	windowStatList[PRIMARY].colStart = 0;
 	windowStatList[PRIMARY].rows = frameRows - windowStatList[LICENCE].rows -
-						windowStatList[EXIT].rows - windowStatList[HELP].rows - 4;
+						windowStatList[EXIT].rows - windowStatList[HELP].rows - 8;
 	windowStatList[PRIMARY].cols = frameCols ;
 
 	for (c=0; c < nWindows; ++c)
 		windowList[c] = newwin(windowStatList[c].rows, windowStatList[c].cols, windowStatList[c].rowStart, windowStatList[c].colStart);
-
+	box(windowList[HELP],ACS_PI,ACS_PI);
 	exitItems = (ITEM**)calloc(3 + 1, sizeof(ITEM*));
 	if (exitItems == NULL)
 		errx(EX_OSERR, "unable to make room for exitItems");
@@ -886,7 +887,8 @@ main(int argc, char* argv[])
 				else if (whichLocation == LICENCE) {
 					if (curItem == licenceItems[licenceVIEW]) {
 						char const * const pager = getenv("PAGER");
-						const int pid = rfork(RFPROC|RFCFDG);
+						//const int pid = rfork(RFPROC|RFCFDG);
+						const int pid = fork();
 						if (pid == 0) {
 							//endwin();
 //							close(0);
@@ -947,6 +949,8 @@ main(int argc, char* argv[])
 			}
 		}
 		wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
+		wrefresh(windowList[HELP]);
+		box(windowList[HELP], ACS_PI, ACS_PI);
 		wrefresh(windowList[HELP]);
 		wrefresh(windowList[whichLocation]);
 		doupdate();
