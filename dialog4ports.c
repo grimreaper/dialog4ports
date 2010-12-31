@@ -59,7 +59,7 @@ printInCenter(WINDOW *win, const int row, const char * const str)
 	if (cols == ERR)
 		errx(EX_SOFTWARE, "unable to determine number of columns");
 	start = (cols-(int)strlen(str))/2;
-      if (mvwaddstr(win, row, start, str) == ERR)
+	if (mvwaddstr(win, row, start, str) == ERR)
 		errx(EX_SOFTWARE, "unable to write string to center of screen for unknown reason");
 	return (start);
 }
@@ -321,11 +321,11 @@ parseArguments(const int argc, char * argv[])
 
 			if (curr->mode == RADIOBOX) {
 				if (countChar(argv[arg], '=') < 2)
-      	     			errx(EX_USAGE,"Radioboxes must contain at least 2");
+					errx(EX_USAGE,"Radioboxes must contain at least 2");
 			}
 			else {
 				if (countChar(argv[arg], '=') != 1)
-      	     			errx(EX_USAGE,"Options must contain exactly one equals sign [ %s ]", argv[arg]);
+					errx(EX_USAGE,"Options must contain exactly one equals sign [ %s ]", argv[arg]);
 			}
 
 
@@ -490,7 +490,7 @@ main(int argc, char* argv[])
 	/* create the linked list that I work with later */
 
 	/* culot: better use sys/queue.h instead of your own linked list implementation.
-	   It will be easier to maintain, see queue(3). */
+	 * It will be easier to maintain, see queue(3). */
 	OptionEl *curr = NULL;
 	OptionEl *next = NULL;
 
@@ -556,9 +556,9 @@ main(int argc, char* argv[])
 
 	if(has_colors() == TRUE) {
 		start_color();
-		init_pair(1, colorList[0][0], colorList[0][1]);   /* selected */
-		init_pair(2, colorList[1][0], colorList[1][1]);	/* selectable */
-		init_pair(3, colorList[2][0], colorList[2][1]); 	/* disabled */
+		init_pair(1, colorList[0][0], colorList[0][1]); /* selected */
+		init_pair(2, colorList[1][0], colorList[1][1]); /* selectable */
+		init_pair(3, colorList[2][0], colorList[2][1]); /* disabled */
 	}
 
 	cbreak();
@@ -589,10 +589,10 @@ main(int argc, char* argv[])
 					errx(EX_OSERR, "unable to make room for useName");
 				strcpy(useName, preNameToken);
 				strcat(useName, tmpToken);
-                        useName[0] = '(';
-                        useName[2] = ')';
-	                  option_items[count] = new_item(useName, curr->descr);
-	                  set_item_userptr(option_items[count], curr);
+				useName[0] = '(';
+				useName[2] = ')';
+				option_items[count] = new_item(useName, curr->descr);
+				set_item_userptr(option_items[count], curr);
 				count++;
 			}
 			free(tmpOption);
@@ -631,7 +631,7 @@ main(int argc, char* argv[])
 	/* menu == sizeof(largest item) + 1 space for each item */
 	const int full_licence_menu_size = (int)(strlen("ACCEPT")+strlen("the licence"))*2+1;
 	/* Hack because menu ignores starting location */
-      if (arginfo->outputLicenceRequest)
+	if (arginfo->outputLicenceRequest)
 		windowStatList[LICENCE].colStart = (frameCols - full_licence_menu_size)/2;
 	else
 		windowStatList[LICENCE].colStart = 0;
@@ -670,19 +670,19 @@ main(int argc, char* argv[])
 
 	for (c = 0; c < 1; ++c) {
 		if (exitItems[c] == NULL)
-			errx(EX_OSERR, "Bad null in  exitItems");
+			errx(EX_OSERR, "Bad null in exitItems");
 	}
 
 	menuList[EXIT] = new_menu(exitItems);
 
-      set_menu_win(menuList[EXIT], windowList[EXIT]);
-      set_menu_sub(menuList[EXIT], derwin(windowList[EXIT], windowStatList[EXIT].rows, windowStatList[EXIT].cols, 0, 0));
+	set_menu_win(menuList[EXIT], windowList[EXIT]);
+	set_menu_sub(menuList[EXIT], derwin(windowList[EXIT], windowStatList[EXIT].rows, windowStatList[EXIT].cols, 0, 0));
 	/* 1 row - 2 cols for ok/cancel */
-      set_menu_format(menuList[EXIT], 1, 2);
+	set_menu_format(menuList[EXIT], 1, 2);
 	set_menu_mark(menuList[EXIT], ">");
 
-      post_menu(menuList[EXIT]);
-      menu_driver(menuList[EXIT], REQ_FIRST_ITEM);
+	post_menu(menuList[EXIT]);
+	menu_driver(menuList[EXIT], REQ_FIRST_ITEM);
 	menu_driver(menuList[EXIT], REQ_TOGGLE_ITEM);
 
 	licenceItems = (ITEM**)calloc(2 + 1, sizeof(ITEM*));
@@ -692,7 +692,7 @@ main(int argc, char* argv[])
 
 	/* default to no... */
 	const int licenceNO = 0;
-	const int licenceYES  = 1;
+	const int licenceYES = 1;
 	const int licenceVIEW = 2;
 	licenceItems[licenceNO] = new_item("REJECT", "the licence");
 	licenceItems[licenceYES] = new_item("ACCEPT", "the licence");
@@ -703,14 +703,14 @@ main(int argc, char* argv[])
 		menuList[LICENCE] = new_menu(licenceItems);
 		//menu_opts_off(menuList[LICENCE], O_ONEVALUE);
 
-	      set_menu_win(menuList[LICENCE], windowList[LICENCE]);
-      	set_menu_sub(menuList[LICENCE], derwin(windowList[LICENCE], windowStatList[LICENCE].rows, windowStatList[LICENCE].cols, 1, 0));
+		set_menu_win(menuList[LICENCE], windowList[LICENCE]);
+		set_menu_sub(menuList[LICENCE], derwin(windowList[LICENCE], windowStatList[LICENCE].rows, windowStatList[LICENCE].cols, 1, 0));
 		/* 1 row - 2 cols for ok/cancel */
-      	set_menu_format(menuList[LICENCE], 1, 3);
+		set_menu_format(menuList[LICENCE], 1, 3);
 		set_menu_mark(menuList[LICENCE], ">");
 
 
-	      post_menu(menuList[LICENCE]);
+		post_menu(menuList[LICENCE]);
 		menu_driver(menuList[LICENCE], REQ_TOGGLE_ITEM);
 	}
 	else {
@@ -759,17 +759,17 @@ main(int argc, char* argv[])
 	if (arginfo->nElements > (unsigned int)nMenuRows)
 		bottomChar = ACS_DARROW;
 
-	wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar,  0, 0, 0, 0);
-	wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE,  0, 0, 0, 0);
+	wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
+	wborder(windowList[HELP], ACS_VLINE, ACS_VLINE, ACS_HLINE, ACS_HLINE, 0, 0, 0, 0);
 
 	menu_opts_off(menuList[PRIMARY],O_ONEVALUE);
 	post_menu(menuList[PRIMARY]);
 
 	/*
-	   so go thru each one, set the envrioment, and then return to top
+	 * so go thru each one, set the envrioment, and then return to top
 	*/
 	for(count = 0; count < arginfo->nElements; ++count) {
-            curr = (OptionEl*)item_userptr(option_items[count]);
+		curr = (OptionEl*)item_userptr(option_items[count]);
 		curr->value = getenv(curr->name + strlen(preNameToken));
 		char * n;;
 		if (curr->mode == RADIOBOX) {
@@ -793,9 +793,9 @@ main(int argc, char* argv[])
 			curr->name[1] = selectedMark;
 /*			item_opts_off(option_items[count], O_SELECTABLE);	*/
 		}
-            menu_driver(menuList[PRIMARY], REQ_DOWN_ITEM);
+		menu_driver(menuList[PRIMARY], REQ_DOWN_ITEM);
 	}
-      menu_driver(menuList[PRIMARY], REQ_FIRST_ITEM);
+	menu_driver(menuList[PRIMARY], REQ_FIRST_ITEM);
 
 
 	whichLocation = PRIMARY;
@@ -832,7 +832,7 @@ main(int argc, char* argv[])
 			case KEY_PPAGE:
 				menu_driver(menuList[PRIMARY], REQ_SCR_UPAGE);
 				break;
-			case  9: /* tab */
+			case 9: /* tab */
 				/* it goes
 					primary -> [licence] -> exit -> ...
 
@@ -878,15 +878,15 @@ main(int argc, char* argv[])
 					}
 					char * name = p->name;
 					if (p->mode == RADIOBOX)
-						name =  (char*)item_name(curItem);
+						name = (char*)item_name(curItem);
 
 					if (item_value(curItem) == TRUE)
 						name[1] = selectedMark;
 					else {
-            				if (p->mode == RADIOBOX )
-                  				name[1] = '0' + p->id;
+						if (p->mode == RADIOBOX )
+							name[1] = '0' + p->id;
 						else
-                 					name[1] = ' ';
+							name[1] = ' ';
 					}
 
 					/*
@@ -966,7 +966,7 @@ main(int argc, char* argv[])
 		wrefresh(windowList[HELP]);
 		wrefresh(windowList[whichLocation]);
 	}
-	bool licenceAccepted  = false;
+	bool licenceAccepted = false;
 
 	if (menuList[LICENCE] != NULL) {
 		if (current_item(menuList[LICENCE]) == licenceItems[licenceYES])
