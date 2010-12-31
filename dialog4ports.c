@@ -1,4 +1,4 @@
-q/*-
+/*-
 * Copyright 2010 by Eitan Adler
 * Copyright 2001 by Pradeep Padala.
 
@@ -35,8 +35,8 @@ __FBSDID("$FreeBSD$");
 #include <stdio.h>
 #include <sysexits.h>
 #include <sys/errno.h>
-#include <sys/time.h>
-#include <sys/resource.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include "dialog4ports.h"
