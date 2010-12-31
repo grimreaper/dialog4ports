@@ -888,6 +888,8 @@ main(int argc, char* argv[])
 					if (curItem == licenceItems[licenceVIEW]) {
 						char const * const pager = getenv("PAGER");
 						//const int pid = rfork(RFPROC|RFCFDG);
+						def_prog_mode();
+						endwin();
 						const int pid = fork();
 						if (pid == 0) {
 							//endwin();
@@ -903,6 +905,8 @@ main(int argc, char* argv[])
 						else {
 							wait(pid);
 						}
+						reset_prog_mode();
+						wrefresh(curscr);
 					}
 				}
 				else if (whichLocation == EXIT) {
