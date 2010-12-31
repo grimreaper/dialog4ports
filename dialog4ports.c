@@ -643,7 +643,7 @@ main(int argc, char* argv[])
 
 	windowStatList[PRIMARY].rowStart = windowStatList[HEAD].rows + 1;
 	windowStatList[PRIMARY].colStart = 0;
-	windowStatList[PRIMARY].rows = windowStatList[HELP].rowStart - windowStatList[HEAD].rows;
+	windowStatList[PRIMARY].rows = windowStatList[HELP].rowStart - windowStatList[HEAD].rows - 1;
 	windowStatList[PRIMARY].cols = frameCols ;
 
 //	endwin();
@@ -932,8 +932,10 @@ main(int argc, char* argv[])
 		/*
 			this rereads the file each time. perhaps it could be cached?
 		*/
-		wclear(windowList[HELP]);
+		/* don't wclear help unless we need to; this results in some cases of stale text
+		in the help window */
 		if (whichLocation == PRIMARY ) {
+			wclear(windowList[HELP]);
 			OptionEl *p = (OptionEl*)item_userptr(current_item(menuList[whichLocation]));
 			if (p->longDescrFile != NULL) {
 				printFileToWindow(windowList[HELP], p->longDescrFile);
@@ -950,9 +952,9 @@ main(int argc, char* argv[])
 			wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
 		}
 		else if (whichLocation == LICENCE) {
+			wclear(windowList[HELP]);
 			if (arginfo->licenceText != NULL)
 			{
-				wclear(windowList[HELP]);
 				printFileToWindow(windowList[HELP], arginfo->licenceText);
 			}
 			else if (arginfo->licenceName != NULL) {
