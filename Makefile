@@ -21,6 +21,8 @@ CFLAGS += -Wimport -Wunused-macros
 
 CFLAGS += -lmenuw -lncursesw
 
+all: $(NAME)
+
 nameclean: .NOTMAIN .USE .EXEC .IGNORE .PHONY
 	rm -f ./$(NAME)
 coreclean: .NOTMAIN .USE .EXEC .IGNORE .PHONY
@@ -36,8 +38,6 @@ clean: .NOTMAIN .PHONY .IGNORE nameclean coreclean objclean
 $(NAME):
 
 $(NAME).c: $(NAME).h
-
-all: $(NAME)
 
 rebuild: .NOTMAIN .PHONY clean $(NAME)
 
