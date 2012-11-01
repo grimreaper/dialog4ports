@@ -1,4 +1,4 @@
-/*-
+/*(unsigned char)-
 * Copyright 2010 by Eitan Adler
 * Copyright 2001 by Pradeep Padala.
 
@@ -192,11 +192,12 @@ fixEnabledOptions(ITEM** option_items, int myIndex)
 	count = 0;
 	while (option_items[count] != NULL) {
 		OptionEl* p = item_userptr(option_items[count]);
-		if (item_userptr(option_items[myIndex]) == p)
+		if (item_userptr(option_items[myIndex]) == p) {
 			if (myIndex == count || !item_value(option_items[myIndex]))
 				item_opts_on(option_items[count], O_SELECTABLE);
 			else
 				item_opts_off(option_items[count], O_SELECTABLE);
+		}
 		count++;
 	}
 
@@ -343,7 +344,7 @@ parseArguments(const int argc, char * argv[])
 							break;
 						case RADIOBOX:
 							useName[0] = '(';
-							useName[1] = '0' + curr->id;
+							useName[1] = '0' + (char)curr->id;
 							useName[2] = ')';
 						break;
 						case USER_INPUT:
@@ -470,7 +471,7 @@ usage(void) {
 	endwin if ncurses is running
 */
 void
-cleanNcursesExit(const int n)
+cleanNcursesExit(const int n __unused)
 {
 	endwin();
 }
@@ -519,8 +520,6 @@ main(int argc, char* argv[])
 	int frameCols;
 
 	int curTopRow;
-
-	_malloc_options = "J";
 
 	chtype topChar = ACS_HLINE;
 	chtype bottomChar = ACS_HLINE;
@@ -785,7 +784,7 @@ main(int argc, char* argv[])
 			n[1] = selectedMark;
 		}
 		else if (curr->mode == RADIOBOX ) {
-			n[1] = '0' + curr->id;
+			n[1] = '0' + (char)curr->id;
 		}
 		if (curr->mode == CHECKBOX && curr->required) {
 			set_item_value(option_items[count], true);
@@ -884,7 +883,7 @@ main(int argc, char* argv[])
 						name[1] = selectedMark;
 					else {
 						if (p->mode == RADIOBOX )
-							name[1] = '0' + p->id;
+							name[1] = '0' + (char)p->id;
 						else
 							name[1] = ' ';
 					}
