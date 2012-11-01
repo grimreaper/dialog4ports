@@ -9,7 +9,7 @@ CFLAGS += -Wmissing-declarations -Wnested-externs
 CFLAGS += -Wall -Wextra -pedantic
 CFLAGS += -Wformat=2 -Wstrict-aliasing=2 -Wstrict-overflow=4
 CFLAGS += -Wunused -Wunused-parameter -Wswitch-enum 
-CFLAGS += -Winit-self -Wmissing-include-dirs -Wpointer-arith -Wconversion
+CFLAGS += -Winit-self -Wmissing-include-dirs -Wpointer-arith #-Wconversion
 CFLAGS += -Wfloat-equal -Wundef -Wshadow -Wcast-qual -Wcast-align -Wwrite-strings
 CFLAGS += -funswitch-loops  #-fprefetch-loop-arrays #-funroll-loops 
 CFLAGS += -Winline -Wmissing-noreturn -Wpacked -Wredundant-decls
