@@ -11,7 +11,6 @@ CFLAGS += -Wformat=2 -Wstrict-aliasing=2 -Wstrict-overflow=4
 CFLAGS += -Wunused -Wunused-parameter -Wswitch-enum 
 CFLAGS += -Winit-self -Wmissing-include-dirs -Wpointer-arith #-Wconversion
 CFLAGS += -Wfloat-equal -Wundef -Wshadow -Wcast-qual -Wcast-align -Wwrite-strings
-CFLAGS += -funswitch-loops  #-fprefetch-loop-arrays #-funroll-loops 
 CFLAGS += -Winline -Wmissing-noreturn -Wpacked -Wredundant-decls
 CFLAGS += -Wno-write-strings -Waggregate-return -Winvalid-pch -Wlong-long
 CFLAGS += -Wvariadic-macros -Wvolatile-register-var
