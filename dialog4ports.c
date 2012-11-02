@@ -803,7 +803,7 @@ main(int argc, char* argv[])
 	pos_menu_cursor(menuList[whichLocation]);
 	for (int i = 0; i < nWindows; ++i) {
 		if (windowList[i] != NULL)
-			wrefresh(windowList[i]);
+			wnoutrefresh(windowList[i]); //wrefresh
 	}
 	doupdate();
 
@@ -934,7 +934,7 @@ main(int argc, char* argv[])
 		/* don't wclear help unless we need to; this results in some cases of stale text
 		in the help window */
 		if (whichLocation == PRIMARY ) {
-			wclear(windowList[HELP]);
+			werase(windowList[HELP]);
 			OptionEl *p = (OptionEl*)item_userptr(current_item(menuList[whichLocation]));
 			if (p->longDescrFile != NULL) {
 				printFileToWindow(windowList[HELP], p->longDescrFile);
@@ -951,7 +951,7 @@ main(int argc, char* argv[])
 			wborder(windowList[PRIMARY], ACS_VLINE, ACS_VLINE, topChar, bottomChar, 0, 0, 0, 0);
 		}
 		else if (whichLocation == LICENCE) {
-			wclear(windowList[HELP]);
+			werase(windowList[HELP]);
 			if (arginfo->licenceText != NULL)
 			{
 				printFileToWindow(windowList[HELP], arginfo->licenceText);
