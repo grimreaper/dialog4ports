@@ -770,7 +770,7 @@ main(int argc, char* argv[])
 	for(count = 0; count < arginfo->nElements; ++count) {
 		curr = (OptionEl*)item_userptr(option_items[count]);
 		curr->value = getenv(curr->name + strlen(preNameToken));
-		char * n;;
+		char * n;
 		if (curr->mode == RADIOBOX) {
 			/* I highly doubt this is defined or legal behavior */
 			n = (char*)item_name(option_items[count]);
